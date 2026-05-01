@@ -35,8 +35,8 @@ class MovieGrid extends StatelessWidget {
           sliver: SliverGrid.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: columns,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
               childAspectRatio: aspectRatio,
             ),
             itemCount: movies.length,

@@ -13,23 +13,27 @@ class AppBreakpoints {
   /// Max content width for narrow forms on wide screens.
   static const double maxContentWidth = 480;
 
-  /// Horizontal padding — tighter on phones, generous on tablets.
+  /// Horizontal padding — tighter on phones, modest on tablets.
   static double horizontalPadding(double width) {
-    if (isTablet(width)) return width * 0.08;
+    if (isTablet(width)) return width * 0.04;
     return 16;
   }
 
   /// Number of poster grid columns for the current width.
+  ///
+  /// Tablet column count scales with width, targeting ~180pt per card
+  /// so landscape orientations (and larger iPads) pack in more posters
+  /// rather than stretching a fixed 4 across the screen.
   static int posterGridColumns(double width) {
-    if (isTablet(width)) return 4;
-    return 3;
+    if (!isTablet(width)) return 3;
+    return (width / 180).floor().clamp(4, 7);
   }
 
   /// Card aspect ratio (width / height) tuned to leave room for the
   /// 2:3 poster plus title + year text below.
   static double posterCardAspectRatio(double width) {
-    if (isTablet(width)) return 0.55;
-    return 0.5;
+    if (isTablet(width)) return 0.52;
+    return 0.48;
   }
 }
 

@@ -42,10 +42,20 @@ class MovieListSkeleton extends StatelessWidget {
               Container(
                 height: 12,
                 width: double.infinity,
-                color: colors.shimmerBase,
+                decoration: BoxDecoration(
+                  color: colors.shimmerBase,
+                  borderRadius: BorderRadius.circular(6),
+                ),
               ),
               const SizedBox(height: 6),
-              Container(height: 10, width: 60, color: colors.shimmerBase),
+              Container(
+                height: 10,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: colors.shimmerBase,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
             ],
           );
         },
