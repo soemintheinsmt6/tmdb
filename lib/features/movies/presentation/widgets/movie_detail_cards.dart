@@ -213,7 +213,7 @@ class DetailCastList extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             itemCount: cast.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, __) => const SizedBox(width: 6),
             itemBuilder: (_, index) {
               final c = cast[index];
               return SizedBox(width: 100, child: _CastTile(member: c));
@@ -235,7 +235,7 @@ class _CastTile extends StatelessWidget {
     final url = member.profileUrl();
     final colors = context.colors;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(50),
@@ -259,6 +259,7 @@ class _CastTile extends StatelessWidget {
           member.name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
           style: AppTypography.smallText.copyWith(
             color: colors.textPrimary,
             fontWeight: FontWeight.w600,
@@ -266,8 +267,9 @@ class _CastTile extends StatelessWidget {
         ),
         Text(
           member.character,
-          maxLines: 2,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
           style: AppTypography.labelSmall,
         ),
       ],
