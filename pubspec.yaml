@@ -17,6 +17,7 @@ dependencies:
   http: ^1.2.0
   dartz: ^0.10.1
   equatable: ^2.0.7
+  path_provider: ^2.1.5
 
   # State management & DI
   flutter_bloc: ^9.1.0

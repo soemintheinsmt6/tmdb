@@ -5,7 +5,7 @@ import 'package:tmdb/core/theme/app_colors.dart';
 
 /// Grid skeleton used while a movie list is loading.
 class MovieListSkeleton extends StatelessWidget {
-  const MovieListSkeleton({super.key, this.itemCount = 8});
+  const MovieListSkeleton({super.key, this.itemCount = 12});
 
   final int itemCount;
 

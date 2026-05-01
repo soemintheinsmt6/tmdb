@@ -98,7 +98,7 @@ class DetailSummary extends StatelessWidget {
                     label: detail.releaseYear ?? '—',
                   ),
                   _MetaChip(
-                    icon: IconsaxPlusLinear.clock,
+                    icon: IconsaxPlusLinear.clock_1,
                     label: detail.formattedRuntime,
                   ),
                 ],
@@ -187,9 +187,14 @@ class DetailOverview extends StatelessWidget {
 }
 
 class DetailCastList extends StatelessWidget {
-  const DetailCastList({super.key, required this.cast});
+  const DetailCastList({
+    super.key,
+    required this.cast,
+    this.horizontalPadding = 16,
+  });
 
   final List<CastMember> cast;
+  final double horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -197,12 +202,16 @@ class DetailCastList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Top Billed Cast', style: AppTypography.subTitle),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Text('Top Cast', style: AppTypography.subTitle),
+        ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 180,
+          height: 150,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             itemCount: cast.length,
             separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemBuilder: (_, index) {
@@ -267,9 +276,14 @@ class _CastTile extends StatelessWidget {
 }
 
 class DetailRecommendations extends StatelessWidget {
-  const DetailRecommendations({super.key, required this.movies});
+  const DetailRecommendations({
+    super.key,
+    required this.movies,
+    this.horizontalPadding = 16,
+  });
 
   final List<Movie> movies;
+  final double horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -277,14 +291,18 @@ class DetailRecommendations extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('More Like This', style: AppTypography.subTitle),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Text('Similar Movies', style: AppTypography.subTitle),
+        ),
         const SizedBox(height: 12),
         SizedBox(
           height: 230,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             itemCount: movies.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (ctx, index) {
               final m = movies[index];
               return SizedBox(
