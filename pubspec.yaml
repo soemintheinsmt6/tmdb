@@ -19,6 +19,10 @@ dependencies:
   equatable: ^2.0.7
   path_provider: ^2.1.5
 
+  # Local persistence
+  objectbox: ^4.0.3
+  objectbox_flutter_libs: ^4.0.3
+
   # State management & DI
   flutter_bloc: ^9.1.0
   get_it: ^8.0.3
@@ -36,6 +40,10 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   bloc_test: ^10.0.0
   mocktail: ^1.0.4
+
+  # ObjectBox code generation
+  build_runner: ^2.4.13
+  objectbox_generator: ^4.0.3
 
 flutter:
   uses-material-design: true

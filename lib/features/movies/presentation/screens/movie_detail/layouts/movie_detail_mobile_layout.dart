@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
+import 'package:tmdb/features/favourites/presentation/widgets/favourite_toggle_button.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_bloc.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_event.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_state.dart';
@@ -58,6 +59,19 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
           fontWeight: FontWeight.w600,
         ),
         title: Text(_isScrolled ? (widget.fallbackTitle ?? '') : ''),
+        actions: [
+          BlocBuilder<MovieDetailBloc, MovieDetailState>(
+            builder: (context, state) {
+              if (state is MovieDetailLoaded) {
+                return FavouriteToggleButton(
+                  movie: state.detail.toMovie(),
+                  color: foreground,
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
       body: BlocBuilder<MovieDetailBloc, MovieDetailState>(
         builder: (context, state) {

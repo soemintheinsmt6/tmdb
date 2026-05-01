@@ -76,6 +76,18 @@ class MovieDetail extends Equatable {
   String get formattedRuntime => runtime.runtime;
   String get formattedRating => voteCount == 0 ? 'NR' : voteAverage.rating;
 
+  Movie toMovie() => Movie(
+        id: id,
+        title: title,
+        overview: overview,
+        posterPath: posterPath,
+        backdropPath: backdropPath,
+        releaseDate: releaseDate,
+        voteAverage: voteAverage,
+        voteCount: voteCount,
+        genreIds: genres.map((g) => g.id).toList(),
+      );
+
   @override
   List<Object?> get props => [
     id,
