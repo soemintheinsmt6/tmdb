@@ -54,6 +54,8 @@ class FavouritesRepository {
     if (existing != null) _box.remove(existing.id);
   }
 
+  void removeAll() => _box.removeAll();
+
   FavouriteMovie? _findByMovieId(int movieId) {
     final query = _box.query(FavouriteMovie_.movieId.equals(movieId)).build();
     try {

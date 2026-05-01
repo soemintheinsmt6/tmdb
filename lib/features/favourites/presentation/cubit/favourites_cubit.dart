@@ -20,6 +20,8 @@ class FavouritesCubit extends Cubit<List<FavouriteMovie>> {
 
   void remove(int movieId) => _repository.removeByMovieId(movieId);
 
+  void clear() => _repository.removeAll();
+
   @override
   Future<void> close() async {
     await _subscription.cancel();
