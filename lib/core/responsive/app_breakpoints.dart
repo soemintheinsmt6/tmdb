@@ -22,7 +22,14 @@ class AppBreakpoints {
   /// Number of poster grid columns for the current width.
   static int posterGridColumns(double width) {
     if (isTablet(width)) return 4;
-    return 2;
+    return 3;
+  }
+
+  /// Card aspect ratio (width / height) tuned to leave room for the
+  /// 2:3 poster plus title + year text below.
+  static double posterCardAspectRatio(double width) {
+    if (isTablet(width)) return 0.55;
+    return 0.5;
   }
 }
 
@@ -35,4 +42,6 @@ extension ResponsiveContext on BuildContext {
 
   double get horizontalPadding => AppBreakpoints.horizontalPadding(screenWidth);
   int get posterGridColumns => AppBreakpoints.posterGridColumns(screenWidth);
+  double get posterCardAspectRatio =>
+      AppBreakpoints.posterCardAspectRatio(screenWidth);
 }

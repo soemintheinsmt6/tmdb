@@ -14,7 +14,7 @@ A movie browser built on top of [The Movie Database (TMDB) API](https://develope
 
 ## Architecture
 
-Clean Architecture + feature-first:
+Clean Architecture + Feature-first
 
 ```
 lib/

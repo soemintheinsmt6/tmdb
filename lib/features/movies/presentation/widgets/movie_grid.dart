@@ -25,6 +25,7 @@ class MovieGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final columns = context.posterGridColumns;
+    final aspectRatio = context.posterCardAspectRatio;
 
     final grid = CustomScrollView(
       controller: scrollController,
@@ -36,7 +37,7 @@ class MovieGrid extends StatelessWidget {
               crossAxisCount: columns,
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
-              childAspectRatio: 0.55,
+              childAspectRatio: aspectRatio,
             ),
             itemCount: movies.length,
             itemBuilder: (_, index) {

@@ -7,40 +7,28 @@ import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/error/exceptions.dart';
 
 /// A thin wrapper around [http.Client] that handles common headers,
-/// base URL prefixing, TMDB auth, and error mapping.
-///
-/// Auth strategy:
-/// - If `TMDB_BEARER_TOKEN` is set (v4 read access token), uses it as a
-///   `Bearer` Authorization header on every request.
-/// - Otherwise falls back to `TMDB_API_KEY` (v3) appended as `?api_key=`.
+/// base URL prefixing, TMDB v3 `api_key` auth, and error mapping.
 class ApiClient {
   ApiClient({http.Client? client}) : _client = client ?? http.Client();
 
   final http.Client _client;
 
-  bool get _hasBearer => ApiConstants.bearerToken.isNotEmpty;
-  bool get _hasApiKey => ApiConstants.apiKey.isNotEmpty;
-
   Map<String, String> _buildHeaders() {
-    final headers = <String, String>{
+    return const {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-    if (_hasBearer) {
-      headers['Authorization'] = 'Bearer ${ApiConstants.bearerToken}';
-    }
-    return headers;
   }
 
   /// Builds a [Uri] with the base URL, the relative [endpoint], optional
-  /// [query] params, and the v3 `api_key` fallback when no Bearer is set.
+  /// [query] params, and the v3 `api_key` query parameter.
   Uri _buildUri(String endpoint, {Map<String, String>? query}) {
-    final params = <String, String>{...?query};
-    if (!_hasBearer && _hasApiKey) {
-      params['api_key'] = ApiConstants.apiKey;
-    }
+    final params = <String, String>{
+      ...?query,
+      'api_key': ApiConstants.apiKey,
+    };
     final base = Uri.parse('${ApiConstants.baseUrl}$endpoint');
-    return params.isEmpty ? base : base.replace(queryParameters: {
+    return base.replace(queryParameters: {
       ...base.queryParameters,
       ...params,
     });
