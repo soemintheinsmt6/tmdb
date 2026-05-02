@@ -3,11 +3,12 @@ import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/int_runtime.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
-import 'package:tmdb/features/movies/data/models/cast_member.dart';
-import 'package:tmdb/features/movies/data/models/genre.dart';
-import 'package:tmdb/features/movies/data/models/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/cast_member.dart';
+import 'package:tmdb/features/movies/domain/entities/genre.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
 
-/// Full movie detail response from `/movie/{id}`.
+/// Full movie detail entity — combines `/movie/{id}` with credits and
+/// recommendations into a single domain object.
 class MovieDetail extends Equatable {
   const MovieDetail({
     required this.id,
@@ -26,6 +27,9 @@ class MovieDetail extends Equatable {
     required this.recommendations,
   });
 
+  /// Parses the `/movie/{id}` payload. Cast and recommendations come from
+  /// separate endpoints, so the repository injects them after the parallel
+  /// fetch.
   factory MovieDetail.fromJson(
     Map<String, dynamic> json, {
     List<CastMember> cast = const [],
@@ -48,6 +52,28 @@ class MovieDetail extends Equatable {
       status: json['status'] as String? ?? '',
       cast: cast,
       recommendations: recommendations,
+    );
+  }
+
+  MovieDetail copyWith({
+    List<CastMember>? cast,
+    List<Movie>? recommendations,
+  }) {
+    return MovieDetail(
+      id: id,
+      title: title,
+      tagline: tagline,
+      overview: overview,
+      posterPath: posterPath,
+      backdropPath: backdropPath,
+      releaseDate: releaseDate,
+      voteAverage: voteAverage,
+      voteCount: voteCount,
+      runtime: runtime,
+      genres: genres,
+      status: status,
+      cast: cast ?? this.cast,
+      recommendations: recommendations ?? this.recommendations,
     );
   }
 
@@ -77,16 +103,16 @@ class MovieDetail extends Equatable {
   String get formattedRating => voteCount == 0 ? 'NR' : voteAverage.rating;
 
   Movie toMovie() => Movie(
-        id: id,
-        title: title,
-        overview: overview,
-        posterPath: posterPath,
-        backdropPath: backdropPath,
-        releaseDate: releaseDate,
-        voteAverage: voteAverage,
-        voteCount: voteCount,
-        genreIds: genres.map((g) => g.id).toList(),
-      );
+    id: id,
+    title: title,
+    overview: overview,
+    posterPath: posterPath,
+    backdropPath: backdropPath,
+    releaseDate: releaseDate,
+    voteAverage: voteAverage,
+    voteCount: voteCount,
+    genreIds: genres.map((g) => g.id).toList(),
+  );
 
   @override
   List<Object?> get props => [

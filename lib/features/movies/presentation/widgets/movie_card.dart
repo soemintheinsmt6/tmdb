@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/features/movies/data/models/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
 
 import 'movie_poster.dart';
 import 'rating_badge.dart';

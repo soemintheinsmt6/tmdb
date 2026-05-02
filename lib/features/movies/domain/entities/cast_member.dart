@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:tmdb/core/constants/api_constants.dart';
 
-/// Cast row from `/movie/{id}/credits`.
 class CastMember extends Equatable {
   const CastMember({
     required this.id,

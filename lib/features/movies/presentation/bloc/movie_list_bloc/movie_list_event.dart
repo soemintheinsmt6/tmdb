@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:tmdb/features/movies/data/repositories/movie_repository.dart';
+import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 
 abstract class MovieListEvent extends Equatable {
   const MovieListEvent();

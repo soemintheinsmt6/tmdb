@@ -1,5 +1,5 @@
 import 'package:objectbox/objectbox.dart';
-import 'package:tmdb/features/movies/data/models/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
 
 @Entity()
 class FavouriteMovie {

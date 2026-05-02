@@ -1,6 +1,6 @@
 import 'package:tmdb/core/storage/object_box.dart';
 import 'package:tmdb/features/favourites/data/models/favourite_movie.dart';
-import 'package:tmdb/features/movies/data/models/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/objectbox.g.dart';
 
 /// CRUD + reactive queries for the user's favourited movies.

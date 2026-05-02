@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
-import 'package:tmdb/features/movies/data/models/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/movies/presentation/widgets/movie_card.dart';
 
 /// Grid of [MovieCard]s with an optional trailing footer (load-more spinner).

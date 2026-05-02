@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:tmdb/features/favourites/data/models/favourite_movie.dart';
 import 'package:tmdb/features/favourites/data/repositories/favourites_repository.dart';
-import 'package:tmdb/features/movies/data/models/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
 
 class FavouritesCubit extends Cubit<List<FavouriteMovie>> {
   FavouritesCubit(this._repository) : super(_repository.getAll()) {

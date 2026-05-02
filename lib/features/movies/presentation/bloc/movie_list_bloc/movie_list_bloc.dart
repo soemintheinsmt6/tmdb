@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tmdb/features/movies/data/repositories/movie_repository.dart';
+import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 
 import 'movie_list_event.dart';
 import 'movie_list_state.dart';
@@ -24,7 +24,10 @@ class MovieListBloc extends Bloc<MovieListEvent, MovieListState> {
     Emitter<MovieListState> emit,
   ) async {
     emit(MovieListLoading(category: event.category));
-    final result = await _repository.getMovies(category: event.category, page: 1);
+    final result = await _repository.getMovies(
+      category: event.category,
+      page: 1,
+    );
     result.fold(
       (failure) => emit(
         MovieListError(category: event.category, message: failure.message),

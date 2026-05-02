@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
-import 'package:tmdb/features/movies/data/repositories/movie_repository.dart';
+import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 
 const Map<MovieCategory, String> kCategoryLabels = {
   MovieCategory.popular: 'Popular',

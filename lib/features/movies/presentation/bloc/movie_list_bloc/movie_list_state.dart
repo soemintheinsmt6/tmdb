@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:tmdb/features/movies/data/models/movie.dart';
-import 'package:tmdb/features/movies/data/repositories/movie_repository.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
+import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 
 abstract class MovieListState extends Equatable {
   const MovieListState({required this.category});

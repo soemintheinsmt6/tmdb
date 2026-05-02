@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tmdb/features/movies/data/repositories/movie_repository.dart';
+import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 
 import 'movie_detail_event.dart';
 import 'movie_detail_state.dart';

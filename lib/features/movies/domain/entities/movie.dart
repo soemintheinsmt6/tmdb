@@ -3,7 +3,6 @@ import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
 
-/// A movie list row as returned by TMDB endpoints like `/movie/popular`.
 class Movie extends Equatable {
   const Movie({
     required this.id,
@@ -24,7 +23,8 @@ class Movie extends Equatable {
       overview: json['overview'] as String? ?? '',
       posterPath: json['poster_path'] as String?,
       backdropPath: json['backdrop_path'] as String?,
-      releaseDate: (json['release_date'] ?? json['first_air_date']) as String? ?? '',
+      releaseDate:
+          (json['release_date'] ?? json['first_air_date']) as String? ?? '',
       voteAverage: ((json['vote_average'] as num?) ?? 0).toDouble(),
       voteCount: (json['vote_count'] as int?) ?? 0,
       genreIds: ((json['genre_ids'] as List?) ?? const [])

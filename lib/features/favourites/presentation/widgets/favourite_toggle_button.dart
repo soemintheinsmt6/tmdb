@@ -5,7 +5,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/features/favourites/data/models/favourite_movie.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
-import 'package:tmdb/features/movies/data/models/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
 
 /// Heart icon that toggles whether [movie] is stored as a favourite.
 class FavouriteToggleButton extends StatelessWidget {
