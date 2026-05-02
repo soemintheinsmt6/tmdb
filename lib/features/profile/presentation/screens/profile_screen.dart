@@ -4,8 +4,8 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/features/favourites/data/models/favourite_movie.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
+import 'package:tmdb/features/favourites/presentation/cubit/favourites_state.dart';
 import 'package:tmdb/features/profile/presentation/widgets/profile_header.dart';
 import 'package:tmdb/features/profile/presentation/widgets/settings_tile.dart';
 
@@ -19,9 +19,9 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
-          BlocBuilder<FavouritesCubit, List<FavouriteMovie>>(
-            builder: (context, favourites) {
-              final count = favourites.length;
+          BlocSelector<FavouritesCubit, FavouritesState, int>(
+            selector: (state) => state.movies.length,
+            builder: (context, count) {
               return ProfileHeader(
                 name: 'Movie Fan',
                 subtitle: count == 1 ? '1 favourite' : '$count favourites',
@@ -59,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
 
   Future<void> _confirmClearFavourites(BuildContext context) async {
     final cubit = context.read<FavouritesCubit>();
-    if (cubit.state.isEmpty) {
+    if (cubit.state.movies.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No favourites to clear')),
       );

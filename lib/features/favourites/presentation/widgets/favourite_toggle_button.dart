@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:tmdb/core/theme/app_colors.dart';
-import 'package:tmdb/features/favourites/data/models/favourite_movie.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
+import 'package:tmdb/features/favourites/presentation/cubit/favourites_state.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 
 /// Heart icon that toggles whether [movie] is stored as a favourite.
@@ -20,9 +20,9 @@ class FavouriteToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FavouritesCubit, List<FavouriteMovie>>(
-      builder: (context, favourites) {
-        final isFav = favourites.any((f) => f.movieId == movie.id);
+    return BlocSelector<FavouritesCubit, FavouritesState, bool>(
+      selector: (state) => state.contains(movie.id),
+      builder: (context, isFav) {
         final tint = isFav ? AppColors.cyan : (color ?? Colors.white);
         return IconButton(
           tooltip: isFav ? 'Remove from favourites' : 'Add to favourites',

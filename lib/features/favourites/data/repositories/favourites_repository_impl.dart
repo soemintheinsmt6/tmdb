@@ -1,60 +1,54 @@
 import 'package:tmdb/core/storage/object_box.dart';
 import 'package:tmdb/features/favourites/data/models/favourite_movie.dart';
+import 'package:tmdb/features/favourites/domain/repositories/favourites_repository.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/objectbox.g.dart';
 
-/// CRUD + reactive queries for the user's favourited movies.
-class FavouritesRepository {
-  FavouritesRepository(ObjectBox objectBox) : _box = objectBox.favouriteBox;
+class FavouritesRepositoryImpl implements FavouritesRepository {
+  FavouritesRepositoryImpl(ObjectBox objectBox) : _box = objectBox.favouriteBox;
 
   final Box<FavouriteMovie> _box;
 
-  Stream<List<FavouriteMovie>> watchAll() {
+  @override
+  Stream<List<Movie>> watchAll() {
     final query = _box
         .query()
         .order(FavouriteMovie_.savedAt, flags: Order.descending)
         .watch(triggerImmediately: true);
-    return query.map((q) => q.find());
+    return query.map((q) => q.find().map((f) => f.toMovie()).toList());
   }
 
-  List<FavouriteMovie> getAll() {
+  @override
+  List<Movie> getAll() {
     final query = _box
         .query()
         .order(FavouriteMovie_.savedAt, flags: Order.descending)
         .build();
     try {
-      return query.find();
+      return query.find().map((f) => f.toMovie()).toList();
     } finally {
       query.close();
     }
   }
 
-  bool isFavourite(int movieId) {
-    final query = _box.query(FavouriteMovie_.movieId.equals(movieId)).build();
-    try {
-      return query.count() > 0;
-    } finally {
-      query.close();
-    }
-  }
-
-  /// Adds when missing, removes when present. Returns the resulting state.
-  bool toggle(Movie movie) {
+  @override
+  void toggle(Movie movie) {
     final existing = _findByMovieId(movie.id);
     if (existing != null) {
       _box.remove(existing.id);
-      return false;
+      return;
     }
     _box.put(FavouriteMovie.fromMovie(movie));
-    return true;
   }
 
-  void removeByMovieId(int movieId) {
+  @override
+  void remove(int movieId) {
     final existing = _findByMovieId(movieId);
     if (existing != null) _box.remove(existing.id);
   }
 
-  void removeAll() => _box.removeAll();
+  @override
+  void clear() => _box.removeAll();
 
   FavouriteMovie? _findByMovieId(int movieId) {
     final query = _box.query(FavouriteMovie_.movieId.equals(movieId)).build();

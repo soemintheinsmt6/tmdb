@@ -2,7 +2,8 @@ import 'package:get_it/get_it.dart';
 
 import 'package:tmdb/core/network/api_client.dart';
 import 'package:tmdb/core/storage/object_box.dart';
-import 'package:tmdb/features/favourites/data/repositories/favourites_repository.dart';
+import 'package:tmdb/features/favourites/data/repositories/favourites_repository_impl.dart';
+import 'package:tmdb/features/favourites/domain/repositories/favourites_repository.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
 import 'package:tmdb/features/movies/data/datasources/movie_remote_data_source.dart';
 import 'package:tmdb/features/movies/data/repositories/movie_repository_impl.dart';
@@ -31,7 +32,7 @@ Future<void> init() async {
 
   // ── Favourites feature ─────────────────────────────────
   sl.registerLazySingleton<FavouritesRepository>(
-    () => FavouritesRepository(sl<ObjectBox>()),
+    () => FavouritesRepositoryImpl(sl<ObjectBox>()),
   );
   sl.registerLazySingleton<FavouritesCubit>(() => FavouritesCubit(sl()));
 }
