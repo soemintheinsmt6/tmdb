@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/core/utils/navigation.dart';
@@ -12,26 +13,37 @@ import 'package:tmdb/features/movies/presentation/widgets/movie_poster.dart';
 import 'package:tmdb/features/movies/presentation/widgets/rating_badge.dart';
 
 class DetailHeader extends StatelessWidget {
-  const DetailHeader({super.key, required this.detail});
+  const DetailHeader({
+    super.key,
+    required this.backdropPath,
+    this.heroTag,
+  });
 
-  final MovieDetail detail;
+  final String? backdropPath;
+  final Object? heroTag;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final url = ApiConstants.backdropUrl(backdropPath, size: 'original');
+    Widget image = url.isEmpty
+        ? Container(color: colors.surface)
+        : CachedNetworkImage(
+            imageUrl: url,
+            fit: BoxFit.cover,
+            placeholder: (_, __) => Container(color: colors.surface),
+            errorWidget: (_, __, ___) => Container(color: colors.surface),
+          );
+    if (heroTag != null) {
+      image = Hero(
+        tag: heroTag!,
+        flightShuttleBuilder: _backdropFlightShuttle,
+        child: image,
+      );
+    }
     return Stack(
       children: [
-        AspectRatio(
-          aspectRatio: 16 / 9,
-          child: detail.backdropUrl().isEmpty
-              ? Container(color: colors.surface)
-              : CachedNetworkImage(
-                  imageUrl: detail.backdropUrl(),
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(color: colors.surface),
-                  errorWidget: (_, __, ___) => Container(color: colors.surface),
-                ),
-        ),
+        AspectRatio(aspectRatio: 16 / 9, child: image),
         Positioned.fill(
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -51,6 +63,28 @@ class DetailHeader extends StatelessWidget {
       ],
     );
   }
+}
+
+Widget _backdropFlightShuttle(
+  BuildContext flightContext,
+  Animation<double> animation,
+  HeroFlightDirection direction,
+  BuildContext fromContext,
+  BuildContext toContext,
+) {
+  final pop = direction == HeroFlightDirection.pop;
+  final tween = BorderRadiusTween(
+    begin: pop ? BorderRadius.zero : BorderRadius.circular(16),
+    end: pop ? BorderRadius.circular(16) : BorderRadius.zero,
+  );
+  final hero = (pop ? fromContext : toContext).widget as Hero;
+  return AnimatedBuilder(
+    animation: animation,
+    builder: (_, __) => ClipRRect(
+      borderRadius: tween.evaluate(animation) ?? BorderRadius.zero,
+      child: hero.child,
+    ),
+  );
 }
 
 class DetailSummary extends StatelessWidget {
@@ -234,6 +268,11 @@ class _CastTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final url = member.profileUrl();
     final colors = context.colors;
+    Widget fallback() => Container(
+      color: colors.surfaceMuted,
+      alignment: Alignment.center,
+      child: Icon(IconsaxPlusLinear.user, color: colors.textMuted),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -243,15 +282,13 @@ class _CastTile extends StatelessWidget {
             width: 80,
             height: 80,
             child: url.isEmpty
-                ? Container(
-                    color: colors.surfaceMuted,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      IconsaxPlusLinear.user,
-                      color: colors.textMuted,
-                    ),
-                  )
-                : CachedNetworkImage(imageUrl: url, fit: BoxFit.cover),
+                ? fallback()
+                : CachedNetworkImage(
+                    imageUrl: url,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => fallback(),
+                    errorWidget: (_, __, ___) => fallback(),
+                  ),
           ),
         ),
         const SizedBox(height: 8),

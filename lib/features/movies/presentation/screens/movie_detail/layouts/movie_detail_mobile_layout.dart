@@ -9,9 +9,18 @@ import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dar
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 
 class MovieDetailMobileLayout extends StatefulWidget {
-  const MovieDetailMobileLayout({super.key, this.fallbackTitle});
+  const MovieDetailMobileLayout({
+    super.key,
+    required this.movieId,
+    this.fallbackTitle,
+    this.seedBackdropPath,
+    this.heroTag,
+  });
 
+  final int movieId;
   final String? fallbackTitle;
+  final String? seedBackdropPath;
+  final Object? heroTag;
 
   @override
   State<MovieDetailMobileLayout> createState() =>
@@ -21,6 +30,7 @@ class MovieDetailMobileLayout extends StatefulWidget {
 class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
   final _scrollController = ScrollController();
   bool _isScrolled = false;
+  bool _suppressHero = false;
 
   @override
   void initState() {
@@ -40,17 +50,30 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
     if (scrolled != _isScrolled) setState(() => _isScrolled = scrolled);
   }
 
+  void _onPopInvoked(bool didPop, Object? result) {
+    if (didPop || widget.heroTag == null) return;
+    setState(() => _suppressHero = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.of(context).pop(result);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final foreground = _isScrolled ? colors.textPrimary : Colors.white;
-    return Scaffold(
+    final heroTag = _suppressHero ? null : widget.heroTag;
+    return PopScope(
+      canPop: widget.heroTag == null,
+      onPopInvokedWithResult: _onPopInvoked,
+      child: Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor:
             _isScrolled ? colors.background : Colors.transparent,
         elevation: 0,
-        // scrolledUnderElevation: 0,
+        scrolledUnderElevation: 0,
         titleSpacing: 0,
         iconTheme: IconThemeData(color: foreground),
         titleTextStyle: TextStyle(
@@ -75,28 +98,17 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
       ),
       body: BlocBuilder<MovieDetailBloc, MovieDetailState>(
         builder: (context, state) {
-          if (state is MovieDetailLoading || state is MovieDetailInitial) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is MovieDetailError) {
-            return AppErrorView(
-              message: state.message,
-              onRetry: () {
-                final bloc = context.read<MovieDetailBloc>();
-                final id = (bloc.state is MovieDetailLoaded)
-                    ? (bloc.state as MovieDetailLoaded).detail.id
-                    : null;
-                if (id != null) bloc.add(MovieDetailFetched(id));
-              },
-            );
-          }
-          if (state is MovieDetailLoaded) {
-            final detail = state.detail;
-            return ListView(
-              controller: _scrollController,
-              padding: EdgeInsets.zero,
-              children: [
-                DetailHeader(detail: detail),
+          final loaded = state is MovieDetailLoaded ? state.detail : null;
+          final backdropPath = loaded?.backdropPath ?? widget.seedBackdropPath;
+          return ListView(
+            controller: _scrollController,
+            padding: EdgeInsets.zero,
+            children: [
+              DetailHeader(
+                backdropPath: backdropPath,
+                heroTag: heroTag,
+              ),
+              if (loaded != null) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                   child: Column(
@@ -104,22 +116,36 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                     children: [
                       Transform.translate(
                         offset: const Offset(0, -40),
-                        child: DetailSummary(detail: detail),
+                        child: DetailSummary(detail: loaded),
                       ),
-                      DetailOverview(overview: detail.overview),
+                      DetailOverview(overview: loaded.overview),
                     ],
                   ),
                 ),
                 const SizedBox(height: 24),
-                DetailCastList(cast: detail.cast),
+                DetailCastList(cast: loaded.cast),
                 const SizedBox(height: 12),
-                DetailRecommendations(movies: detail.recommendations),
+                DetailRecommendations(movies: loaded.recommendations),
                 const SizedBox(height: 24),
-              ],
-            );
-          }
-          return const SizedBox.shrink();
+              ] else if (state is MovieDetailError) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 48),
+                  child: AppErrorView(
+                    message: state.message,
+                    onRetry: () => context
+                        .read<MovieDetailBloc>()
+                        .add(MovieDetailFetched(widget.movieId)),
+                  ),
+                ),
+              ] else
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 48),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          );
         },
+      ),
       ),
     );
   }

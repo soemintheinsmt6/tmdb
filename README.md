@@ -141,8 +141,9 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Browse** Popular, Now Playing, Top Rated, Upcoming with a horizontal tab switcher.
 - **Search** with 400 ms debounce; falls back to category browse when cleared.
 - **Infinite scroll** + pull-to-refresh on the category grid.
-- **Movie detail** with backdrop hero, runtime / year / genres chips, top-billed cast (capped at 20), and "More Like This" recommendations.
+- **Movie detail** with full-bleed backdrop header, runtime / year / genres chips, top-billed cast (capped at 20), and "More Like This" recommendations. Header renders immediately from a seed backdrop path passed via the route, so navigation lands on the image instead of a spinner.
 - **Favourites** persisted locally via ObjectBox; reactive — toggling on the detail screen updates the home grid heart and the Favourites tab in real time.
+- **Shared-element transition** — tapping a favourites card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
 - **Profile tab** showing favourites count plus a destructive "Clear favourites" flow with confirm dialog.
 - **Responsive grid** — 3 columns on mobile, scaling 4–7 on tablet (clamped on `width / 180`); aspect ratio shifts slightly between tiers.
 - **Light & dark mode** — `MaterialApp` is wired with `themeMode: ThemeMode.system`. Theme-dependent surfaces/text live on `AppColors` instances (`AppColors.light` / `AppColors.dark`) and resolve at the call site via `context.colors`; brand and semantic colors stay as static constants.

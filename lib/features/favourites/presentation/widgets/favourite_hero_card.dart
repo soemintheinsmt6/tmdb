@@ -20,11 +20,14 @@ class FavouriteHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasBackdrop =
+        movie.backdropPath != null && movie.backdropPath!.isNotEmpty;
+    final heroTag = hasBackdrop ? 'favourite-backdrop-${movie.id}' : null;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Stack(
         children: [
-          _BackgroundImage(movie: movie),
+          _BackgroundImage(movie: movie, heroTag: heroTag),
           const Positioned.fill(child: _BottomGradient()),
           Positioned.fill(
             child: Material(
@@ -32,7 +35,12 @@ class FavouriteHeroCard extends StatelessWidget {
               child: InkWell(
                 onTap: () => pushView(
                   context,
-                  MovieDetailScreen(movieId: movie.id, title: movie.title),
+                  MovieDetailScreen(
+                    movieId: movie.id,
+                    title: movie.title,
+                    backdropPath: movie.backdropPath,
+                    heroTag: heroTag,
+                  ),
                 ),
               ),
             ),
@@ -55,9 +63,10 @@ class FavouriteHeroCard extends StatelessWidget {
 }
 
 class _BackgroundImage extends StatelessWidget {
-  const _BackgroundImage({required this.movie});
+  const _BackgroundImage({required this.movie, required this.heroTag});
 
   final Movie movie;
+  final Object? heroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -68,17 +77,18 @@ class _BackgroundImage extends StatelessWidget {
         ? movie.backdropUrl(size: 'w780')
         : movie.posterUrl(size: 'w500');
 
+    final image = imageUrl.isEmpty
+        ? Container(color: colors.surfaceMuted)
+        : CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.cover,
+            placeholder: (_, __) => Container(color: colors.surfaceMuted),
+            errorWidget: (_, __, ___) => Container(color: colors.surfaceMuted),
+          );
+
     return AspectRatio(
       aspectRatio: 16 / 9,
-      child: imageUrl.isEmpty
-          ? Container(color: colors.surfaceMuted)
-          : CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              placeholder: (_, __) => Container(color: colors.surfaceMuted),
-              errorWidget: (_, __, ___) =>
-                  Container(color: colors.surfaceMuted),
-            ),
+      child: heroTag != null ? Hero(tag: heroTag!, child: image) : image,
     );
   }
 }

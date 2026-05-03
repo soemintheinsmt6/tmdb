@@ -9,10 +9,18 @@ import 'layouts/movie_detail_mobile_layout.dart';
 import 'layouts/movie_detail_tablet_layout.dart';
 
 class MovieDetailScreen extends StatelessWidget {
-  const MovieDetailScreen({super.key, required this.movieId, this.title});
+  const MovieDetailScreen({
+    super.key,
+    required this.movieId,
+    this.title,
+    this.backdropPath,
+    this.heroTag,
+  });
 
   final int movieId;
   final String? title;
+  final String? backdropPath;
+  final Object? heroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +28,18 @@ class MovieDetailScreen extends StatelessWidget {
       create: (_) =>
           sl<MovieDetailBloc>()..add(MovieDetailFetched(movieId)),
       child: ResponsiveBuilder(
-        mobile: (_, __) => MovieDetailMobileLayout(fallbackTitle: title),
-        tablet: (_, __) => MovieDetailTabletLayout(fallbackTitle: title),
+        mobile: (_, __) => MovieDetailMobileLayout(
+          movieId: movieId,
+          fallbackTitle: title,
+          seedBackdropPath: backdropPath,
+          heroTag: heroTag,
+        ),
+        tablet: (_, __) => MovieDetailTabletLayout(
+          movieId: movieId,
+          fallbackTitle: title,
+          seedBackdropPath: backdropPath,
+          heroTag: heroTag,
+        ),
       ),
     );
   }
