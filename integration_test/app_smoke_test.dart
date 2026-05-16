@@ -10,9 +10,9 @@ import 'package:tmdb/injection_container.dart';
 /// End-to-end smoke test that boots the real `App`, replaces `ApiClient`
 /// with a deterministic fake, and drives a full user journey:
 /// home → switch tabs → open detail → favourite → see it on the favourites
-/// tab. ObjectBox runs for real (favourites are persisted via the native
-/// lib that ships with `objectbox_flutter_libs`), so this must execute on
-/// a device or simulator — it cannot run via `flutter test`.
+/// tab. Hive runs for real (favourites are persisted to disk via
+/// `path_provider`), so this must execute on a device, simulator, or
+/// desktop — it cannot run via `flutter test`.
 ///
 /// Run on a connected iOS simulator / Android emulator / macOS desktop:
 ///
@@ -52,7 +52,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('An offer you can\'t refuse.'), findsOneWidget);
 
-    // 4. Tap the heart → favourite the movie (persisted via real ObjectBox).
+    // 4. Tap the heart → favourite the movie (persisted via real Hive).
     await tester.tap(find.byTooltip('Add to favourites'));
     await tester.pumpAndSettle();
     expect(find.byTooltip('Remove from favourites'), findsOneWidget);
@@ -63,8 +63,8 @@ void main() {
     await tester.tap(find.text('Favourites'));
     await tester.pumpAndSettle();
 
-    // 6. The favourited movie shows up there — ObjectBox round-tripped it
-    // and the cubit's stream pushed the new state across tabs.
+    // 6. The favourited movie shows up there — Hive round-tripped it and
+    // the cubit's stream pushed the new state across tabs.
     expect(find.text('The Godfather'), findsOneWidget);
   });
 }

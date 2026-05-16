@@ -10,7 +10,7 @@ A movie browser built on top of [The Movie Database (TMDB) API](https://develope
 - **equatable** for value objects
 - **get_it** for dependency injection
 - **http** for networking (wrapped by `core/network/api_client.dart`)
-- **objectbox** for local persistence of favourites
+- **hive** for local persistence of favourites
 - **cached_network_image**, **shimmer**, **iconsax_plus**, **google_fonts** for UI
 - **bloc_test**, **mocktail**, **integration_test** for tests
 
@@ -27,7 +27,7 @@ lib/
 │   ├── extensions/         # rating, runtime, year helpers
 │   ├── network/            # api_client.dart (api_key auth, exception mapping)
 │   ├── responsive/         # breakpoints + ResponsiveBuilder
-│   ├── storage/            # ObjectBox wrapper (favourites store)
+│   ├── storage/            # Hive wrapper (favourites box)
 │   ├── theme/              # AppColors, AppTypography, AppTheme, AppDecoration
 │   └── utils/              # navigation.dart, typedef.dart
 ├── features/
@@ -50,7 +50,7 @@ lib/
 │   │       └── widgets/        # MoviePoster, MovieCard, RatingBadge, …
 │   ├── favourites/
 │   │   ├── data/
-│   │   │   ├── models/         # FavouriteMovie (ObjectBox @Entity, persistence-only)
+│   │   │   ├── models/         # FavouriteMovie (Hive TypeAdapter, persistence-only)
 │   │   │   └── repositories/   # FavouritesRepositoryImpl (queries Box; returns Movie)
 │   │   ├── domain/
 │   │   │   └── repositories/   # FavouritesRepository (abstract — test seam)
@@ -70,7 +70,7 @@ lib/
 
 **Error flow.** `ApiClient` throws `UnauthorizedException` / `ServerException` / `NetworkException`. `MovieRepositoryImpl._guard` converts them to `ServerFailure` (with the original status code, or 401 for unauthorised) / `NetworkFailure`. BLoCs `fold` the `Either<Failure, T>` into success / error states.
 
-**Persistence boundary.** `FavouriteMovie` (ObjectBox `@Entity`) lives only in the favourites data layer. The repository converts to `Movie` at the boundary, so widgets and the cubit only see domain types.
+**Persistence boundary.** `FavouriteMovie` (Hive-encoded via a hand-written `TypeAdapter`) lives only in the favourites data layer. The repository converts to `Movie` at the boundary, so widgets and the cubit only see domain types.
 
 ## Setup
 
@@ -126,7 +126,7 @@ test/
 
 ### End-to-end (`integration_test`)
 
-A full-app smoke test boots the real `App`, swaps `ApiClient` for a deterministic fake (lazy-singleton swap via `GetIt`), and drives a complete user journey: home loads → switch tab → open detail → favourite → switch to favourites tab and verify. ObjectBox runs for real, so the test must execute on a device, simulator, or desktop — not via `flutter test`.
+A full-app smoke test boots the real `App`, swaps `ApiClient` for a deterministic fake (lazy-singleton swap via `GetIt`), and drives a complete user journey: home loads → switch tab → open detail → favourite → switch to favourites tab and verify. Hive runs for real, so the test must execute on a device, simulator, or desktop — not via `flutter test`.
 
 ```bash
 flutter devices                                                 # list targets
@@ -142,7 +142,7 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Search** with 400 ms debounce; falls back to category browse when cleared.
 - **Infinite scroll** + pull-to-refresh on the category grid.
 - **Movie detail** with full-bleed backdrop header, runtime / year / genres chips, top-billed cast (capped at 20), and "More Like This" recommendations. Header renders immediately from a seed backdrop path passed via the route, so navigation lands on the image instead of a spinner.
-- **Favourites** persisted locally via ObjectBox; reactive — toggling on the detail screen updates the home grid heart and the Favourites tab in real time.
+- **Favourites** persisted locally via Hive; reactive — toggling on the detail screen updates the home grid heart and the Favourites tab in real time.
 - **Shared-element transition** — tapping a favourites card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
 - **Profile tab** showing favourites count plus a destructive "Clear favourites" flow with confirm dialog.
 - **Responsive grid** — 3 columns on mobile, scaling 4–7 on tablet (clamped on `width / 180`); aspect ratio shifts slightly between tiers.

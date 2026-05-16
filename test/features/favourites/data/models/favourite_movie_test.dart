@@ -20,8 +20,6 @@ void main() {
       expect(fav.releaseDate, movie.releaseDate);
       expect(fav.voteAverage, movie.voteAverage);
       expect(fav.voteCount, movie.voteCount);
-      // ObjectBox `id` only gets assigned on `_box.put`.
-      expect(fav.id, 0);
       expect(
         fav.savedAt.isBefore(before.subtract(const Duration(seconds: 1))),
         isFalse,

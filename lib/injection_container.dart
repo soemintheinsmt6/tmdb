@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import 'package:tmdb/core/network/api_client.dart';
-import 'package:tmdb/core/storage/object_box.dart';
+import 'package:tmdb/core/storage/hive_storage.dart';
 import 'package:tmdb/features/favourites/data/repositories/favourites_repository_impl.dart';
 import 'package:tmdb/features/favourites/domain/repositories/favourites_repository.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
@@ -19,8 +19,8 @@ Future<void> init() async {
   // ── Core ────────────────────────────────────────────────
   sl.registerLazySingleton(() => ApiClient());
 
-  final objectBox = await ObjectBox.create();
-  sl.registerSingleton<ObjectBox>(objectBox);
+  final hiveStorage = await HiveStorage.create();
+  sl.registerSingleton<HiveStorage>(hiveStorage);
 
   // ── Movies feature ─────────────────────────────────────
   sl.registerLazySingleton(() => MovieRemoteDataSource(sl()));
@@ -32,7 +32,7 @@ Future<void> init() async {
 
   // ── Favourites feature ─────────────────────────────────
   sl.registerLazySingleton<FavouritesRepository>(
-    () => FavouritesRepositoryImpl(sl<ObjectBox>()),
+    () => FavouritesRepositoryImpl(sl<HiveStorage>()),
   );
   sl.registerLazySingleton<FavouritesCubit>(() => FavouritesCubit(sl()));
 }
