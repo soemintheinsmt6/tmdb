@@ -48,10 +48,12 @@ void main() {
     );
   }
 
-  testWidgets('shows the skeleton then renders the loaded movies grid',
-      (tester) async {
-    when(() => repo.getMovies(category: MovieCategory.popular, page: 1))
-        .thenAnswer(
+  testWidgets('shows the skeleton then renders the loaded movies grid', (
+    tester,
+  ) async {
+    when(
+      () => repo.getMovies(category: MovieCategory.popular, page: 1),
+    ).thenAnswer(
       (_) async => Right(
         buildPaginated(
           totalPages: 1,
@@ -75,12 +77,12 @@ void main() {
     expect(find.text('Tenet'), findsOneWidget);
   });
 
-  testWidgets('shows the error view with a Retry that re-fetches',
-      (tester) async {
-    when(() => repo.getMovies(category: MovieCategory.popular, page: 1))
-        .thenAnswer(
-      (_) async => const Left(NetworkFailure(message: 'offline')),
-    );
+  testWidgets('shows the error view with a Retry that re-fetches', (
+    tester,
+  ) async {
+    when(
+      () => repo.getMovies(category: MovieCategory.popular, page: 1),
+    ).thenAnswer((_) async => const Left(NetworkFailure(message: 'offline')));
 
     await pumpHome(tester);
     await tester.pumpAndSettle();
@@ -90,8 +92,9 @@ void main() {
     expect(find.text('Retry'), findsOneWidget);
 
     // Subsequent fetch succeeds — tap Retry and verify the grid renders.
-    when(() => repo.getMovies(category: MovieCategory.popular, page: 1))
-        .thenAnswer(
+    when(
+      () => repo.getMovies(category: MovieCategory.popular, page: 1),
+    ).thenAnswer(
       (_) async => Right(
         buildPaginated(
           totalPages: 1,
@@ -107,10 +110,12 @@ void main() {
     expect(find.text('Recovered'), findsOneWidget);
   });
 
-  testWidgets('tapping a category tab triggers a refetch for that category',
-      (tester) async {
-    when(() => repo.getMovies(category: MovieCategory.popular, page: 1))
-        .thenAnswer(
+  testWidgets('tapping a category tab triggers a refetch for that category', (
+    tester,
+  ) async {
+    when(
+      () => repo.getMovies(category: MovieCategory.popular, page: 1),
+    ).thenAnswer(
       (_) async => Right(
         buildPaginated(
           totalPages: 1,
@@ -118,8 +123,9 @@ void main() {
         ),
       ),
     );
-    when(() => repo.getMovies(category: MovieCategory.topRated, page: 1))
-        .thenAnswer(
+    when(
+      () => repo.getMovies(category: MovieCategory.topRated, page: 1),
+    ).thenAnswer(
       (_) async => Right(
         buildPaginated(
           totalPages: 1,
@@ -136,17 +142,19 @@ void main() {
     await tester.tap(find.text('Top Rated'));
     await tester.pumpAndSettle();
 
-    verify(() =>
-            repo.getMovies(category: MovieCategory.topRated, page: 1))
-        .called(1);
+    verify(
+      () => repo.getMovies(category: MovieCategory.topRated, page: 1),
+    ).called(1);
     expect(find.text('Top Movie'), findsOneWidget);
     expect(find.text('Popular Movie'), findsNothing);
   });
 
-  testWidgets('typing in search hides the tabs and renders search results',
-      (tester) async {
-    when(() => repo.getMovies(category: MovieCategory.popular, page: 1))
-        .thenAnswer(
+  testWidgets('typing in search hides the tabs and renders search results', (
+    tester,
+  ) async {
+    when(
+      () => repo.getMovies(category: MovieCategory.popular, page: 1),
+    ).thenAnswer(
       (_) async => Right(
         buildPaginated(
           totalPages: 1,
@@ -158,9 +166,7 @@ void main() {
       (_) async => Right(
         buildPaginated(
           totalPages: 1,
-          movies: [
-            buildMovie(id: 27205, title: 'Inception', posterPath: null),
-          ],
+          movies: [buildMovie(id: 27205, title: 'Inception', posterPath: null)],
         ),
       ),
     );
@@ -179,15 +185,15 @@ void main() {
     expect(find.text('Inception'), findsOneWidget);
   });
 
-  testWidgets('an empty search result shows the no-matches empty view',
-      (tester) async {
-    when(() => repo.getMovies(category: MovieCategory.popular, page: 1))
-        .thenAnswer(
-      (_) async => Right(buildPaginated(movies: const [])),
-    );
-    when(() => repo.searchMovies(query: 'xyz', page: 1)).thenAnswer(
-      (_) async => Right(buildPaginated(movies: const [])),
-    );
+  testWidgets('an empty search result shows the no-matches empty view', (
+    tester,
+  ) async {
+    when(
+      () => repo.getMovies(category: MovieCategory.popular, page: 1),
+    ).thenAnswer((_) async => Right(buildPaginated(movies: const [])));
+    when(
+      () => repo.searchMovies(query: 'xyz', page: 1),
+    ).thenAnswer((_) async => Right(buildPaginated(movies: const [])));
 
     await pumpHome(tester);
     await tester.pumpAndSettle();

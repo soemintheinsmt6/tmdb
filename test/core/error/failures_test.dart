@@ -53,11 +53,13 @@ void main() {
     });
   });
 
-  test('ServerFailure and NetworkFailure are not equal even when fields align',
-      () {
-    const server = ServerFailure(message: 'x', statusCode: 0);
-    const network = NetworkFailure(message: 'x');
+  test(
+    'ServerFailure and NetworkFailure are not equal even when fields align',
+    () {
+      const server = ServerFailure(message: 'x', statusCode: 0);
+      const network = NetworkFailure(message: 'x');
 
-    expect(server, isNot(equals(network)));
-  });
+      expect(server, isNot(equals(network)));
+    },
+  );
 }

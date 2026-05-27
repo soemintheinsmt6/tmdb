@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/core/network/api_client.dart';
 import 'package:tmdb/core/storage/hive_storage.dart';
 import 'package:tmdb/features/favourites/data/repositories/favourites_repository_impl.dart';
@@ -17,14 +18,17 @@ final sl = GetIt.instance;
 /// Call once before [runApp].
 Future<void> init() async {
   // ── Core ────────────────────────────────────────────────
-  sl.registerLazySingleton(() => ApiClient());
+  sl.registerLazySingleton<AppLogger>(() => const ConsoleLogger());
+  sl.registerLazySingleton(() => ApiClient(logger: sl<AppLogger>()));
 
   final hiveStorage = await HiveStorage.create();
   sl.registerSingleton<HiveStorage>(hiveStorage);
 
   // ── Movies feature ─────────────────────────────────────
   sl.registerLazySingleton(() => MovieRemoteDataSource(sl()));
-  sl.registerLazySingleton<MovieRepository>(() => MovieRepositoryImpl(sl()));
+  sl.registerLazySingleton<MovieRepository>(
+    () => MovieRepositoryImpl(sl(), logger: sl<AppLogger>()),
+  );
 
   sl.registerFactory(() => MovieListBloc(repository: sl()));
   sl.registerFactory(() => MovieSearchBloc(repository: sl()));

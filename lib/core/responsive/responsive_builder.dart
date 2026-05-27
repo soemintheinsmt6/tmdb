@@ -6,15 +6,11 @@ enum ScreenTier { mobile, tablet }
 /// Builds different widget trees based on the available width.
 /// Two tiers only — mobile and tablet.
 class ResponsiveBuilder extends StatelessWidget {
-  const ResponsiveBuilder({
-    super.key,
-    this.mobile,
-    this.tablet,
-    this.builder,
-  }) : assert(
-         mobile != null || builder != null,
-         'Provide at least mobile or builder.',
-       );
+  const ResponsiveBuilder({super.key, this.mobile, this.tablet, this.builder})
+    : assert(
+        mobile != null || builder != null,
+        'Provide at least mobile or builder.',
+      );
 
   final Widget Function(BuildContext, BoxConstraints)? mobile;
   final Widget Function(BuildContext, BoxConstraints)? tablet;

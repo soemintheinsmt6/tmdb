@@ -26,28 +26,28 @@ class FavouriteMovie {
   final DateTime savedAt;
 
   factory FavouriteMovie.fromMovie(Movie m) => FavouriteMovie(
-        movieId: m.id,
-        title: m.title,
-        overview: m.overview,
-        posterPath: m.posterPath,
-        backdropPath: m.backdropPath,
-        releaseDate: m.releaseDate,
-        voteAverage: m.voteAverage,
-        voteCount: m.voteCount,
-        savedAt: DateTime.now(),
-      );
+    movieId: m.id,
+    title: m.title,
+    overview: m.overview,
+    posterPath: m.posterPath,
+    backdropPath: m.backdropPath,
+    releaseDate: m.releaseDate,
+    voteAverage: m.voteAverage,
+    voteCount: m.voteCount,
+    savedAt: DateTime.now(),
+  );
 
   Movie toMovie() => Movie(
-        id: movieId,
-        title: title,
-        overview: overview,
-        posterPath: posterPath,
-        backdropPath: backdropPath,
-        releaseDate: releaseDate,
-        voteAverage: voteAverage,
-        voteCount: voteCount,
-        genreIds: const [],
-      );
+    id: movieId,
+    title: title,
+    overview: overview,
+    posterPath: posterPath,
+    backdropPath: backdropPath,
+    releaseDate: releaseDate,
+    voteAverage: voteAverage,
+    voteCount: voteCount,
+    genreIds: const [],
+  );
 }
 
 /// Hand-written [TypeAdapter] — keeps the project free of `build_runner`.

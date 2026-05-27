@@ -12,9 +12,9 @@ abstract class FavouritesRepository {
   List<Movie> getAll();
 
   /// Adds when missing, removes when present.
-  void toggle(Movie movie);
+  Future<void> toggle(Movie movie);
 
-  void remove(int movieId);
+  Future<void> remove(int movieId);
 
-  void clear();
+  Future<void> clear();
 }

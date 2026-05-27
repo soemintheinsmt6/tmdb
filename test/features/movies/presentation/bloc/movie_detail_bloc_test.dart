@@ -39,9 +39,7 @@ void main() {
     'emits Loading then Error when the repo returns a Failure',
     setUp: () {
       when(() => repository.getMovieDetail(any())).thenAnswer(
-        (_) async => const Left(
-          NetworkFailure(message: 'no internet'),
-        ),
+        (_) async => const Left(NetworkFailure(message: 'no internet')),
       );
     },
     build: () => MovieDetailBloc(repository: repository),

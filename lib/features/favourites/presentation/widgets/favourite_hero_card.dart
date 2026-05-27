@@ -45,11 +45,7 @@ class FavouriteHeroCard extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: _RemoveButton(movieId: movie.id),
-          ),
+          Positioned(top: 8, right: 8, child: _RemoveButton(movieId: movie.id)),
           Positioned(
             left: 14,
             right: 14,

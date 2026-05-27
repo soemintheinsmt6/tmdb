@@ -27,11 +27,10 @@ void main() {
   setUpAll(() async {
     await Env.init();
     await di.init();
-    _swapApiClient();
+    await _swapApiClient();
   });
 
-  testWidgets(
-      'home loads → switch category → open detail → favourite → '
+  testWidgets('home loads → switch category → open detail → favourite → '
       'appears on favourites tab', (tester) async {
     await tester.pumpWidget(const App());
     await tester.pumpAndSettle();
@@ -69,12 +68,12 @@ void main() {
   });
 }
 
-void _swapApiClient() {
+Future<void> _swapApiClient() async {
   // Lazy singletons defer creation, so swapping `ApiClient` here — after
   // `di.init()` registers it but before any consumer resolves it — wires
   // the fake all the way down: MovieRepository → MovieRemoteDataSource →
   // ApiClient (fake).
-  sl.unregister<ApiClient>();
+  await sl.unregister<ApiClient>();
   sl.registerLazySingleton<ApiClient>(() => _FakeApiClient());
 }
 
@@ -146,6 +145,5 @@ class _FakeApiClient implements ApiClient {
   }
 
   @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      super.noSuchMethod(invocation);
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

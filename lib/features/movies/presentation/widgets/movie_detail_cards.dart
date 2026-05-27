@@ -13,11 +13,7 @@ import 'package:tmdb/features/movies/presentation/widgets/movie_poster.dart';
 import 'package:tmdb/features/movies/presentation/widgets/rating_badge.dart';
 
 class DetailHeader extends StatelessWidget {
-  const DetailHeader({
-    super.key,
-    required this.backdropPath,
-    this.heroTag,
-  });
+  const DetailHeader({super.key, required this.backdropPath, this.heroTag});
 
   final String? backdropPath;
   final Object? heroTag;
@@ -187,9 +183,7 @@ class _MetaChip extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: AppTypography.smallText.copyWith(
-            color: colors.textSecondary,
-          ),
+          style: AppTypography.smallText.copyWith(color: colors.textSecondary),
         ),
       ],
     );
@@ -206,7 +200,7 @@ class DetailOverview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Overview', style: AppTypography.subTitle),
+        const Text('Overview', style: AppTypography.subTitle),
         const SizedBox(height: 8),
         Text(
           overview.isEmpty ? 'No overview available.' : overview,
@@ -238,7 +232,7 @@ class DetailCastList extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Text('Top Cast', style: AppTypography.subTitle),
+          child: const Text('Top Cast', style: AppTypography.subTitle),
         ),
         const SizedBox(height: 12),
         SizedBox(
@@ -332,7 +326,7 @@ class DetailRecommendations extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Text('Similar Movies', style: AppTypography.subTitle),
+          child: const Text('Similar Movies', style: AppTypography.subTitle),
         ),
         const SizedBox(height: 12),
         SizedBox(

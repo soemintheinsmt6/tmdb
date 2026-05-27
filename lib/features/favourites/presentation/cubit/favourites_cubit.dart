@@ -18,11 +18,11 @@ class FavouritesCubit extends Cubit<FavouritesState> {
   final FavouritesRepository _repository;
   late final StreamSubscription<FavouritesState> _subscription;
 
-  void toggle(Movie movie) => _repository.toggle(movie);
+  Future<void> toggle(Movie movie) => _repository.toggle(movie);
 
-  void remove(int movieId) => _repository.remove(movieId);
+  Future<void> remove(int movieId) => _repository.remove(movieId);
 
-  void clear() => _repository.clear();
+  Future<void> clear() => _repository.clear();
 
   @override
   Future<void> close() async {

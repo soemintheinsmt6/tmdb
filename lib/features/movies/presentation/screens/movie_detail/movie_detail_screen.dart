@@ -25,8 +25,7 @@ class MovieDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          sl<MovieDetailBloc>()..add(MovieDetailFetched(movieId)),
+      create: (_) => sl<MovieDetailBloc>()..add(MovieDetailFetched(movieId)),
       child: ResponsiveBuilder(
         mobile: (_, __) => MovieDetailMobileLayout(
           movieId: movieId,

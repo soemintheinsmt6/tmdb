@@ -68,7 +68,10 @@ void main() {
 
     test('movieCredits and movieRecommendations interpolate the id', () {
       expect(ApiConstants.movieCredits(42), '/movie/42/credits');
-      expect(ApiConstants.movieRecommendations(42), '/movie/42/recommendations');
+      expect(
+        ApiConstants.movieRecommendations(42),
+        '/movie/42/recommendations',
+      );
     });
   });
 }

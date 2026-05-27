@@ -33,8 +33,9 @@ void main() {
     MovieCategory category = MovieCategory.popular,
     PaginatedMovies? page,
   }) {
-    when(() => repository.getMovies(category: category, page: 1))
-        .thenAnswer((_) async => Right(page ?? initialPage));
+    when(
+      () => repository.getMovies(category: category, page: 1),
+    ).thenAnswer((_) async => Right(page ?? initialPage));
   }
 
   group('initial category fetch', () {
@@ -56,12 +57,11 @@ void main() {
     blocTest<MovieListBloc, MovieListState>(
       'emits Loading then Error when the initial fetch fails',
       setUp: () {
-        when(() =>
-                repository.getMovies(category: MovieCategory.popular, page: 1))
-            .thenAnswer(
-          (_) async => const Left(
-            ServerFailure(message: 'oops', statusCode: 500),
-          ),
+        when(
+          () => repository.getMovies(category: MovieCategory.popular, page: 1),
+        ).thenAnswer(
+          (_) async =>
+              const Left(ServerFailure(message: 'oops', statusCode: 500)),
         );
       },
       build: () => MovieListBloc(repository: repository),
@@ -77,15 +77,11 @@ void main() {
       'appends the next page and clears the loading flag',
       setUp: () {
         stubInitial();
-        when(() =>
-                repository.getMovies(category: MovieCategory.popular, page: 2))
-            .thenAnswer(
+        when(
+          () => repository.getMovies(category: MovieCategory.popular, page: 2),
+        ).thenAnswer(
           (_) async => Right(
-            buildPaginated(
-              page: 2,
-              totalPages: 3,
-              movies: [buildMovie(id: 2)],
-            ),
+            buildPaginated(page: 2, totalPages: 3, movies: [buildMovie(id: 2)]),
           ),
         );
       },
@@ -99,8 +95,10 @@ void main() {
         isA<MovieListLoaded>()
             .having((s) => s.isLoadingMore, 'isLoadingMore', false)
             .having((s) => s.page, 'page', 2)
-            .having((s) => s.movies.map((m) => m.id).toList(),
-                'movie ids', [1, 2]),
+            .having((s) => s.movies.map((m) => m.id).toList(), 'movie ids', [
+              1,
+              2,
+            ]),
       ],
     );
 
@@ -119,11 +117,12 @@ void main() {
       expect: () => const <MovieListState>[],
       verify: (_) {
         // Only the initial fetch — never page 2.
-        verify(() =>
-                repository.getMovies(category: MovieCategory.popular, page: 1))
-            .called(1);
-        verifyNever(() =>
-            repository.getMovies(category: MovieCategory.popular, page: 2));
+        verify(
+          () => repository.getMovies(category: MovieCategory.popular, page: 1),
+        ).called(1);
+        verifyNever(
+          () => repository.getMovies(category: MovieCategory.popular, page: 2),
+        );
       },
     );
 
@@ -131,20 +130,22 @@ void main() {
       'reverts the loading flag when the next page errors',
       setUp: () {
         stubInitial();
-        when(() =>
-                repository.getMovies(category: MovieCategory.popular, page: 2))
-            .thenAnswer(
-          (_) async => const Left(
-            ServerFailure(message: 'nope', statusCode: 500),
-          ),
+        when(
+          () => repository.getMovies(category: MovieCategory.popular, page: 2),
+        ).thenAnswer(
+          (_) async =>
+              const Left(ServerFailure(message: 'nope', statusCode: 500)),
         );
       },
       build: () => MovieListBloc(repository: repository),
       act: (bloc) => bloc.add(const MovieListLoadMore()),
       skip: 2,
       expect: () => [
-        isA<MovieListLoaded>()
-            .having((s) => s.isLoadingMore, 'isLoadingMore', true),
+        isA<MovieListLoaded>().having(
+          (s) => s.isLoadingMore,
+          'isLoadingMore',
+          true,
+        ),
         isA<MovieListLoaded>()
             .having((s) => s.isLoadingMore, 'isLoadingMore', false)
             .having((s) => s.movies.length, 'movies.length', 1),
@@ -157,12 +158,10 @@ void main() {
       'switches category and refetches',
       setUp: () {
         stubInitial();
-        when(() =>
-                repository.getMovies(category: MovieCategory.topRated, page: 1))
-            .thenAnswer(
-          (_) async => Right(
-            buildPaginated(movies: [buildMovie(id: 99)]),
-          ),
+        when(
+          () => repository.getMovies(category: MovieCategory.topRated, page: 1),
+        ).thenAnswer(
+          (_) async => Right(buildPaginated(movies: [buildMovie(id: 99)])),
         );
       },
       build: () => MovieListBloc(repository: repository),

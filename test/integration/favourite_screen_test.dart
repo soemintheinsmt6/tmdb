@@ -42,8 +42,9 @@ void main() {
     );
   }
 
-  testWidgets('shows the empty view when there are no favourites',
-      (tester) async {
+  testWidgets('shows the empty view when there are no favourites', (
+    tester,
+  ) async {
     when(() => repo.getAll()).thenReturn(const []);
 
     await pumpScreen(tester);
@@ -56,7 +57,12 @@ void main() {
 
   testWidgets('renders a hero card per favourited movie', (tester) async {
     when(() => repo.getAll()).thenReturn([
-      buildMovie(id: 1, title: 'Inception', posterPath: null, backdropPath: null),
+      buildMovie(
+        id: 1,
+        title: 'Inception',
+        posterPath: null,
+        backdropPath: null,
+      ),
       buildMovie(id: 2, title: 'Tenet', posterPath: null, backdropPath: null),
     ]);
 
@@ -69,8 +75,9 @@ void main() {
     expect(find.text('Tenet'), findsOneWidget);
   });
 
-  testWidgets('reactively re-renders when the repo stream emits',
-      (tester) async {
+  testWidgets('reactively re-renders when the repo stream emits', (
+    tester,
+  ) async {
     when(() => repo.getAll()).thenReturn(const []);
 
     await pumpScreen(tester);
@@ -78,7 +85,12 @@ void main() {
     expect(find.byType(AppEmptyView), findsOneWidget);
 
     stream.add([
-      buildMovie(id: 99, title: 'Late Arrival', posterPath: null, backdropPath: null),
+      buildMovie(
+        id: 99,
+        title: 'Late Arrival',
+        posterPath: null,
+        backdropPath: null,
+      ),
     ]);
     await tester.pumpAndSettle();
 
@@ -86,11 +98,18 @@ void main() {
     expect(find.text('Late Arrival'), findsOneWidget);
   });
 
-  testWidgets('tapping the remove button forwards to repository.remove',
-      (tester) async {
+  testWidgets('tapping the remove button forwards to repository.remove', (
+    tester,
+  ) async {
     when(() => repo.getAll()).thenReturn([
-      buildMovie(id: 42, title: 'To Remove', posterPath: null, backdropPath: null),
+      buildMovie(
+        id: 42,
+        title: 'To Remove',
+        posterPath: null,
+        backdropPath: null,
+      ),
     ]);
+    when(() => repo.remove(any())).thenAnswer((_) async {});
 
     await pumpScreen(tester);
     await tester.pump();

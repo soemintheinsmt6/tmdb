@@ -100,7 +100,12 @@ class _HomeContentState extends State<HomeContent>
   }
 
   void _openDetail(Movie movie) {
-    pushView(context, MovieDetailScreen(movieId: movie.id, title: movie.title));
+    unawaited(
+      pushView(
+        context,
+        MovieDetailScreen(movieId: movie.id, title: movie.title),
+      ),
+    );
   }
 
   @override
@@ -174,9 +179,9 @@ class _HomeContentState extends State<HomeContent>
         if (state is MovieListError) {
           return AppErrorView(
             message: state.message,
-            onRetry: () => context
-                .read<MovieListBloc>()
-                .add(MovieListCategoryChanged(state.category)),
+            onRetry: () => context.read<MovieListBloc>().add(
+              MovieListCategoryChanged(state.category),
+            ),
           );
         }
         if (state is MovieListLoaded) {

@@ -60,9 +60,9 @@ class ProfileScreen extends StatelessWidget {
   Future<void> _confirmClearFavourites(BuildContext context) async {
     final cubit = context.read<FavouritesCubit>();
     if (cubit.state.movies.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No favourites to clear')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No favourites to clear')));
       return;
     }
 
@@ -88,10 +88,11 @@ class ProfileScreen extends StatelessWidget {
     );
 
     if (confirmed != true || !context.mounted) return;
-    cubit.clear();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Favourites cleared')),
-    );
+    await cubit.clear();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Favourites cleared')));
   }
 
   void _showAbout(BuildContext context) {

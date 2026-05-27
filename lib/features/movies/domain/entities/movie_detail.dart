@@ -55,10 +55,7 @@ class MovieDetail extends Equatable {
     );
   }
 
-  MovieDetail copyWith({
-    List<CastMember>? cast,
-    List<Movie>? recommendations,
-  }) {
+  MovieDetail copyWith({List<CastMember>? cast, List<Movie>? recommendations}) {
     return MovieDetail(
       id: id,
       title: title,

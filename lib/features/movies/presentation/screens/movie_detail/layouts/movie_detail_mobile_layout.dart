@@ -68,84 +68,81 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
       canPop: widget.heroTag == null,
       onPopInvokedWithResult: _onPopInvoked,
       child: Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor:
-            _isScrolled ? colors.background : Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        titleSpacing: 0,
-        iconTheme: IconThemeData(color: foreground),
-        titleTextStyle: TextStyle(
-          color: foreground,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-        title: Text(_isScrolled ? (widget.fallbackTitle ?? '') : ''),
-        actions: [
-          BlocBuilder<MovieDetailBloc, MovieDetailState>(
-            builder: (context, state) {
-              if (state is MovieDetailLoaded) {
-                return FavouriteToggleButton(
-                  movie: state.detail.toMovie(),
-                  color: foreground,
-                );
-              }
-              return const SizedBox.shrink();
-            },
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: _isScrolled ? colors.background : Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          titleSpacing: 0,
+          iconTheme: IconThemeData(color: foreground),
+          titleTextStyle: TextStyle(
+            color: foreground,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
           ),
-        ],
-      ),
-      body: BlocBuilder<MovieDetailBloc, MovieDetailState>(
-        builder: (context, state) {
-          final loaded = state is MovieDetailLoaded ? state.detail : null;
-          final backdropPath = loaded?.backdropPath ?? widget.seedBackdropPath;
-          return ListView(
-            controller: _scrollController,
-            padding: EdgeInsets.zero,
-            children: [
-              DetailHeader(
-                backdropPath: backdropPath,
-                heroTag: heroTag,
-              ),
-              if (loaded != null) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Transform.translate(
-                        offset: const Offset(0, -40),
-                        child: DetailSummary(detail: loaded),
+          title: Text(_isScrolled ? (widget.fallbackTitle ?? '') : ''),
+          actions: [
+            BlocBuilder<MovieDetailBloc, MovieDetailState>(
+              builder: (context, state) {
+                if (state is MovieDetailLoaded) {
+                  return FavouriteToggleButton(
+                    movie: state.detail.toMovie(),
+                    color: foreground,
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ],
+        ),
+        body: BlocBuilder<MovieDetailBloc, MovieDetailState>(
+          builder: (context, state) {
+            final loaded = state is MovieDetailLoaded ? state.detail : null;
+            final backdropPath =
+                loaded?.backdropPath ?? widget.seedBackdropPath;
+            return ListView(
+              controller: _scrollController,
+              padding: EdgeInsets.zero,
+              children: [
+                DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
+                if (loaded != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Transform.translate(
+                          offset: const Offset(0, -40),
+                          child: DetailSummary(detail: loaded),
+                        ),
+                        DetailOverview(overview: loaded.overview),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  DetailCastList(cast: loaded.cast),
+                  const SizedBox(height: 12),
+                  DetailRecommendations(movies: loaded.recommendations),
+                  const SizedBox(height: 24),
+                ] else if (state is MovieDetailError) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 48),
+                    child: AppErrorView(
+                      message: state.message,
+                      onRetry: () => context.read<MovieDetailBloc>().add(
+                        MovieDetailFetched(widget.movieId),
                       ),
-                      DetailOverview(overview: loaded.overview),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                DetailCastList(cast: loaded.cast),
-                const SizedBox(height: 12),
-                DetailRecommendations(movies: loaded.recommendations),
-                const SizedBox(height: 24),
-              ] else if (state is MovieDetailError) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 48),
-                  child: AppErrorView(
-                    message: state.message,
-                    onRetry: () => context
-                        .read<MovieDetailBloc>()
-                        .add(MovieDetailFetched(widget.movieId)),
+                ] else
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 48),
+                    child: Center(child: CircularProgressIndicator()),
                   ),
-                ),
-              ] else
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 48),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-            ],
-          );
-        },
-      ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

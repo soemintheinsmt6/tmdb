@@ -22,7 +22,7 @@ class CategoryTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categories = MovieCategory.values;
+    const categories = MovieCategory.values;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -36,8 +36,7 @@ class CategoryTabBar extends StatelessWidget {
         labelPadding: const EdgeInsets.symmetric(horizontal: 16),
         onTap: (index) => onChanged(categories[index]),
         tabs: [
-          for (final c in categories)
-            Tab(text: kCategoryLabels[c], height: 44),
+          for (final c in categories) Tab(text: kCategoryLabels[c], height: 44),
         ],
       ),
     );

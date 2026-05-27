@@ -26,18 +26,21 @@ void main() {
       act: (bloc) => bloc.add(const MovieSearchQueryChanged('   ')),
       expect: () => const [MovieSearchIdle()],
       verify: (_) {
-        verifyNever(() => repository.searchMovies(
-              query: any(named: 'query'),
-              page: any(named: 'page'),
-            ));
+        verifyNever(
+          () => repository.searchMovies(
+            query: any(named: 'query'),
+            page: any(named: 'page'),
+          ),
+        );
       },
     );
 
     blocTest<MovieSearchBloc, MovieSearchState>(
       'emits Loading then Loaded when the query has results',
       setUp: () {
-        when(() => repository.searchMovies(query: 'inception', page: 1))
-            .thenAnswer(
+        when(
+          () => repository.searchMovies(query: 'inception', page: 1),
+        ).thenAnswer(
           (_) async => Right(
             buildPaginated(
               page: 1,
@@ -78,24 +81,14 @@ void main() {
     blocTest<MovieSearchBloc, MovieSearchState>(
       'appends the next page',
       setUp: () {
-        when(() => repository.searchMovies(query: 'fight', page: 1))
-            .thenAnswer(
+        when(() => repository.searchMovies(query: 'fight', page: 1)).thenAnswer(
           (_) async => Right(
-            buildPaginated(
-              page: 1,
-              totalPages: 3,
-              movies: [buildMovie(id: 1)],
-            ),
+            buildPaginated(page: 1, totalPages: 3, movies: [buildMovie(id: 1)]),
           ),
         );
-        when(() => repository.searchMovies(query: 'fight', page: 2))
-            .thenAnswer(
+        when(() => repository.searchMovies(query: 'fight', page: 2)).thenAnswer(
           (_) async => Right(
-            buildPaginated(
-              page: 2,
-              totalPages: 3,
-              movies: [buildMovie(id: 2)],
-            ),
+            buildPaginated(page: 2, totalPages: 3, movies: [buildMovie(id: 2)]),
           ),
         );
       },
@@ -108,12 +101,17 @@ void main() {
       },
       skip: 2, // Loading + first Loaded
       expect: () => [
-        isA<MovieSearchLoaded>()
-            .having((s) => s.isLoadingMore, 'isLoadingMore', true),
+        isA<MovieSearchLoaded>().having(
+          (s) => s.isLoadingMore,
+          'isLoadingMore',
+          true,
+        ),
         isA<MovieSearchLoaded>()
             .having((s) => s.isLoadingMore, 'isLoadingMore', false)
-            .having((s) => s.movies.map((m) => m.id).toList(),
-                'movie ids', [1, 2])
+            .having((s) => s.movies.map((m) => m.id).toList(), 'movie ids', [
+              1,
+              2,
+            ])
             .having((s) => s.page, 'page', 2),
       ],
     );
@@ -124,10 +122,12 @@ void main() {
       act: (bloc) => bloc.add(const MovieSearchLoadMore()),
       expect: () => const <MovieSearchState>[],
       verify: (_) {
-        verifyNever(() => repository.searchMovies(
-              query: any(named: 'query'),
-              page: any(named: 'page'),
-            ));
+        verifyNever(
+          () => repository.searchMovies(
+            query: any(named: 'query'),
+            page: any(named: 'page'),
+          ),
+        );
       },
     );
   });
@@ -135,9 +135,9 @@ void main() {
   blocTest<MovieSearchBloc, MovieSearchState>(
     'MovieSearchCleared resets to Idle',
     setUp: () {
-      when(() => repository.searchMovies(query: 'x', page: 1)).thenAnswer(
-        (_) async => Right(buildPaginated(movies: [buildMovie()])),
-      );
+      when(
+        () => repository.searchMovies(query: 'x', page: 1),
+      ).thenAnswer((_) async => Right(buildPaginated(movies: [buildMovie()])));
     },
     build: () => MovieSearchBloc(repository: repository),
     act: (bloc) async {

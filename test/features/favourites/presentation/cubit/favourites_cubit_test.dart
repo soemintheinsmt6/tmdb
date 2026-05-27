@@ -54,15 +54,18 @@ void main() {
     expect(emitted[1].ids, {1, 2});
   });
 
-  test('toggle / remove / clear forward to the repository', () {
+  test('toggle / remove / clear forward to the repository', () async {
+    final movie = buildMovie(id: 99);
     when(() => repository.getAll()).thenReturn(const []);
+    when(() => repository.toggle(movie)).thenAnswer((_) async {});
+    when(() => repository.remove(99)).thenAnswer((_) async {});
+    when(() => repository.clear()).thenAnswer((_) async {});
     final cubit = FavouritesCubit(repository);
     addTearDown(cubit.close);
 
-    final movie = buildMovie(id: 99);
-    cubit.toggle(movie);
-    cubit.remove(99);
-    cubit.clear();
+    await cubit.toggle(movie);
+    await cubit.remove(99);
+    await cubit.clear();
 
     verify(() => repository.toggle(movie)).called(1);
     verify(() => repository.remove(99)).called(1);

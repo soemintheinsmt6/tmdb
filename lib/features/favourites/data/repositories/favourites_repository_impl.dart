@@ -22,19 +22,18 @@ class FavouritesRepositoryImpl implements FavouritesRepository {
   List<Movie> getAll() => _snapshot();
 
   @override
-  void toggle(Movie movie) {
+  Future<void> toggle(Movie movie) {
     if (_box.containsKey(movie.id)) {
-      _box.delete(movie.id);
-      return;
+      return _box.delete(movie.id);
     }
-    _box.put(movie.id, FavouriteMovie.fromMovie(movie));
+    return _box.put(movie.id, FavouriteMovie.fromMovie(movie));
   }
 
   @override
-  void remove(int movieId) => _box.delete(movieId);
+  Future<void> remove(int movieId) => _box.delete(movieId);
 
   @override
-  void clear() => _box.clear();
+  Future<void> clear() => _box.clear();
 
   List<Movie> _snapshot() {
     final favourites = _box.values.toList()

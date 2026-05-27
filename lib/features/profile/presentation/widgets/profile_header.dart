@@ -6,11 +6,7 @@ import 'package:tmdb/core/theme/app_typography.dart';
 
 /// Avatar circle + display name + a single-line stat (e.g. favourites count).
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({
-    super.key,
-    required this.name,
-    required this.subtitle,
-  });
+  const ProfileHeader({super.key, required this.name, required this.subtitle});
 
   final String name;
   final String subtitle;

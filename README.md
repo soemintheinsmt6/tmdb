@@ -13,6 +13,7 @@ A movie browser built on top of [The Movie Database (TMDB) API](https://develope
 - **hive** for local persistence of favourites
 - **cached_network_image**, **shimmer**, **iconsax_plus**, **google_fonts** for UI
 - **bloc_test**, **mocktail**, **integration_test** for tests
+- **GitHub Actions** CI (format + analyze + test + coverage), curated lints on top of **flutter_lints**, and ADRs in `docs/adr/`
 
 ## Architecture
 
@@ -25,7 +26,8 @@ lib/
 │   ├── constants/          # api_constants.dart (TMDB endpoints + image URLs)
 │   ├── error/              # exceptions.dart, failures.dart
 │   ├── extensions/         # rating, runtime, year helpers
-│   ├── network/            # api_client.dart (api_key auth, exception mapping)
+│   ├── logging/            # AppLogger seam + ConsoleLogger + global error handlers
+│   ├── network/            # api_client.dart (api_key auth, retry/backoff, exception mapping)
 │   ├── responsive/         # breakpoints + ResponsiveBuilder
 │   ├── storage/            # Hive wrapper (favourites box)
 │   ├── theme/              # AppColors, AppTypography, AppTheme, AppDecoration
@@ -68,7 +70,9 @@ lib/
 └── main.dart                   # boot: Env.init → di.init → runApp
 ```
 
-**Error flow.** `ApiClient` throws `UnauthorizedException` / `ServerException` / `NetworkException`. `MovieRepositoryImpl._guard` converts them to `ServerFailure` (with the original status code, or 401 for unauthorised) / `NetworkFailure`. BLoCs `fold` the `Either<Failure, T>` into success / error states.
+**Error flow.** `ApiClient` applies a per-request timeout and retries transient failures (network errors + 5xx) with exponential backoff before throwing `UnauthorizedException` / `ServerException` / `NetworkException`; 4xx (incl. 401) fail fast. `MovieRepositoryImpl._guard` converts them to `ServerFailure` (with the original status code, or 401 for unauthorised) / `NetworkFailure`, logging each mapped failure through the `AppLogger` seam. BLoCs `fold` the `Either<Failure, T>` into success / error states.
+
+**Observability.** Code logs through the injected `AppLogger` abstraction, never `print`. The default `ConsoleLogger` routes to `dart:developer`; global Flutter/platform errors are funnelled in at boot. Shipping a crash reporter is a one-line DI swap — see [ADR 0005](docs/adr/0005-observability-seam.md). The network logger logs endpoint paths only, never the `api_key`-bearing URL.
 
 **Persistence boundary.** `FavouriteMovie` (Hive-encoded via a hand-written `TypeAdapter`) lives only in the favourites data layer. The repository converts to `Movie` at the boundary, so widgets and the cubit only see domain types.
 
@@ -98,18 +102,24 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 121 host-side tests + one device E2E.
+The project has three test layers; together they're 126 host-side tests + one device E2E.
 
 ```bash
-flutter analyze                # static analysis
-flutter test                   # unit + widget + screen-integration tests
+dart format --set-exit-if-changed .   # formatting gate
+flutter analyze                       # static analysis (curated lints, strict casts)
+flutter test                          # unit + widget + screen-integration tests
+flutter test --coverage               # with lcov coverage report
 ```
+
+These three commands are exactly what CI runs on every push/PR — see
+`.github/workflows/ci.yml`. Lint choices and other non-obvious decisions are
+recorded in [`docs/adr/`](docs/adr/README.md).
 
 Test layout mirrors `lib/`:
 
 ```
 test/
-├── core/                       # extensions, breakpoints, URL helpers, Failure
+├── core/                       # extensions, breakpoints, URL helpers, Failure, ApiClient retry
 ├── features/
 │   ├── movies/
 │   │   ├── data/               # repository impl, remote data source

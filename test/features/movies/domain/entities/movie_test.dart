@@ -41,7 +41,7 @@ void main() {
     });
 
     test('uses safe defaults when optional fields are missing', () {
-      final movie = Movie.fromJson(<String, dynamic>{'id': 1});
+      final movie = Movie.fromJson(const <String, dynamic>{'id': 1});
 
       expect(movie.title, '');
       expect(movie.overview, '');
@@ -55,7 +55,10 @@ void main() {
 
     test('coerces integer vote_average to double', () {
       // TMDB occasionally returns whole numbers without decimals.
-      final movie = Movie.fromJson(<String, dynamic>{'id': 1, 'vote_average': 7});
+      final movie = Movie.fromJson(const <String, dynamic>{
+        'id': 1,
+        'vote_average': 7,
+      });
 
       expect(movie.voteAverage, 7.0);
       expect(movie.voteAverage, isA<double>());
@@ -64,7 +67,7 @@ void main() {
 
   group('Movie computed properties', () {
     test('formattedRating returns "NR" when voteCount is zero', () {
-      final movie = Movie.fromJson(<String, dynamic>{
+      final movie = Movie.fromJson(const <String, dynamic>{
         'id': 1,
         'vote_average': 9.9,
         'vote_count': 0,
@@ -74,7 +77,7 @@ void main() {
     });
 
     test('formattedRating uses the rating extension when there are votes', () {
-      final movie = Movie.fromJson(<String, dynamic>{
+      final movie = Movie.fromJson(const <String, dynamic>{
         'id': 1,
         'vote_average': 8.456,
         'vote_count': 100,
@@ -85,7 +88,7 @@ void main() {
     });
 
     test('releaseYear extracts the year from the date string', () {
-      final movie = Movie.fromJson(<String, dynamic>{
+      final movie = Movie.fromJson(const <String, dynamic>{
         'id': 1,
         'release_date': '1999-10-15',
       });
@@ -94,13 +97,13 @@ void main() {
     });
 
     test('releaseYear is null when releaseDate is empty', () {
-      final movie = Movie.fromJson(<String, dynamic>{'id': 1});
+      final movie = Movie.fromJson(const <String, dynamic>{'id': 1});
 
       expect(movie.releaseYear, isNull);
     });
 
     test('posterUrl is empty when posterPath is null', () {
-      final movie = Movie.fromJson(<String, dynamic>{'id': 1});
+      final movie = Movie.fromJson(const <String, dynamic>{'id': 1});
 
       expect(movie.posterUrl(), '');
     });
@@ -127,7 +130,7 @@ void main() {
     });
 
     test('hasMore is true when page < totalPages', () {
-      final paginated = PaginatedMovies.fromJson(<String, dynamic>{
+      final paginated = PaginatedMovies.fromJson(const <String, dynamic>{
         'page': 2,
         'results': [],
         'total_pages': 5,
@@ -137,7 +140,7 @@ void main() {
     });
 
     test('hasMore is false on the last page', () {
-      final paginated = PaginatedMovies.fromJson(<String, dynamic>{
+      final paginated = PaginatedMovies.fromJson(const <String, dynamic>{
         'page': 5,
         'results': [],
         'total_pages': 5,
@@ -147,7 +150,7 @@ void main() {
     });
 
     test('defaults total_results to the result count when missing', () {
-      final paginated = PaginatedMovies.fromJson(<String, dynamic>{
+      final paginated = PaginatedMovies.fromJson(const <String, dynamic>{
         'page': 1,
         'results': [
           {'id': 1},

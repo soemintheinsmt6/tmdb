@@ -8,14 +8,17 @@ import '../../../../helpers/movie_fixtures.dart';
 void main() {
   group('Genre.fromJson', () {
     test('parses id and name', () {
-      final genre = Genre.fromJson(<String, dynamic>{'id': 18, 'name': 'Drama'});
+      final genre = Genre.fromJson(const <String, dynamic>{
+        'id': 18,
+        'name': 'Drama',
+      });
 
       expect(genre.id, 18);
       expect(genre.name, 'Drama');
     });
 
     test('defaults name to empty string when missing', () {
-      final genre = Genre.fromJson(<String, dynamic>{'id': 1});
+      final genre = Genre.fromJson(const <String, dynamic>{'id': 1});
 
       expect(genre.name, '');
     });
@@ -23,7 +26,7 @@ void main() {
 
   group('CastMember.fromJson', () {
     test('parses a credits row', () {
-      final cast = CastMember.fromJson(<String, dynamic>{
+      final cast = CastMember.fromJson(const <String, dynamic>{
         'id': 287,
         'name': 'Brad Pitt',
         'character': 'Tyler Durden',
@@ -39,7 +42,7 @@ void main() {
     });
 
     test('defaults missing fields gracefully', () {
-      final cast = CastMember.fromJson(<String, dynamic>{'id': 1});
+      final cast = CastMember.fromJson(const <String, dynamic>{'id': 1});
 
       expect(cast.name, '');
       expect(cast.character, '');
@@ -88,7 +91,7 @@ void main() {
       final recs = [buildMovie(id: 999, title: 'Recommended')];
 
       final detail = MovieDetail.fromJson(
-        <String, dynamic>{'id': 550, 'title': 'Fight Club'},
+        const <String, dynamic>{'id': 550, 'title': 'Fight Club'},
         cast: cast,
         recommendations: recs,
       );
@@ -136,7 +139,10 @@ void main() {
 
     test('toMovie projects the detail back to a list-row Movie', () {
       final detail = buildMovieDetail(
-        genres: const [Genre(id: 18, name: 'Drama'), Genre(id: 53, name: 'Thriller')],
+        genres: const [
+          Genre(id: 18, name: 'Drama'),
+          Genre(id: 53, name: 'Thriller'),
+        ],
       );
 
       final movie = detail.toMovie();

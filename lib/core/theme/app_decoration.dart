@@ -7,11 +7,7 @@ class AppDecoration {
 
   /// Subtle shadow used on card-style containers.
   static const List<BoxShadow> cardShadow = [
-    BoxShadow(
-      color: Color(0x33000000),
-      blurRadius: 14,
-      offset: Offset(0, 4),
-    ),
+    BoxShadow(color: Color(0x33000000), blurRadius: 14, offset: Offset(0, 4)),
   ];
 
   /// Standard card decoration: surface background, 16px radius, subtle shadow.

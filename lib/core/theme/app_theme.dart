@@ -15,20 +15,25 @@ class AppTheme {
     final colors = isDark ? AppColors.dark : AppColors.light;
     final fontFamily = GoogleFonts.plusJakartaSans().fontFamily;
 
-    final textTheme = TextTheme(
-      displayLarge: AppTypography.pageTitle,
-      titleLarge: AppTypography.sectionTitle,
-      titleMedium: AppTypography.subTitle,
-      bodyLarge: AppTypography.bodyLarge,
-      bodyMedium: AppTypography.bodyText,
-      bodySmall: AppTypography.smallText.copyWith(color: colors.textSecondary),
-      labelSmall: AppTypography.labelSmall.copyWith(color: colors.textSecondary),
-      labelLarge: AppTypography.buttonLabel.copyWith(color: AppColors.cyan),
-    ).apply(
-      bodyColor: colors.textPrimary,
-      displayColor: colors.textPrimary,
-      fontFamily: fontFamily,
-    );
+    final textTheme =
+        TextTheme(
+          displayLarge: AppTypography.pageTitle,
+          titleLarge: AppTypography.sectionTitle,
+          titleMedium: AppTypography.subTitle,
+          bodyLarge: AppTypography.bodyLarge,
+          bodyMedium: AppTypography.bodyText,
+          bodySmall: AppTypography.smallText.copyWith(
+            color: colors.textSecondary,
+          ),
+          labelSmall: AppTypography.labelSmall.copyWith(
+            color: colors.textSecondary,
+          ),
+          labelLarge: AppTypography.buttonLabel.copyWith(color: AppColors.cyan),
+        ).apply(
+          bodyColor: colors.textPrimary,
+          displayColor: colors.textPrimary,
+          fontFamily: fontFamily,
+        );
 
     return ThemeData(
       useMaterial3: true,
@@ -146,17 +151,13 @@ class AppTheme {
         color: colors.surface,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       // ── Chip ──────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: colors.surfaceMuted,
         selectedColor: AppColors.cyan,
-        labelStyle: AppTypography.smallText.copyWith(
-          color: colors.textPrimary,
-        ),
+        labelStyle: AppTypography.smallText.copyWith(color: colors.textPrimary),
         secondaryLabelStyle: AppTypography.smallText.copyWith(
           color: AppColors.navy,
           fontWeight: FontWeight.w600,
