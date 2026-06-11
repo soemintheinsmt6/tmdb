@@ -1,11 +1,11 @@
 # tmdb
 
-A movie browser built on top of [The Movie Database (TMDB) API](https://developer.themoviedb.org/docs/getting-started).
+A movie & TV browser built on top of [The Movie Database (TMDB) API](https://developer.themoviedb.org/docs/getting-started).
 
 ## Tech stack
 
 - **Flutter** (Material 3, light + dark themes that follow the system setting)
-- **flutter_bloc** for state management (BLoCs for movies, Cubit for favourites)
+- **flutter_bloc** for state management (BLoCs for movies & TV, Cubit for favourites)
 - **dartz** `Either<Failure, T>` for error handling
 - **equatable** for value objects
 - **get_it** for dependency injection
@@ -38,7 +38,7 @@ lib/
 │   │   │   ├── datasources/    # MovieRemoteDataSource (concrete, wraps ApiClient)
 │   │   │   └── repositories/   # MovieRepositoryImpl (composition + Failure mapping)
 │   │   ├── domain/
-│   │   │   ├── entities/       # Movie, MovieDetail, Genre, CastMember, PaginatedMovies
+│   │   │   ├── entities/       # Movie (implements PosterItem), MovieDetail, PaginatedMovies
 │   │   │   │                   # — entities own their fromJson; no separate Model class
 │   │   │   └── repositories/   # MovieRepository (abstract — test seam)
 │   │   └── presentation/
@@ -49,7 +49,12 @@ lib/
 │   │       ├── screens/
 │   │       │   ├── home/{home_screen.dart, layouts/}
 │   │       │   └── movie_detail/{movie_detail_screen.dart, layouts/}
-│   │       └── widgets/        # MoviePoster, MovieCard, RatingBadge, …
+│   │       └── widgets/        # home_content + movie_detail_cards (compose the shared kernel)
+│   ├── tv/                     # Same shape as movies: TvShow (implements PosterItem),
+│   │                           # TvShowDetail, TvRepository, remote data source,
+│   │                           # tv_list/tv_search/tv_detail blocs, tv_screen + tv_detail.
+│   │                           # Categories: Popular / Top Rated / On The Air / Airing Today.
+│   │                           # Browse + detail only — no favouriting in v1.
 │   ├── favourites/
 │   │   ├── data/
 │   │   │   ├── models/         # FavouriteMovie (Hive TypeAdapter, persistence-only)
@@ -64,7 +69,13 @@ lib/
 │       └── presentation/
 │           ├── screens/        # ProfileScreen (favourite count + clear / about)
 │           └── widgets/        # ProfileHeader, SettingsTile
-├── shared/widgets/             # AppSearchField, AppErrorView, AppEmptyView, RootScreen
+├── shared/
+│   ├── domain/                 # PosterItem (poster view contract), Genre, CastMember
+│   └── widgets/                # Poster kernel shared by movies + TV — PosterGrid,
+│                               # PosterCard, PosterImage, RatingBadge, PosterGridSkeleton,
+│                               # CategoryTabBar, detail_cards (DetailHeader/Summary/
+│                               # CastList/PosterRail) — plus AppSearchField, AppErrorView,
+│                               # AppEmptyView, RootScreen
 ├── injection_container.dart    # GetIt registrations
 ├── app.dart                    # MaterialApp + global providers
 └── main.dart                   # boot: Env.init → di.init → runApp
@@ -102,7 +113,7 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 126 host-side tests + one device E2E.
+The project has three test layers; together they're 178 host-side tests + one device E2E.
 
 ```bash
 dart format --set-exit-if-changed .   # formatting gate
@@ -125,13 +136,15 @@ test/
 │   │   ├── data/               # repository impl, remote data source
 │   │   ├── domain/entities/    # fromJson, copyWith, computed props
 │   │   └── presentation/bloc/  # MovieList, MovieSearch, MovieDetail blocs
+│   ├── tv/                     # mirrors movies: entities, data, TvList/TvSearch/TvDetail blocs
 │   └── favourites/
 │       ├── data/models/        # FavouriteMovie mapper
 │       └── presentation/cubit/ # FavouritesState, FavouritesCubit
 ├── integration/                # screen-level: real bloc + real widgets + mocked repo
 │   ├── home_content_test.dart
+│   ├── tv_content_test.dart
 │   └── favourite_screen_test.dart
-└── helpers/movie_fixtures.dart # shared builders
+└── helpers/                    # movie_fixtures.dart, tv_fixtures.dart (shared builders)
 ```
 
 ### End-to-end (`integration_test`)
@@ -152,6 +165,7 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Search** with 400 ms debounce; falls back to category browse when cleared.
 - **Infinite scroll** + pull-to-refresh on the category grid.
 - **Movie detail** with full-bleed backdrop header, runtime / year / genres chips, top-billed cast (capped at 20), and "More Like This" recommendations. Header renders immediately from a seed backdrop path passed via the route, so navigation lands on the image instead of a spinner.
+- **TV shows** on their own tab (Popular / Top Rated / On The Air / Airing Today) with the same search, infinite scroll, and detail layout — season & episode counts replace runtime. Browse + detail only (no favouriting in v1). Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
 - **Favourites** persisted locally via Hive; reactive — toggling on the detail screen updates the home grid heart and the Favourites tab in real time.
 - **Shared-element transition** — tapping a favourites card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
 - **Profile tab** showing favourites count plus a destructive "Clear favourites" flow with confirm dialog.

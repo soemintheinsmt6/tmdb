@@ -1,51 +1,57 @@
 import 'package:equatable/equatable.dart';
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/extensions/double_rating.dart';
-import 'package:tmdb/core/extensions/int_runtime.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
-import 'package:tmdb/features/movies/domain/entities/movie.dart';
+import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
 
-/// Full movie detail entity — combines `/movie/{id}` with credits and
-/// recommendations into a single domain object.
-class MovieDetail extends Equatable {
-  const MovieDetail({
+/// Full TV show detail — combines `/tv/{id}` with credits and recommendations
+/// into a single domain object. Mirrors `MovieDetail`.
+class TvShowDetail extends Equatable {
+  const TvShowDetail({
     required this.id,
-    required this.title,
+    required this.name,
     required this.tagline,
     required this.overview,
     required this.posterPath,
     required this.backdropPath,
-    required this.releaseDate,
+    required this.firstAirDate,
+    required this.lastAirDate,
     required this.voteAverage,
     required this.voteCount,
-    required this.runtime,
+    required this.numberOfSeasons,
+    required this.numberOfEpisodes,
+    required this.episodeRunTime,
     required this.genres,
     required this.status,
     required this.cast,
     required this.recommendations,
   });
 
-  /// Parses the `/movie/{id}` payload. Cast and recommendations come from
-  /// separate endpoints, so the repository injects them after the parallel
-  /// fetch.
-  factory MovieDetail.fromJson(
+  /// Parses the `/tv/{id}` payload. Cast and recommendations come from separate
+  /// endpoints, so the repository injects them after the parallel fetch.
+  factory TvShowDetail.fromJson(
     Map<String, dynamic> json, {
     List<CastMember> cast = const [],
-    List<Movie> recommendations = const [],
+    List<TvShow> recommendations = const [],
   }) {
-    return MovieDetail(
+    return TvShowDetail(
       id: json['id'] as int,
-      title: json['title'] as String? ?? '',
+      name: json['name'] as String? ?? '',
       tagline: json['tagline'] as String? ?? '',
       overview: json['overview'] as String? ?? '',
       posterPath: json['poster_path'] as String?,
       backdropPath: json['backdrop_path'] as String?,
-      releaseDate: json['release_date'] as String? ?? '',
+      firstAirDate: json['first_air_date'] as String? ?? '',
+      lastAirDate: json['last_air_date'] as String? ?? '',
       voteAverage: ((json['vote_average'] as num?) ?? 0).toDouble(),
       voteCount: (json['vote_count'] as int?) ?? 0,
-      runtime: (json['runtime'] as int?) ?? 0,
+      numberOfSeasons: (json['number_of_seasons'] as int?) ?? 0,
+      numberOfEpisodes: (json['number_of_episodes'] as int?) ?? 0,
+      episodeRunTime: ((json['episode_run_time'] as List?) ?? const [])
+          .map((e) => e as int)
+          .toList(),
       genres: ((json['genres'] as List?) ?? const [])
           .map((e) => Genre.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -55,18 +61,24 @@ class MovieDetail extends Equatable {
     );
   }
 
-  MovieDetail copyWith({List<CastMember>? cast, List<Movie>? recommendations}) {
-    return MovieDetail(
+  TvShowDetail copyWith({
+    List<CastMember>? cast,
+    List<TvShow>? recommendations,
+  }) {
+    return TvShowDetail(
       id: id,
-      title: title,
+      name: name,
       tagline: tagline,
       overview: overview,
       posterPath: posterPath,
       backdropPath: backdropPath,
-      releaseDate: releaseDate,
+      firstAirDate: firstAirDate,
+      lastAirDate: lastAirDate,
       voteAverage: voteAverage,
       voteCount: voteCount,
-      runtime: runtime,
+      numberOfSeasons: numberOfSeasons,
+      numberOfEpisodes: numberOfEpisodes,
+      episodeRunTime: episodeRunTime,
       genres: genres,
       status: status,
       cast: cast ?? this.cast,
@@ -75,19 +87,22 @@ class MovieDetail extends Equatable {
   }
 
   final int id;
-  final String title;
+  final String name;
   final String tagline;
   final String overview;
   final String? posterPath;
   final String? backdropPath;
-  final String releaseDate;
+  final String firstAirDate;
+  final String lastAirDate;
   final double voteAverage;
   final int voteCount;
-  final int runtime;
+  final int numberOfSeasons;
+  final int numberOfEpisodes;
+  final List<int> episodeRunTime;
   final List<Genre> genres;
   final String status;
   final List<CastMember> cast;
-  final List<Movie> recommendations;
+  final List<TvShow> recommendations;
 
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
@@ -95,34 +110,34 @@ class MovieDetail extends Equatable {
   String backdropUrl({String size = 'original'}) =>
       ApiConstants.backdropUrl(backdropPath, size: size);
 
-  String? get releaseYear => releaseDate.year;
-  String get formattedRuntime => runtime.runtime;
+  String? get firstAirYear => firstAirDate.year;
   String get formattedRating => voteCount == 0 ? 'NR' : voteAverage.rating;
 
-  Movie toMovie() => Movie(
-    id: id,
-    title: title,
-    overview: overview,
-    posterPath: posterPath,
-    backdropPath: backdropPath,
-    releaseDate: releaseDate,
-    voteAverage: voteAverage,
-    voteCount: voteCount,
-    genreIds: genres.map((g) => g.id).toList(),
-  );
+  /// e.g. `"3 Seasons"` / `"1 Season"`; `""` when unknown.
+  String get seasonsLabel => numberOfSeasons <= 0
+      ? ''
+      : '$numberOfSeasons ${numberOfSeasons == 1 ? 'Season' : 'Seasons'}';
+
+  /// e.g. `"24 Episodes"` / `"1 Episode"`; `""` when unknown.
+  String get episodesLabel => numberOfEpisodes <= 0
+      ? ''
+      : '$numberOfEpisodes ${numberOfEpisodes == 1 ? 'Episode' : 'Episodes'}';
 
   @override
   List<Object?> get props => [
     id,
-    title,
+    name,
     tagline,
     overview,
     posterPath,
     backdropPath,
-    releaseDate,
+    firstAirDate,
+    lastAirDate,
     voteAverage,
     voteCount,
-    runtime,
+    numberOfSeasons,
+    numberOfEpisodes,
+    episodeRunTime,
     genres,
     status,
     cast,

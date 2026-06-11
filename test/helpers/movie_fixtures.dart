@@ -1,8 +1,8 @@
-import 'package:tmdb/features/movies/domain/entities/cast_member.dart';
-import 'package:tmdb/features/movies/domain/entities/genre.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
+import 'package:tmdb/shared/domain/cast_member.dart';
+import 'package:tmdb/shared/domain/genre.dart';
 
 /// Reusable builders. Every parameter has a sensible default so tests only
 /// override the fields that matter to the assertion.

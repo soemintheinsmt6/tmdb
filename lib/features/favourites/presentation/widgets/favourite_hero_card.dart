@@ -9,7 +9,7 @@ import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
-import 'package:tmdb/features/movies/presentation/widgets/rating_badge.dart';
+import 'package:tmdb/shared/widgets/rating_badge.dart';
 
 /// Full-width 16:9 card with the backdrop as a hero image, a heart in the
 /// top-right, and title / rating / year overlaid at the bottom.

@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:tmdb/core/constants/api_constants.dart';
 
+/// A credited cast member, shared by the movie and TV features. The `/credits`
+/// payload has the same shape for both `/movie/{id}` and `/tv/{id}`.
 class CastMember extends Equatable {
   const CastMember({
     required this.id,

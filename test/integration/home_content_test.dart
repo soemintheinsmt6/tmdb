@@ -7,12 +7,12 @@ import 'package:tmdb/core/error/failures.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_list_bloc/movie_list_bloc.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_search_bloc/movie_search_bloc.dart';
-import 'package:tmdb/features/movies/presentation/widgets/category_tab_bar.dart';
 import 'package:tmdb/features/movies/presentation/widgets/home_content.dart';
-import 'package:tmdb/features/movies/presentation/widgets/movie_grid.dart';
-import 'package:tmdb/features/movies/presentation/widgets/movie_list_skeleton.dart';
 import 'package:tmdb/shared/widgets/app_empty_view.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
+import 'package:tmdb/shared/widgets/category_tab_bar.dart';
+import 'package:tmdb/shared/widgets/poster_grid.dart';
+import 'package:tmdb/shared/widgets/poster_grid_skeleton.dart';
 
 import '../helpers/movie_fixtures.dart';
 
@@ -21,7 +21,7 @@ class _MockMovieRepository extends Mock implements MovieRepository {}
 /// Wires real `MovieListBloc` + `MovieSearchBloc` with a mocked
 /// `MovieRepository` and pumps `HomeContent` end-to-end.
 ///
-/// Movies use `posterPath: null` so `MoviePoster` shows its placeholder
+/// Movies use `posterPath: null` so `PosterImage` shows its placeholder
 /// instead of attempting network image loads inside the test.
 void main() {
   late _MockMovieRepository repo;
@@ -67,12 +67,12 @@ void main() {
 
     await pumpHome(tester);
 
-    expect(find.byType(MovieListSkeleton), findsOneWidget);
+    expect(find.byType(PosterGridSkeleton), findsOneWidget);
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(MovieListSkeleton), findsNothing);
-    expect(find.byType(MovieGrid), findsOneWidget);
+    expect(find.byType(PosterGridSkeleton), findsNothing);
+    expect(find.byType(PosterGrid), findsOneWidget);
     expect(find.text('Inception'), findsOneWidget);
     expect(find.text('Tenet'), findsOneWidget);
   });

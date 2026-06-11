@@ -4,6 +4,7 @@ import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/features/favourites/presentation/screens/favourite_screen.dart';
 import 'package:tmdb/features/movies/presentation/screens/home/home_screen.dart';
 import 'package:tmdb/features/profile/presentation/screens/profile_screen.dart';
+import 'package:tmdb/features/tv/presentation/screens/tv_home/tv_screen.dart';
 
 /// App shell with a bottom navigation bar. Tabs are built lazily on first
 /// selection and kept alive afterwards so their state survives switches.
@@ -16,13 +17,14 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen> {
   int _index = 0;
-  final List<Widget?> _tabs = List.filled(3, null);
+  final List<Widget?> _tabs = List.filled(4, null);
 
   Widget _buildTab(int index) {
     return _tabs[index] ??= switch (index) {
       0 => const HomeScreen(),
-      1 => const FavouriteScreen(),
-      2 => const ProfileScreen(),
+      1 => const TvScreen(),
+      2 => const FavouriteScreen(),
+      3 => const ProfileScreen(),
       _ => const SizedBox.shrink(),
     };
   }
@@ -64,6 +66,14 @@ class _RootScreenState extends State<RootScreen> {
                 color: AppColors.cyan,
               ),
               label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(IconsaxPlusLinear.monitor, color: colors.textMuted),
+              selectedIcon: const Icon(
+                IconsaxPlusBold.monitor,
+                color: AppColors.cyan,
+              ),
+              label: 'TV',
             ),
             NavigationDestination(
               icon: Icon(IconsaxPlusLinear.heart, color: colors.textMuted),

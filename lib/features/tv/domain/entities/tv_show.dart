@@ -4,28 +4,31 @@ import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
 import 'package:tmdb/shared/domain/poster_item.dart';
 
-class Movie extends Equatable implements PosterItem {
-  const Movie({
+/// A TV show list item. Implements [PosterItem] so it renders through the
+/// shared poster widgets exactly like a `Movie`.
+class TvShow extends Equatable implements PosterItem {
+  const TvShow({
     required this.id,
-    required this.title,
+    required this.name,
     required this.overview,
     required this.posterPath,
     required this.backdropPath,
-    required this.releaseDate,
+    required this.firstAirDate,
     required this.voteAverage,
     required this.voteCount,
     required this.genreIds,
   });
 
-  factory Movie.fromJson(Map<String, dynamic> json) {
-    return Movie(
+  factory TvShow.fromJson(Map<String, dynamic> json) {
+    return TvShow(
       id: json['id'] as int,
-      title: (json['title'] ?? json['name']) as String? ?? '',
+      // `/search/tv` and list endpoints use `name`; tolerate `title` too.
+      name: (json['name'] ?? json['title']) as String? ?? '',
       overview: json['overview'] as String? ?? '',
       posterPath: json['poster_path'] as String?,
       backdropPath: json['backdrop_path'] as String?,
-      releaseDate:
-          (json['release_date'] ?? json['first_air_date']) as String? ?? '',
+      firstAirDate:
+          (json['first_air_date'] ?? json['release_date']) as String? ?? '',
       voteAverage: ((json['vote_average'] as num?) ?? 0).toDouble(),
       voteCount: (json['vote_count'] as int?) ?? 0,
       genreIds: ((json['genre_ids'] as List?) ?? const [])
@@ -36,15 +39,18 @@ class Movie extends Equatable implements PosterItem {
 
   @override
   final int id;
-  @override
-  final String title;
+  final String name;
   final String overview;
   final String? posterPath;
   final String? backdropPath;
-  final String releaseDate;
+  final String firstAirDate;
   final double voteAverage;
   final int voteCount;
   final List<int> genreIds;
+
+  /// [PosterItem] title — a show's `name`.
+  @override
+  String get title => name;
 
   @override
   String posterUrl({String size = 'w500'}) =>
@@ -54,11 +60,11 @@ class Movie extends Equatable implements PosterItem {
       ApiConstants.backdropUrl(backdropPath, size: size);
 
   /// `"2024"` or `null` when no parseable year.
-  String? get releaseYear => releaseDate.year;
+  String? get firstAirYear => firstAirDate.year;
 
-  /// [PosterItem] year — the release year for movies.
+  /// [PosterItem] year — the first-air year for TV shows.
   @override
-  String? get year => releaseYear;
+  String? get year => firstAirYear;
 
   /// One-decimal score, e.g. `"7.5"`. `"NR"` when unrated.
   @override
@@ -67,11 +73,11 @@ class Movie extends Equatable implements PosterItem {
   @override
   List<Object?> get props => [
     id,
-    title,
+    name,
     overview,
     posterPath,
     backdropPath,
-    releaseDate,
+    firstAirDate,
     voteAverage,
     voteCount,
     genreIds,

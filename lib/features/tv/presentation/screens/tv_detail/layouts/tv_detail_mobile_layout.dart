@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tmdb/core/responsive/app_breakpoints.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
-import 'package:tmdb/features/favourites/presentation/widgets/favourite_toggle_button.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_bloc.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_event.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_state.dart';
-import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_event.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_state.dart';
+import 'package:tmdb/features/tv/presentation/widgets/tv_detail_cards.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
 
-class MovieDetailTabletLayout extends StatefulWidget {
-  const MovieDetailTabletLayout({
+class TvDetailMobileLayout extends StatefulWidget {
+  const TvDetailMobileLayout({
     super.key,
-    required this.movieId,
+    required this.tvShowId,
     this.fallbackTitle,
     this.seedBackdropPath,
     this.heroTag,
   });
 
-  final int movieId;
+  final int tvShowId;
   final String? fallbackTitle;
   final String? seedBackdropPath;
   final Object? heroTag;
 
   @override
-  State<MovieDetailTabletLayout> createState() =>
-      _MovieDetailTabletLayoutState();
+  State<TvDetailMobileLayout> createState() => _TvDetailMobileLayoutState();
 }
 
-class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
+class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
   final _scrollController = ScrollController();
   bool _isScrolled = false;
   bool _suppressHero = false;
@@ -48,7 +45,7 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
   }
 
   void _onScroll() {
-    final scrolled = _scrollController.offset > 160;
+    final scrolled = _scrollController.offset > 120;
     if (scrolled != _isScrolled) setState(() => _isScrolled = scrolled);
   }
 
@@ -63,7 +60,6 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final padding = context.horizontalPadding;
     final colors = context.colors;
     final foreground = _isScrolled ? colors.textPrimary : Colors.white;
     final heroTag = _suppressHero ? null : widget.heroTag;
@@ -84,23 +80,10 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
             fontWeight: FontWeight.w600,
           ),
           title: Text(_isScrolled ? (widget.fallbackTitle ?? '') : ''),
-          actions: [
-            BlocBuilder<MovieDetailBloc, MovieDetailState>(
-              builder: (context, state) {
-                if (state is MovieDetailLoaded) {
-                  return FavouriteToggleButton(
-                    movie: state.detail.toMovie(),
-                    color: foreground,
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
         ),
-        body: BlocBuilder<MovieDetailBloc, MovieDetailState>(
+        body: BlocBuilder<TvDetailBloc, TvDetailState>(
           builder: (context, state) {
-            final loaded = state is MovieDetailLoaded ? state.detail : null;
+            final loaded = state is TvDetailLoaded ? state.detail : null;
             final backdropPath =
                 loaded?.backdropPath ?? widget.seedBackdropPath;
             return ListView(
@@ -110,33 +93,30 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
                 DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
                 if (loaded != null) ...[
                   Padding(
-                    padding: EdgeInsets.fromLTRB(padding, 0, padding, 0),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Transform.translate(
-                          offset: const Offset(0, -64),
-                          child: MovieDetailSummary(detail: loaded),
+                          offset: const Offset(0, -40),
+                          child: TvDetailSummary(detail: loaded),
                         ),
                         DetailOverview(overview: loaded.overview),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  DetailCastList(cast: loaded.cast, horizontalPadding: padding),
-                  const SizedBox(height: 16),
-                  MovieRecommendations(
-                    movies: loaded.recommendations,
-                    horizontalPadding: padding,
-                  ),
-                  const SizedBox(height: 32),
-                ] else if (state is MovieDetailError) ...[
+                  const SizedBox(height: 24),
+                  DetailCastList(cast: loaded.cast),
+                  const SizedBox(height: 12),
+                  TvRecommendations(shows: loaded.recommendations),
+                  const SizedBox(height: 24),
+                ] else if (state is TvDetailError) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 48),
                     child: AppErrorView(
                       message: state.message,
-                      onRetry: () => context.read<MovieDetailBloc>().add(
-                        MovieDetailFetched(widget.movieId),
+                      onRetry: () => context.read<TvDetailBloc>().add(
+                        TvDetailFetched(widget.tvShowId),
                       ),
                     ),
                   ),

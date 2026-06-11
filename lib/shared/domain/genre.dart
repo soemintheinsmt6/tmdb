@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+/// A TMDB genre, shared by the movie and TV features.
 class Genre extends Equatable {
   const Genre({required this.id, required this.name});
 

@@ -3,9 +3,9 @@ import 'package:shimmer/shimmer.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 
-/// Grid skeleton used while a movie list is loading.
-class MovieListSkeleton extends StatelessWidget {
-  const MovieListSkeleton({super.key, this.itemCount = 12});
+/// Grid skeleton used while a poster list (movies or TV shows) is loading.
+class PosterGridSkeleton extends StatelessWidget {
+  const PosterGridSkeleton({super.key, this.itemCount = 12});
 
   final int itemCount;
 

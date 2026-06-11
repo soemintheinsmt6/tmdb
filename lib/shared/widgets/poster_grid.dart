@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
-import 'package:tmdb/features/movies/domain/entities/movie.dart';
-import 'package:tmdb/features/movies/presentation/widgets/movie_card.dart';
+import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/widgets/poster_card.dart';
 
-/// Grid of [MovieCard]s with an optional trailing footer (load-more spinner).
-class MovieGrid extends StatelessWidget {
-  const MovieGrid({
+/// Grid of [PosterCard]s with an optional trailing footer (load-more spinner).
+/// Generic over [PosterItem] so movies and TV shows share one grid.
+class PosterGrid extends StatelessWidget {
+  const PosterGrid({
     super.key,
-    required this.movies,
+    required this.items,
     required this.onTap,
     this.scrollController,
     this.padding = const EdgeInsets.all(16),
@@ -15,8 +16,8 @@ class MovieGrid extends StatelessWidget {
     this.onRefresh,
   });
 
-  final List<Movie> movies;
-  final void Function(Movie movie) onTap;
+  final List<PosterItem> items;
+  final void Function(PosterItem item) onTap;
   final ScrollController? scrollController;
   final EdgeInsets padding;
   final Widget? footer;
@@ -39,10 +40,10 @@ class MovieGrid extends StatelessWidget {
               crossAxisSpacing: 8,
               childAspectRatio: aspectRatio,
             ),
-            itemCount: movies.length,
+            itemCount: items.length,
             itemBuilder: (_, index) {
-              final movie = movies[index];
-              return MovieCard(movie: movie, onTap: () => onTap(movie));
+              final item = items[index];
+              return PosterCard(item: item, onTap: () => onTap(item));
             },
           ),
         ),

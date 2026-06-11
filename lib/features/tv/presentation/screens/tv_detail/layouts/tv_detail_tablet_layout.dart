@@ -2,34 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
-import 'package:tmdb/features/favourites/presentation/widgets/favourite_toggle_button.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_bloc.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_event.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_state.dart';
-import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_event.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_state.dart';
+import 'package:tmdb/features/tv/presentation/widgets/tv_detail_cards.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
 
-class MovieDetailTabletLayout extends StatefulWidget {
-  const MovieDetailTabletLayout({
+class TvDetailTabletLayout extends StatefulWidget {
+  const TvDetailTabletLayout({
     super.key,
-    required this.movieId,
+    required this.tvShowId,
     this.fallbackTitle,
     this.seedBackdropPath,
     this.heroTag,
   });
 
-  final int movieId;
+  final int tvShowId;
   final String? fallbackTitle;
   final String? seedBackdropPath;
   final Object? heroTag;
 
   @override
-  State<MovieDetailTabletLayout> createState() =>
-      _MovieDetailTabletLayoutState();
+  State<TvDetailTabletLayout> createState() => _TvDetailTabletLayoutState();
 }
 
-class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
+class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
   final _scrollController = ScrollController();
   bool _isScrolled = false;
   bool _suppressHero = false;
@@ -84,23 +82,10 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
             fontWeight: FontWeight.w600,
           ),
           title: Text(_isScrolled ? (widget.fallbackTitle ?? '') : ''),
-          actions: [
-            BlocBuilder<MovieDetailBloc, MovieDetailState>(
-              builder: (context, state) {
-                if (state is MovieDetailLoaded) {
-                  return FavouriteToggleButton(
-                    movie: state.detail.toMovie(),
-                    color: foreground,
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
         ),
-        body: BlocBuilder<MovieDetailBloc, MovieDetailState>(
+        body: BlocBuilder<TvDetailBloc, TvDetailState>(
           builder: (context, state) {
-            final loaded = state is MovieDetailLoaded ? state.detail : null;
+            final loaded = state is TvDetailLoaded ? state.detail : null;
             final backdropPath =
                 loaded?.backdropPath ?? widget.seedBackdropPath;
             return ListView(
@@ -116,7 +101,7 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
                       children: [
                         Transform.translate(
                           offset: const Offset(0, -64),
-                          child: MovieDetailSummary(detail: loaded),
+                          child: TvDetailSummary(detail: loaded),
                         ),
                         DetailOverview(overview: loaded.overview),
                       ],
@@ -125,18 +110,18 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
                   const SizedBox(height: 32),
                   DetailCastList(cast: loaded.cast, horizontalPadding: padding),
                   const SizedBox(height: 16),
-                  MovieRecommendations(
-                    movies: loaded.recommendations,
+                  TvRecommendations(
+                    shows: loaded.recommendations,
                     horizontalPadding: padding,
                   ),
                   const SizedBox(height: 32),
-                ] else if (state is MovieDetailError) ...[
+                ] else if (state is TvDetailError) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 48),
                     child: AppErrorView(
                       message: state.message,
-                      onRetry: () => context.read<MovieDetailBloc>().add(
-                        MovieDetailFetched(widget.movieId),
+                      onRetry: () => context.read<TvDetailBloc>().add(
+                        TvDetailFetched(widget.tvShowId),
                       ),
                     ),
                   ),

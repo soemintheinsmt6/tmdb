@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/utils/navigation.dart';
-import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_list_bloc/movie_list_bloc.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_list_bloc/movie_list_event.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_list_bloc/movie_list_state.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_search_bloc/movie_search_bloc.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_search_bloc/movie_search_event.dart';
-import 'package:tmdb/features/movies/presentation/bloc/movie_search_bloc/movie_search_state.dart';
-import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
+import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_bloc.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_event.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_state.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_search_bloc/tv_search_bloc.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_search_bloc/tv_search_event.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_search_bloc/tv_search_state.dart';
+import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
 import 'package:tmdb/shared/domain/poster_item.dart';
 import 'package:tmdb/shared/widgets/app_empty_view.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
@@ -20,25 +20,25 @@ import 'package:tmdb/shared/widgets/category_tab_bar.dart';
 import 'package:tmdb/shared/widgets/poster_grid.dart';
 import 'package:tmdb/shared/widgets/poster_grid_skeleton.dart';
 
-/// Tab labels for each [MovieCategory], in enum order.
-const Map<MovieCategory, String> kMovieCategoryLabels = {
-  MovieCategory.popular: 'Popular',
-  MovieCategory.nowPlaying: 'Now Playing',
-  MovieCategory.topRated: 'Top Rated',
-  MovieCategory.upcoming: 'Upcoming',
+/// Tab labels for each [TvCategory], in enum order.
+const Map<TvCategory, String> kTvCategoryLabels = {
+  TvCategory.popular: 'Popular',
+  TvCategory.topRated: 'Top Rated',
+  TvCategory.onTheAir: 'On The Air',
+  TvCategory.airingToday: 'Airing Today',
 };
 
-/// The body of the home screen, shared between mobile and tablet layouts.
-/// Handles search debouncing, category tabs, infinite scroll, and routing
-/// to the detail screen.
-class HomeContent extends StatefulWidget {
-  const HomeContent({super.key});
+/// The body of the TV screen, shared between mobile and tablet layouts.
+/// Handles search debouncing, category tabs, infinite scroll, and routing to
+/// the detail screen. Mirrors `HomeContent` for the TV vertical.
+class TvContent extends StatefulWidget {
+  const TvContent({super.key});
 
   @override
-  State<HomeContent> createState() => _HomeContentState();
+  State<TvContent> createState() => _TvContentState();
 }
 
-class _HomeContentState extends State<HomeContent>
+class _TvContentState extends State<TvContent>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   final _searchCtrl = TextEditingController();
@@ -50,7 +50,7 @@ class _HomeContentState extends State<HomeContent>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: MovieCategory.values.length,
+      length: TvCategory.values.length,
       vsync: this,
     );
     _scrollController.addListener(_onScroll);
@@ -66,19 +66,19 @@ class _HomeContentState extends State<HomeContent>
     super.dispose();
   }
 
-  void _onCategoryTap(MovieCategory category) {
-    context.read<MovieListBloc>().add(MovieListCategoryChanged(category));
+  void _onCategoryTap(TvCategory category) {
+    context.read<TvListBloc>().add(TvListCategoryChanged(category));
     _scrollController.jumpTo(0);
   }
 
   void _onSearchChanged(String value) {
     _debounce?.cancel();
     if (value.trim().isEmpty) {
-      context.read<MovieSearchBloc>().add(const MovieSearchCleared());
+      context.read<TvSearchBloc>().add(const TvSearchCleared());
       return;
     }
     _debounce = Timer(const Duration(milliseconds: 400), () {
-      context.read<MovieSearchBloc>().add(MovieSearchQueryChanged(value));
+      context.read<TvSearchBloc>().add(TvSearchQueryChanged(value));
     });
   }
 
@@ -87,29 +87,29 @@ class _HomeContentState extends State<HomeContent>
     final position = _scrollController.position;
     if (position.pixels < position.maxScrollExtent - 320) return;
 
-    final searchState = context.read<MovieSearchBloc>().state;
-    if (searchState is MovieSearchLoaded) {
+    final searchState = context.read<TvSearchBloc>().state;
+    if (searchState is TvSearchLoaded) {
       if (searchState.hasMore && !searchState.isLoadingMore) {
-        context.read<MovieSearchBloc>().add(const MovieSearchLoadMore());
+        context.read<TvSearchBloc>().add(const TvSearchLoadMore());
       }
       return;
     }
 
-    final listState = context.read<MovieListBloc>().state;
-    if (listState is MovieListLoaded &&
+    final listState = context.read<TvListBloc>().state;
+    if (listState is TvListLoaded &&
         listState.hasMore &&
         !listState.isLoadingMore) {
-      context.read<MovieListBloc>().add(const MovieListLoadMore());
+      context.read<TvListBloc>().add(const TvListLoadMore());
     }
   }
 
   Future<void> _onRefresh() async {
-    context.read<MovieListBloc>().add(const MovieListRefreshed());
+    context.read<TvListBloc>().add(const TvListRefreshed());
   }
 
   void _openDetail(PosterItem item) {
     unawaited(
-      pushView(context, MovieDetailScreen(movieId: item.id, title: item.title)),
+      pushView(context, TvDetailScreen(tvShowId: item.id, title: item.title)),
     );
   }
 
@@ -122,26 +122,24 @@ class _HomeContentState extends State<HomeContent>
           child: AppSearchField(
             controller: _searchCtrl,
             focusNode: _searchFocus,
-            hint: 'Search movies…',
+            hint: 'Search TV shows…',
             onChanged: _onSearchChanged,
             onClear: () {
               _debounce?.cancel();
-              context.read<MovieSearchBloc>().add(const MovieSearchCleared());
+              context.read<TvSearchBloc>().add(const TvSearchCleared());
             },
           ),
         ),
-        BlocBuilder<MovieSearchBloc, MovieSearchState>(
+        BlocBuilder<TvSearchBloc, TvSearchState>(
           builder: (context, state) {
-            final showCategories = state is MovieSearchIdle;
+            final showCategories = state is TvSearchIdle;
             return showCategories
                 ? CategoryTabBar(
                     controller: _tabController,
                     labels: [
-                      for (final c in MovieCategory.values)
-                        kMovieCategoryLabels[c]!,
+                      for (final c in TvCategory.values) kTvCategoryLabels[c]!,
                     ],
-                    onIndexChanged: (i) =>
-                        _onCategoryTap(MovieCategory.values[i]),
+                    onIndexChanged: (i) => _onCategoryTap(TvCategory.values[i]),
                   )
                 : const SizedBox.shrink();
           },
@@ -152,23 +150,23 @@ class _HomeContentState extends State<HomeContent>
   }
 
   Widget _buildBody() {
-    return BlocBuilder<MovieSearchBloc, MovieSearchState>(
+    return BlocBuilder<TvSearchBloc, TvSearchState>(
       builder: (context, searchState) {
-        if (searchState is MovieSearchLoading) {
+        if (searchState is TvSearchLoading) {
           return const PosterGridSkeleton();
         }
-        if (searchState is MovieSearchError) {
+        if (searchState is TvSearchError) {
           return AppErrorView(message: searchState.message);
         }
-        if (searchState is MovieSearchLoaded) {
-          if (searchState.movies.isEmpty) {
+        if (searchState is TvSearchLoaded) {
+          if (searchState.shows.isEmpty) {
             return AppEmptyView(
               message: 'No matches for "${searchState.query}"',
             );
           }
           return PosterGrid(
             scrollController: _scrollController,
-            items: searchState.movies,
+            items: searchState.shows,
             onTap: _openDetail,
             footer: searchState.isLoadingMore
                 ? const Center(child: CircularProgressIndicator())
@@ -181,26 +179,26 @@ class _HomeContentState extends State<HomeContent>
   }
 
   Widget _buildCategoryList() {
-    return BlocBuilder<MovieListBloc, MovieListState>(
+    return BlocBuilder<TvListBloc, TvListState>(
       builder: (context, state) {
-        if (state is MovieListInitial || state is MovieListLoading) {
+        if (state is TvListInitial || state is TvListLoading) {
           return const PosterGridSkeleton();
         }
-        if (state is MovieListError) {
+        if (state is TvListError) {
           return AppErrorView(
             message: state.message,
-            onRetry: () => context.read<MovieListBloc>().add(
-              MovieListCategoryChanged(state.category),
+            onRetry: () => context.read<TvListBloc>().add(
+              TvListCategoryChanged(state.category),
             ),
           );
         }
-        if (state is MovieListLoaded) {
-          if (state.movies.isEmpty) {
-            return const AppEmptyView(message: 'No movies to show');
+        if (state is TvListLoaded) {
+          if (state.shows.isEmpty) {
+            return const AppEmptyView(message: 'No TV shows to show');
           }
           return PosterGrid(
             scrollController: _scrollController,
-            items: state.movies,
+            items: state.shows,
             onTap: _openDetail,
             onRefresh: _onRefresh,
             footer: state.isLoadingMore

@@ -74,4 +74,21 @@ void main() {
       );
     });
   });
+
+  group('ApiConstants TV endpoints', () {
+    test('static list endpoints', () {
+      expect(ApiConstants.popularTv, '/tv/popular');
+      expect(ApiConstants.topRatedTv, '/tv/top_rated');
+      expect(ApiConstants.onTheAirTv, '/tv/on_the_air');
+      expect(ApiConstants.airingTodayTv, '/tv/airing_today');
+      expect(ApiConstants.searchTv, '/search/tv');
+      expect(ApiConstants.tvGenres, '/genre/tv/list');
+    });
+
+    test('id-interpolating endpoints', () {
+      expect(ApiConstants.tvDetail(1399), '/tv/1399');
+      expect(ApiConstants.tvCredits(1399), '/tv/1399/credits');
+      expect(ApiConstants.tvRecommendations(1399), '/tv/1399/recommendations');
+    });
+  });
 }

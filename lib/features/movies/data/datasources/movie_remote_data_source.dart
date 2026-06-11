@@ -1,9 +1,9 @@
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/network/api_client.dart';
-import 'package:tmdb/features/movies/domain/entities/cast_member.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
+import 'package:tmdb/shared/domain/cast_member.dart';
 
 /// Network-only client for the movies feature. Throws the exceptions defined
 /// in `core/error/exceptions.dart`; the repository converts them to

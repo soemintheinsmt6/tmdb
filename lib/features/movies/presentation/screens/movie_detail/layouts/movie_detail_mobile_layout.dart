@@ -7,6 +7,7 @@ import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_d
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_state.dart';
 import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
+import 'package:tmdb/shared/widgets/detail_cards.dart';
 
 class MovieDetailMobileLayout extends StatefulWidget {
   const MovieDetailMobileLayout({
@@ -113,7 +114,7 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                       children: [
                         Transform.translate(
                           offset: const Offset(0, -40),
-                          child: DetailSummary(detail: loaded),
+                          child: MovieDetailSummary(detail: loaded),
                         ),
                         DetailOverview(overview: loaded.overview),
                       ],
@@ -122,7 +123,7 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                   const SizedBox(height: 24),
                   DetailCastList(cast: loaded.cast),
                   const SizedBox(height: 12),
-                  DetailRecommendations(movies: loaded.recommendations),
+                  MovieRecommendations(movies: loaded.recommendations),
                   const SizedBox(height: 24),
                 ] else if (state is MovieDetailError) ...[
                   Padding(

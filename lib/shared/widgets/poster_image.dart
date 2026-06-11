@@ -5,8 +5,8 @@ import 'package:tmdb/core/theme/app_colors.dart';
 
 /// Renders a TMDB poster URL with rounded corners, placeholder, and error
 /// fallback. Pass an empty string for [url] to show the placeholder directly.
-class MoviePoster extends StatelessWidget {
-  const MoviePoster({
+class PosterImage extends StatelessWidget {
+  const PosterImage({
     super.key,
     required this.url,
     this.borderRadius = 12,

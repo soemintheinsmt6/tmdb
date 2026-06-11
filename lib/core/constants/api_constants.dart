@@ -27,11 +27,22 @@ class ApiConstants {
   static String movieRecommendations(int id) => '/movie/$id/recommendations';
   static String movieVideos(int id) => '/movie/$id/videos';
 
+  // ── TV shows ──────────────────────────────────────────
+  static const String popularTv = '/tv/popular';
+  static const String topRatedTv = '/tv/top_rated';
+  static const String onTheAirTv = '/tv/on_the_air';
+  static const String airingTodayTv = '/tv/airing_today';
+  static String tvDetail(int id) => '/tv/$id';
+  static String tvCredits(int id) => '/tv/$id/credits';
+  static String tvRecommendations(int id) => '/tv/$id/recommendations';
+
   // ── Search ────────────────────────────────────────────
   static const String searchMovies = '/search/movie';
+  static const String searchTv = '/search/tv';
 
   // ── Genres ────────────────────────────────────────────
   static const String movieGenres = '/genre/movie/list';
+  static const String tvGenres = '/genre/tv/list';
 
   // ── Image helpers ─────────────────────────────────────
   static String posterUrl(String? path, {String size = 'w500'}) {

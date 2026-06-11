@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
-import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 
-const Map<MovieCategory, String> kCategoryLabels = {
-  MovieCategory.popular: 'Popular',
-  MovieCategory.nowPlaying: 'Now Playing',
-  MovieCategory.topRated: 'Top Rated',
-  MovieCategory.upcoming: 'Upcoming',
-};
-
-/// Horizontal scrolling tab bar of [MovieCategory]s.
+/// Horizontal scrolling tab bar driven by a plain list of [labels]. The owning
+/// feature maps the selected index back onto its own category enum.
 class CategoryTabBar extends StatelessWidget {
   const CategoryTabBar({
     super.key,
     required this.controller,
-    required this.onChanged,
+    required this.labels,
+    required this.onIndexChanged,
   });
 
   final TabController controller;
-  final ValueChanged<MovieCategory> onChanged;
+  final List<String> labels;
+  final ValueChanged<int> onIndexChanged;
 
   @override
   Widget build(BuildContext context) {
-    const categories = MovieCategory.values;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -34,10 +28,8 @@ class CategoryTabBar extends StatelessWidget {
         isScrollable: true,
         tabAlignment: TabAlignment.start,
         labelPadding: const EdgeInsets.symmetric(horizontal: 16),
-        onTap: (index) => onChanged(categories[index]),
-        tabs: [
-          for (final c in categories) Tab(text: kCategoryLabels[c], height: 44),
-        ],
+        onTap: onIndexChanged,
+        tabs: [for (final label in labels) Tab(text: label, height: 44)],
       ),
     );
   }
