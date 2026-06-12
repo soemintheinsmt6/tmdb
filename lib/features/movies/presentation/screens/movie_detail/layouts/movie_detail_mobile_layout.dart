@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
+import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourite_toggle_button.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_bloc.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_event.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_state.dart';
 import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dart';
+import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
 
@@ -121,7 +123,16 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  DetailCastList(cast: loaded.cast),
+                  DetailCastList(
+                    cast: loaded.cast,
+                    onTap: (member) => pushView(
+                      context,
+                      PersonDetailScreen(
+                        personId: member.id,
+                        name: member.name,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   MovieRecommendations(movies: loaded.recommendations),
                   const SizedBox(height: 24),

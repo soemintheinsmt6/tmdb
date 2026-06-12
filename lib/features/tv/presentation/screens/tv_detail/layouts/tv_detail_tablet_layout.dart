@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
+import 'package:tmdb/core/utils/navigation.dart';
+import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_event.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_state.dart';
@@ -108,7 +110,17 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  DetailCastList(cast: loaded.cast, horizontalPadding: padding),
+                  DetailCastList(
+                    cast: loaded.cast,
+                    horizontalPadding: padding,
+                    onTap: (member) => pushView(
+                      context,
+                      PersonDetailScreen(
+                        personId: member.id,
+                        name: member.name,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   TvRecommendations(
                     shows: loaded.recommendations,

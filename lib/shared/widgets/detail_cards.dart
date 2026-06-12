@@ -227,10 +227,15 @@ class DetailCastList extends StatelessWidget {
   const DetailCastList({
     super.key,
     required this.cast,
+    this.onTap,
     this.horizontalPadding = 16,
   });
 
   final List<CastMember> cast;
+
+  /// Routes a tapped cast member (e.g. to the person detail screen). When
+  /// `null` the tiles render as plain, non-interactive avatars.
+  final void Function(CastMember member)? onTap;
   final double horizontalPadding;
 
   @override
@@ -253,7 +258,10 @@ class DetailCastList extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(width: 6),
             itemBuilder: (_, index) {
               final c = cast[index];
-              return SizedBox(width: 100, child: _CastTile(member: c));
+              return SizedBox(
+                width: 100,
+                child: _CastTile(member: c, onTap: onTap),
+              );
             },
           ),
         ),
@@ -263,9 +271,10 @@ class DetailCastList extends StatelessWidget {
 }
 
 class _CastTile extends StatelessWidget {
-  const _CastTile({required this.member});
+  const _CastTile({required this.member, this.onTap});
 
   final CastMember member;
+  final void Function(CastMember member)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +285,7 @@ class _CastTile extends StatelessWidget {
       alignment: Alignment.center,
       child: Icon(IconsaxPlusLinear.user, color: colors.textMuted),
     );
-    return Column(
+    final tile = Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         ClipRRect(
@@ -313,6 +322,13 @@ class _CastTile extends StatelessWidget {
           style: AppTypography.labelSmall,
         ),
       ],
+    );
+
+    if (onTap == null) return tile;
+    return InkWell(
+      onTap: () => onTap!(member),
+      borderRadius: BorderRadius.circular(12),
+      child: tile,
     );
   }
 }

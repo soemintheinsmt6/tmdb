@@ -8,6 +8,7 @@ import 'package:tmdb/features/movies/data/datasources/movie_remote_data_source.d
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
+import 'package:tmdb/shared/domain/cast_member.dart';
 
 class MovieRepositoryImpl implements MovieRepository {
   const MovieRepositoryImpl(this._remote, {AppLogger? logger})
@@ -35,11 +36,18 @@ class MovieRepositoryImpl implements MovieRepository {
   @override
   ResultFuture<MovieDetail> getMovieDetail(int id) {
     return _guard(() async {
-      final (detail, cast, recommendations) = await (
+      // List `Future.wait` (not the record `.wait`) is deliberate: it rethrows
+      // the original exception so `_guard` can map it, whereas the record form
+      // wraps a partial async failure in a `ParallelWaitError` that escapes the
+      // typed-exception clauses in `_guard`.
+      final results = await Future.wait([
         _remote.getMovieDetail(id),
         _remote.getMovieCredits(id),
         _remote.getMovieRecommendations(id),
-      ).wait;
+      ]);
+      final detail = results[0] as MovieDetail;
+      final cast = results[1] as List<CastMember>;
+      final recommendations = results[2] as PaginatedMovies;
 
       return detail.copyWith(
         cast: cast.take(20).toList(),

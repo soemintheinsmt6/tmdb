@@ -210,6 +210,31 @@ void main() {
       },
     );
 
+    test('a credits failure raised asynchronously is mapped to its original '
+        'status (not wrapped in ParallelWaitError)', () async {
+      when(
+        () => remote.getTvShowDetail(1),
+      ).thenAnswer((_) async => buildTvShowDetail());
+      when(() => remote.getTvCredits(1)).thenAnswer(
+        (_) async => throw const ServerException(
+          message: 'credits failed',
+          statusCode: 500,
+        ),
+      );
+      when(
+        () => remote.getTvRecommendations(1),
+      ).thenAnswer((_) async => buildPaginatedTv());
+
+      final result = await repository.getTvShowDetail(1);
+
+      expect(
+        result,
+        const Left<Failure, TvShowDetail>(
+          ServerFailure(message: 'credits failed', statusCode: 500),
+        ),
+      );
+    });
+
     test('mapped failures are reported through the logging seam', () async {
       final logger = _RecordingLogger();
       final observed = TvRepositoryImpl(remote, logger: logger);

@@ -4,54 +4,33 @@ import 'package:tmdb/core/error/exceptions.dart';
 import 'package:tmdb/core/error/failures.dart';
 import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/core/utils/typedef.dart';
-import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
-import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
-import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
-import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
-import 'package:tmdb/shared/domain/cast_member.dart';
+import 'package:tmdb/features/people/data/datasources/person_remote_data_source.dart';
+import 'package:tmdb/features/people/domain/entities/person.dart';
+import 'package:tmdb/features/people/domain/entities/person_credit.dart';
+import 'package:tmdb/features/people/domain/repositories/person_repository.dart';
 
-class TvRepositoryImpl implements TvRepository {
-  const TvRepositoryImpl(this._remote, {AppLogger? logger}) : _logger = logger;
+class PersonRepositoryImpl implements PersonRepository {
+  const PersonRepositoryImpl(this._remote, {AppLogger? logger})
+    : _logger = logger;
 
-  final TvRemoteDataSource _remote;
+  final PersonRemoteDataSource _remote;
   final AppLogger? _logger;
 
   @override
-  ResultFuture<PaginatedTvShows> getTvShows({
-    required TvCategory category,
-    int page = 1,
-  }) {
-    return _guard(() => _remote.getTvShows(category: category, page: page));
-  }
-
-  @override
-  ResultFuture<PaginatedTvShows> searchTvShows({
-    required String query,
-    int page = 1,
-  }) {
-    return _guard(() => _remote.searchTvShows(query: query, page: page));
-  }
-
-  @override
-  ResultFuture<TvShowDetail> getTvShowDetail(int id) {
+  ResultFuture<Person> getPersonDetail(int id) {
     return _guard(() async {
       // List `Future.wait` (not the record `.wait`) is deliberate: it rethrows
       // the original exception so `_guard` can map it, whereas the record form
       // wraps a partial async failure in a `ParallelWaitError` that escapes the
-      // typed-exception clauses in `_guard`.
+      // typed-exception clauses below.
       final results = await Future.wait([
-        _remote.getTvShowDetail(id),
-        _remote.getTvCredits(id),
-        _remote.getTvRecommendations(id),
+        _remote.getPersonDetail(id),
+        _remote.getCombinedCredits(id),
       ]);
-      final detail = results[0] as TvShowDetail;
-      final cast = results[1] as List<CastMember>;
-      final recommendations = results[2] as PaginatedTvShows;
+      final detail = results[0] as Person;
+      final credits = results[1] as List<PersonCredit>;
 
-      return detail.copyWith(
-        cast: cast.take(20).toList(),
-        recommendations: recommendations.shows,
-      );
+      return detail.copyWith(filmography: credits.take(30).toList());
     });
   }
 

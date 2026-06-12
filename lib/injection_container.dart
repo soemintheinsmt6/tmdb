@@ -12,6 +12,10 @@ import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_bloc.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_list_bloc/movie_list_bloc.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_search_bloc/movie_search_bloc.dart';
+import 'package:tmdb/features/people/data/datasources/person_remote_data_source.dart';
+import 'package:tmdb/features/people/data/repositories/person_repository_impl.dart';
+import 'package:tmdb/features/people/domain/repositories/person_repository.dart';
+import 'package:tmdb/features/people/presentation/bloc/person_detail_bloc/person_detail_bloc.dart';
 import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
 import 'package:tmdb/features/tv/data/repositories/tv_repository_impl.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
@@ -49,6 +53,14 @@ Future<void> init() async {
   sl.registerFactory(() => TvListBloc(repository: sl()));
   sl.registerFactory(() => TvSearchBloc(repository: sl()));
   sl.registerFactory(() => TvDetailBloc(repository: sl()));
+
+  // ── People feature ─────────────────────────────────────
+  sl.registerLazySingleton(() => PersonRemoteDataSource(sl()));
+  sl.registerLazySingleton<PersonRepository>(
+    () => PersonRepositoryImpl(sl(), logger: sl<AppLogger>()),
+  );
+
+  sl.registerFactory(() => PersonDetailBloc(repository: sl()));
 
   // ── Favourites feature ─────────────────────────────────
   sl.registerLazySingleton<FavouritesRepository>(

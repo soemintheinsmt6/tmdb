@@ -55,6 +55,12 @@ lib/
 │   │                           # tv_list/tv_search/tv_detail blocs, tv_screen + tv_detail.
 │   │                           # Categories: Popular / Top Rated / On The Air / Airing Today.
 │   │                           # Browse + detail only — no favouriting in v1.
+│   ├── people/                 # Person (detail) + PersonCredit (implements PosterItem),
+│   │                           # PersonRepository, remote data source (/person/{id} +
+│   │                           # /person/{id}/combined_credits), person_detail bloc, and
+│   │                           # person_detail screen (one width-adaptive layout — no
+│   │                           # backdrop). Reached by tapping a cast tile on any movie/TV
+│   │                           # detail; filmography posters route back into movie/TV detail.
 │   ├── favourites/
 │   │   ├── data/
 │   │   │   ├── models/         # FavouriteMovie (Hive TypeAdapter, persistence-only)
@@ -113,7 +119,7 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 178 host-side tests + one device E2E.
+The project has three test layers; together they're 206 host-side tests + one device E2E.
 
 ```bash
 dart format --set-exit-if-changed .   # formatting gate
@@ -137,6 +143,8 @@ test/
 │   │   ├── domain/entities/    # fromJson, copyWith, computed props
 │   │   └── presentation/bloc/  # MovieList, MovieSearch, MovieDetail blocs
 │   ├── tv/                     # mirrors movies: entities, data, TvList/TvSearch/TvDetail blocs
+│   ├── people/                 # PersonCredit/Person entities, data (datasource + repo),
+│   │                           # PersonDetail bloc
 │   └── favourites/
 │       ├── data/models/        # FavouriteMovie mapper
 │       └── presentation/cubit/ # FavouritesState, FavouritesCubit
@@ -144,7 +152,8 @@ test/
 │   ├── home_content_test.dart
 │   ├── tv_content_test.dart
 │   └── favourite_screen_test.dart
-└── helpers/                    # movie_fixtures.dart, tv_fixtures.dart (shared builders)
+└── helpers/                    # movie_fixtures.dart, tv_fixtures.dart, people_fixtures.dart
+                                # (shared builders)
 ```
 
 ### End-to-end (`integration_test`)
@@ -164,8 +173,9 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Browse** Popular, Now Playing, Top Rated, Upcoming with a horizontal tab switcher.
 - **Search** with 400 ms debounce; falls back to category browse when cleared.
 - **Infinite scroll** + pull-to-refresh on the category grid.
-- **Movie detail** with full-bleed backdrop header, runtime / year / genres chips, top-billed cast (capped at 20), and "More Like This" recommendations. Header renders immediately from a seed backdrop path passed via the route, so navigation lands on the image instead of a spinner.
+- **Movie detail** with full-bleed backdrop header, runtime / year / genres chips, top-billed cast (capped at 20, each face tappable → person page), and "More Like This" recommendations. Header renders immediately from a seed backdrop path passed via the route, so navigation lands on the image instead of a spinner.
 - **TV shows** on their own tab (Popular / Top Rated / On The Air / Airing Today) with the same search, infinite scroll, and detail layout — season & episode counts replace runtime. Browse + detail only (no favouriting in v1). Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
+- **People / cast** — tap any cast member to open a person page with their profile photo, known-for department, birthday / age / birthplace, an expandable biography, and a combined movie + TV **filmography** (sorted by popularity) whose posters route back into the matching movie or TV detail. Reuses the same poster kernel as the browse grids.
 - **Favourites** persisted locally via Hive; reactive — toggling on the detail screen updates the home grid heart and the Favourites tab in real time.
 - **Shared-element transition** — tapping a favourites card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
 - **Profile tab** showing favourites count plus a destructive "Clear favourites" flow with confirm dialog.
