@@ -245,4 +245,39 @@ void main() {
       expect(reviews, isEmpty);
     });
   });
+
+  group('getMovieImages', () {
+    test(
+      'hits /movie/{id}/images (no language) and parses backdrops',
+      () async {
+        when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+          (_) async => <String, dynamic>{
+            'backdrops': [
+              {'file_path': '/a.jpg', 'aspect_ratio': 1.778},
+              {'file_path': '/b.jpg', 'aspect_ratio': 1.778},
+            ],
+            'posters': [
+              {'file_path': '/poster.jpg', 'aspect_ratio': 0.667},
+            ],
+          },
+        );
+
+        final images = await dataSource.getMovieImages(550);
+
+        verify(() => apiClient.get(ApiConstants.movieImages(550))).called(1);
+        // Only backdrops are surfaced, in order.
+        expect(images.map((i) => i.filePath), ['/a.jpg', '/b.jpg']);
+      },
+    );
+
+    test('returns an empty list when backdrops key is missing', () async {
+      when(
+        () => apiClient.get(any(), query: any(named: 'query')),
+      ).thenAnswer((_) async => <String, dynamic>{});
+
+      final images = await dataSource.getMovieImages(1);
+
+      expect(images, isEmpty);
+    });
+  });
 }

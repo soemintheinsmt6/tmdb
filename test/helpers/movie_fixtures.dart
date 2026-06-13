@@ -3,6 +3,7 @@ import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
@@ -106,6 +107,20 @@ Review buildReview({
   );
 }
 
+MediaImage buildImage({
+  String filePath = '/backdrop.jpg',
+  double aspectRatio = 16 / 9,
+  int width = 1920,
+  int height = 1080,
+}) {
+  return MediaImage(
+    filePath: filePath,
+    aspectRatio: aspectRatio,
+    width: width,
+    height: height,
+  );
+}
+
 MovieDetail buildMovieDetail({
   int id = 550,
   String title = 'Fight Club',
@@ -123,6 +138,7 @@ MovieDetail buildMovieDetail({
   List<Movie> recommendations = const [],
   List<Video> videos = const [],
   List<Review> reviews = const [],
+  List<MediaImage> images = const [],
 }) {
   return MovieDetail(
     id: id,
@@ -141,5 +157,6 @@ MovieDetail buildMovieDetail({
     recommendations: recommendations,
     videos: videos,
     reviews: reviews,
+    images: images,
   );
 }

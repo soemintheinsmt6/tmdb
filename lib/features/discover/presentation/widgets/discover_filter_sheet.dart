@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/features/discover/domain/entities/discover_filter.dart';
@@ -127,9 +128,9 @@ class _DiscoverFilterSheetState extends State<_DiscoverFilterSheet> {
                     Slider(
                       value: _minRating,
                       max: 9,
-                      divisions: 9,
-                      label: _minRating.toStringAsFixed(0),
                       activeColor: AppColors.cyan,
+                      // No divisions → continuous, smooth drag; the header above
+                      // reflects the value live as it changes.
                       onChanged: (v) => setState(() => _minRating = v),
                     ),
                     _label('Release year'),
@@ -147,6 +148,14 @@ class _DiscoverFilterSheetState extends State<_DiscoverFilterSheet> {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
+                style: FilledButton.styleFrom(
+                  // White label on the cyan button in light mode; theme default
+                  // (navy) in dark.
+                  foregroundColor:
+                      Theme.of(context).brightness == Brightness.dark
+                      ? null
+                      : AppColors.white,
+                ),
                 onPressed: _apply,
                 child: const Text('Show results'),
               ),
@@ -269,8 +278,14 @@ class _YearDropdown extends StatelessWidget {
         value: year,
         isExpanded: true,
         underline: const SizedBox.shrink(),
-        hint: const Text('Any year'),
+        hint: const Text('Any year', style: AppTypography.bodyText),
+        style: AppTypography.bodyText.copyWith(color: colors.textPrimary),
         dropdownColor: colors.surface,
+        icon: Icon(
+          IconsaxPlusLinear.arrow_down,
+          size: 18,
+          color: colors.textMuted,
+        ),
         items: [
           const DropdownMenuItem<int?>(child: Text('Any year')),
           for (int y = maxYear; y >= minYear; y--)

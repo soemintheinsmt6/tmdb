@@ -107,18 +107,11 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
             final loaded = state is MovieDetailLoaded ? state.detail : null;
             final backdropPath =
                 loaded?.backdropPath ?? widget.seedBackdropPath;
-            final trailer = loaded?.videos.bestTrailer;
             return ListView(
               controller: _scrollController,
               padding: EdgeInsets.zero,
               children: [
-                DetailHeader(
-                  backdropPath: backdropPath,
-                  heroTag: heroTag,
-                  onPlayTrailer: trailer == null
-                      ? null
-                      : () => playTrailer(context, trailer),
-                ),
+                DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
                 if (loaded != null) ...[
                   Padding(
                     padding: EdgeInsets.fromLTRB(padding, 0, padding, 0),
@@ -138,6 +131,11 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
                     videos: loaded.videos.youTubeVideos,
                     horizontalPadding: padding,
                     onTap: (video) => playTrailer(context, video),
+                  ),
+                  const SizedBox(height: 32),
+                  DetailImageGallery(
+                    images: loaded.images,
+                    horizontalPadding: padding,
                   ),
                   const SizedBox(height: 32),
                   DetailCastList(

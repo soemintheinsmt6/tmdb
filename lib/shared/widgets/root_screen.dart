@@ -78,12 +78,15 @@ class _RootScreenState extends State<RootScreen> {
               label: 'Discover',
             ),
             NavigationDestination(
-              icon: Icon(IconsaxPlusLinear.monitor, color: colors.textMuted),
+              icon: Icon(
+                IconsaxPlusLinear.video_square,
+                color: colors.textMuted,
+              ),
               selectedIcon: const Icon(
-                IconsaxPlusBold.monitor,
+                IconsaxPlusBold.video_square,
                 color: AppColors.cyan,
               ),
-              label: 'TV',
+              label: 'Series',
             ),
             NavigationDestination(
               icon: Icon(IconsaxPlusLinear.heart, color: colors.textMuted),

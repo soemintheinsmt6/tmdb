@@ -3,6 +3,7 @@ import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
@@ -82,6 +83,7 @@ TvShowDetail buildTvShowDetail({
   List<TvShow> recommendations = const [],
   List<Video> videos = const [],
   List<Review> reviews = const [],
+  List<MediaImage> images = const [],
 }) {
   return TvShowDetail(
     id: id,
@@ -103,6 +105,7 @@ TvShowDetail buildTvShowDetail({
     recommendations: recommendations,
     videos: videos,
     reviews: reviews,
+    images: images,
   );
 }
 
@@ -143,5 +146,19 @@ Review buildReview({
     rating: rating,
     content: content,
     createdAt: createdAt,
+  );
+}
+
+MediaImage buildImage({
+  String filePath = '/backdrop.jpg',
+  double aspectRatio = 16 / 9,
+  int width = 1920,
+  int height = 1080,
+}) {
+  return MediaImage(
+    filePath: filePath,
+    aspectRatio: aspectRatio,
+    width: width,
+    height: height,
   );
 }

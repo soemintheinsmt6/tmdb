@@ -52,5 +52,9 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TMDB needs access to save photos to your library.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>TMDB needs access to save photos to your library.</string>
 </dict>
 </plist>

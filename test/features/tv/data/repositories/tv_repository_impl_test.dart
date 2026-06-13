@@ -9,6 +9,7 @@ import 'package:tmdb/features/tv/data/repositories/tv_repository_impl.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
+import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
@@ -50,6 +51,9 @@ void main() {
     when(
       () => remote.getTvReviews(any()),
     ).thenAnswer((_) async => const <Review>[]);
+    when(
+      () => remote.getTvImages(any()),
+    ).thenAnswer((_) async => const <MediaImage>[]);
   });
 
   group('getTvShows', () {
@@ -99,6 +103,10 @@ void main() {
         );
         final videos = [buildVideo(id: 'a'), buildVideo(id: 'b')];
         final reviews = List.generate(15, (i) => buildReview(id: 'r$i'));
+        final images = List.generate(
+          20,
+          (i) => buildImage(filePath: '/img$i.jpg'),
+        );
 
         when(
           () => remote.getTvShowDetail(1399),
@@ -109,6 +117,7 @@ void main() {
         ).thenAnswer((_) async => recs);
         when(() => remote.getTvVideos(1399)).thenAnswer((_) async => videos);
         when(() => remote.getTvReviews(1399)).thenAnswer((_) async => reviews);
+        when(() => remote.getTvImages(1399)).thenAnswer((_) async => images);
 
         final result = await repository.getTvShowDetail(1399);
 
@@ -119,9 +128,11 @@ void main() {
         expect(composed.cast.last.id, 19);
         expect(composed.recommendations.map((s) => s.id), [100, 101]);
         expect(composed.videos.map((v) => v.id), ['a', 'b']);
-        // Reviews capped at 10.
+        // Reviews capped at 10, images capped at 16.
         expect(composed.reviews, hasLength(10));
         expect(composed.reviews.first.id, 'r0');
+        expect(composed.images, hasLength(16));
+        expect(composed.images.first.filePath, '/img0.jpg');
         // Base detail fields preserved via copyWith.
         expect(composed.id, detailBase.id);
         expect(composed.name, detailBase.name);
@@ -132,6 +143,7 @@ void main() {
         verify(() => remote.getTvRecommendations(1399)).called(1);
         verify(() => remote.getTvVideos(1399)).called(1);
         verify(() => remote.getTvReviews(1399)).called(1);
+        verify(() => remote.getTvImages(1399)).called(1);
       },
     );
 

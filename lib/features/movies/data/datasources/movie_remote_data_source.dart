@@ -4,6 +4,7 @@ import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
+import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
@@ -101,6 +102,16 @@ class MovieRemoteDataSource {
     final json = response as Map<String, dynamic>;
     return ((json['results'] as List?) ?? const [])
         .map((e) => Review.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Backdrops for the gallery. No `language` filter — that would drop the
+  /// (numerous) language-agnostic backdrops and leave only localized ones.
+  Future<List<MediaImage>> getMovieImages(int id) async {
+    final response = await _apiClient.get(ApiConstants.movieImages(id));
+    final json = response as Map<String, dynamic>;
+    return ((json['backdrops'] as List?) ?? const [])
+        .map((e) => MediaImage.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }

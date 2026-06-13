@@ -38,6 +38,7 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   late final YoutubePlayerController _controller;
   bool _embedFailed = false;
   bool _isFullScreen = false;
+  bool _playerReady = false;
 
   /// Preserves the player's state (and the underlying webview, so playback
   /// doesn't restart) when it is reparented between the portrait and fullscreen
@@ -47,6 +48,16 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   /// While the user is dragging the scrubber, holds the pending position (in
   /// seconds) so the thumb tracks the finger instead of the live playhead.
   double? _dragSeconds;
+
+  /// Seconds a double-tap last seeked by (±10), shown briefly as an overlay;
+  /// `0` hides it. [_seekFeedbackTimer] clears it after a moment.
+  int _seekFeedback = 0;
+  Timer? _seekFeedbackTimer;
+
+  /// X of the last double-tap, used to pick the seek direction (left/right).
+  double _lastDoubleTapDx = 0;
+
+  static const int _seekStep = 10;
 
   @override
   void initState() {
@@ -60,6 +71,9 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
         // Hide the package's overlay (its always-on centre play/pause button);
         // we draw a slim tap-to-toggle layer + red progress bar instead.
         hideControls: true,
+        // Don't flash YouTube's thumbnail while loading — we show a spinner
+        // until the player is ready (better on slow connections / first load).
+        hideThumbnail: true,
       ),
     );
     _controller.addListener(_onControllerUpdate);
@@ -73,13 +87,18 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   }
 
   void _onControllerUpdate() {
-    if (_controller.value.hasError && !_embedFailed && mounted) {
+    if (!mounted) return;
+    if (_controller.value.hasError && !_embedFailed) {
       setState(() => _embedFailed = true);
+    }
+    if (!_playerReady && _controller.value.isReady) {
+      setState(() => _playerReady = true);
     }
   }
 
   @override
   void dispose() {
+    _seekFeedbackTimer?.cancel();
     _controller.removeListener(_onControllerUpdate);
     _controller.dispose();
     // Leave the app as we found it: bars back, orientation unlocked.
@@ -94,6 +113,89 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
     } else {
       _controller.play();
     }
+  }
+
+  /// Seeks by [seconds] (negative = back), clamped to the video bounds, and
+  /// flashes the seek indicator.
+  void _seekBy(int seconds) {
+    final value = _controller.value;
+    final duration = value.metaData.duration;
+    var target = value.position + Duration(seconds: seconds);
+    if (target < Duration.zero) target = Duration.zero;
+    if (duration > Duration.zero && target > duration) target = duration;
+    _controller.seekTo(target);
+
+    setState(() => _seekFeedback = seconds);
+    _seekFeedbackTimer?.cancel();
+    _seekFeedbackTimer = Timer(const Duration(milliseconds: 700), () {
+      if (mounted) setState(() => _seekFeedback = 0);
+    });
+  }
+
+  /// Full-bleed gesture layer over the video: single tap toggles play/pause,
+  /// double tap on the left/right half seeks back/forward by [_seekStep].
+  Widget _gestureLayer() {
+    return Positioned.fill(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _togglePlayPause,
+            onDoubleTapDown: (details) =>
+                _lastDoubleTapDx = details.localPosition.dx,
+            onDoubleTap: () => _seekBy(
+              _lastDoubleTapDx < constraints.maxWidth / 2
+                  ? -_seekStep
+                  : _seekStep,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Black cover with a spinner shown until the player is ready, so a slow or
+  /// first load shows a loading indicator instead of YouTube's thumbnail.
+  Widget _loadingOverlay() {
+    if (_playerReady) return const SizedBox.shrink();
+    return const Positioned.fill(
+      child: ColoredBox(
+        color: Colors.black,
+        child: Center(child: CircularProgressIndicator(color: Colors.white)),
+      ),
+    );
+  }
+
+  /// Brief "10s" overlay on the side that was double-tapped.
+  Widget _seekFeedbackOverlay() {
+    if (_seekFeedback == 0) return const SizedBox.shrink();
+    final forward = _seekFeedback > 0;
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: Align(
+          alignment: forward ? Alignment.centerRight : Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 48),
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                color: Colors.black54,
+                shape: BoxShape.circle,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Icon(
+                  forward
+                      ? Icons.fast_forward_rounded
+                      : Icons.fast_rewind_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _enterFullScreen() {
@@ -255,21 +357,14 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
       child: YoutubePlayer(controller: _controller, aspectRatio: 16 / 9),
     );
 
-    // Tap anywhere on the video to play/pause (replaces the removed centre
-    // button); intercepts taps so they don't reach the embed underneath.
-    final tapToToggle = Positioned.fill(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _togglePlayPause,
-      ),
-    );
-
     final body = _isFullScreen
         ? Stack(
             fit: StackFit.expand,
             children: [
               Center(child: player),
-              tapToToggle,
+              _seekFeedbackOverlay(),
+              // Gesture layer on top so taps/double-taps don't reach the embed.
+              _gestureLayer(),
               Positioned(
                 left: 0,
                 right: 0,
@@ -282,14 +377,17 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
                   child: _exitFullScreenButton(),
                 ),
               ),
+              _loadingOverlay(),
             ],
           )
         : Center(
             child: Stack(
               children: [
                 player,
-                tapToToggle,
+                _seekFeedbackOverlay(),
+                _gestureLayer(),
                 Positioned(left: 0, right: 0, bottom: 0, child: _controlsBar()),
+                _loadingOverlay(),
               ],
             ),
           );

@@ -6,6 +6,7 @@ import 'package:tmdb/core/extensions/string_year.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
@@ -29,17 +30,19 @@ class MovieDetail extends Equatable {
     required this.recommendations,
     required this.videos,
     required this.reviews,
+    required this.images,
   });
 
-  /// Parses the `/movie/{id}` payload. Cast, recommendations, videos, and
-  /// reviews come from separate endpoints, so the repository injects them after
-  /// the parallel fetch.
+  /// Parses the `/movie/{id}` payload. Cast, recommendations, videos, reviews,
+  /// and images come from separate endpoints, so the repository injects them
+  /// after the parallel fetch.
   factory MovieDetail.fromJson(
     Map<String, dynamic> json, {
     List<CastMember> cast = const [],
     List<Movie> recommendations = const [],
     List<Video> videos = const [],
     List<Review> reviews = const [],
+    List<MediaImage> images = const [],
   }) {
     return MovieDetail(
       id: json['id'] as int,
@@ -60,6 +63,7 @@ class MovieDetail extends Equatable {
       recommendations: recommendations,
       videos: videos,
       reviews: reviews,
+      images: images,
     );
   }
 
@@ -68,6 +72,7 @@ class MovieDetail extends Equatable {
     List<Movie>? recommendations,
     List<Video>? videos,
     List<Review>? reviews,
+    List<MediaImage>? images,
   }) {
     return MovieDetail(
       id: id,
@@ -86,6 +91,7 @@ class MovieDetail extends Equatable {
       recommendations: recommendations ?? this.recommendations,
       videos: videos ?? this.videos,
       reviews: reviews ?? this.reviews,
+      images: images ?? this.images,
     );
   }
 
@@ -105,6 +111,7 @@ class MovieDetail extends Equatable {
   final List<Movie> recommendations;
   final List<Video> videos;
   final List<Review> reviews;
+  final List<MediaImage> images;
 
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
@@ -146,5 +153,6 @@ class MovieDetail extends Equatable {
     recommendations,
     videos,
     reviews,
+    images,
   ];
 }

@@ -235,4 +235,32 @@ void main() {
       expect(reviews, isEmpty);
     });
   });
+
+  group('getTvImages', () {
+    test('hits /tv/{id}/images (no language) and parses backdrops', () async {
+      when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+        (_) async => <String, dynamic>{
+          'backdrops': [
+            {'file_path': '/a.jpg', 'aspect_ratio': 1.778},
+            {'file_path': '/b.jpg', 'aspect_ratio': 1.778},
+          ],
+        },
+      );
+
+      final images = await dataSource.getTvImages(1399);
+
+      verify(() => apiClient.get(ApiConstants.tvImages(1399))).called(1);
+      expect(images.map((i) => i.filePath), ['/a.jpg', '/b.jpg']);
+    });
+
+    test('returns an empty list when backdrops key is missing', () async {
+      when(
+        () => apiClient.get(any(), query: any(named: 'query')),
+      ).thenAnswer((_) async => <String, dynamic>{});
+
+      final images = await dataSource.getTvImages(1);
+
+      expect(images, isEmpty);
+    });
+  });
 }

@@ -6,27 +6,20 @@ import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/poster_item.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/widgets/image_gallery_viewer.dart';
 import 'package:tmdb/shared/widgets/poster_image.dart';
 import 'package:tmdb/shared/widgets/rating_badge.dart';
 
 /// Backdrop hero with a bottom fade, shared by the movie and TV detail screens.
-///
-/// When [onPlayTrailer] is non-null, a centered play button is overlaid on the
-/// backdrop so the primary trailer is one tap away.
 class DetailHeader extends StatelessWidget {
-  const DetailHeader({
-    super.key,
-    required this.backdropPath,
-    this.heroTag,
-    this.onPlayTrailer,
-  });
+  const DetailHeader({super.key, required this.backdropPath, this.heroTag});
 
   final String? backdropPath;
   final Object? heroTag;
-  final VoidCallback? onPlayTrailer;
 
   @override
   Widget build(BuildContext context) {
@@ -66,37 +59,7 @@ class DetailHeader extends StatelessWidget {
             ),
           ),
         ),
-        if (onPlayTrailer != null)
-          Positioned.fill(
-            child: Align(
-              alignment: const Alignment(0, -0.2),
-              child: _PlayTrailerButton(onTap: onPlayTrailer!),
-            ),
-          ),
       ],
-    );
-  }
-}
-
-/// Circular "play trailer" affordance overlaid on the [DetailHeader] backdrop.
-class _PlayTrailerButton extends StatelessWidget {
-  const _PlayTrailerButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withValues(alpha: 0.45),
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: const Padding(
-          padding: EdgeInsets.all(16),
-          child: Icon(IconsaxPlusBold.play, color: Colors.white, size: 32),
-        ),
-      ),
     );
   }
 }
@@ -529,7 +492,7 @@ class _VideoTile extends StatelessWidget {
                   ),
                   const Center(
                     child: Icon(
-                      IconsaxPlusBold.play,
+                      IconsaxPlusBold.video_play,
                       color: Colors.white,
                       size: 36,
                     ),
@@ -739,6 +702,77 @@ class _Avatar extends StatelessWidget {
                 errorWidget: (_, __, ___) => fallback(),
               ),
       ),
+    );
+  }
+}
+
+/// Horizontal rail of 16:9 backdrop thumbnails. Tapping one opens the
+/// full-screen [ImageGalleryViewer] at that index. Shared by the movie and TV
+/// detail screens; renders nothing when [images] is empty.
+class DetailImageGallery extends StatelessWidget {
+  const DetailImageGallery({
+    super.key,
+    required this.images,
+    this.title = 'Gallery',
+    this.horizontalPadding = 16,
+  });
+
+  final List<MediaImage> images;
+  final String title;
+  final double horizontalPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    if (images.isEmpty) return const SizedBox.shrink();
+    final colors = context.colors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Text(title, style: AppTypography.subTitle),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 130,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            itemCount: images.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (_, index) {
+              final image = images[index];
+              return GestureDetector(
+                onTap: () => openImageGallery(
+                  context,
+                  images: images,
+                  initialIndex: index,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: CachedNetworkImage(
+                      imageUrl: image.url(),
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) =>
+                          Container(color: colors.surfaceMuted),
+                      errorWidget: (_, __, ___) => Container(
+                        color: colors.surfaceMuted,
+                        alignment: Alignment.center,
+                        child: Icon(
+                          IconsaxPlusLinear.gallery,
+                          color: colors.textMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
