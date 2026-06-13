@@ -14,7 +14,7 @@ class SearchScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => sl<SearchBloc>(),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Browse')),
+        appBar: AppBar(titleSpacing: 0, title: const Text('Browse')),
         body: const SafeArea(child: SearchContent()),
       ),
     );

@@ -154,14 +154,14 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       // ── Chip ──────────────────────────────────────────
+      // Base chip look; the discover filter sheet sets per-state label and
+      // checkmark colours explicitly (Material's selected-state resolution is
+      // unreliable across light/dark).
       chipTheme: ChipThemeData(
         backgroundColor: colors.surfaceMuted,
         selectedColor: AppColors.cyan,
+        checkmarkColor: AppColors.navy,
         labelStyle: AppTypography.smallText.copyWith(color: colors.textPrimary),
-        secondaryLabelStyle: AppTypography.smallText.copyWith(
-          color: AppColors.navy,
-          fontWeight: FontWeight.w600,
-        ),
         side: BorderSide.none,
         shape: const StadiumBorder(),
       ),

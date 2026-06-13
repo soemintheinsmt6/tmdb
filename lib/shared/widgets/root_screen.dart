@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
+import 'package:tmdb/features/discover/presentation/screens/discover_screen.dart';
 import 'package:tmdb/features/favourites/presentation/screens/favourite_screen.dart';
 import 'package:tmdb/features/movies/presentation/screens/home/home_screen.dart';
 import 'package:tmdb/features/profile/presentation/screens/profile_screen.dart';
-import 'package:tmdb/features/search/presentation/screens/search_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_home/tv_screen.dart';
 
 /// App shell with a bottom navigation bar. Tabs are built lazily on first
@@ -23,7 +23,7 @@ class _RootScreenState extends State<RootScreen> {
   Widget _buildTab(int index) {
     return _tabs[index] ??= switch (index) {
       0 => const HomeScreen(),
-      1 => const SearchScreen(),
+      1 => const DiscoverScreen(),
       2 => const TvScreen(),
       3 => const FavouriteScreen(),
       4 => const ProfileScreen(),
@@ -70,15 +70,12 @@ class _RootScreenState extends State<RootScreen> {
               label: 'Home',
             ),
             NavigationDestination(
-              icon: Icon(
-                IconsaxPlusLinear.search_normal_1,
-                color: colors.textMuted,
-              ),
+              icon: Icon(IconsaxPlusLinear.discover_1, color: colors.textMuted),
               selectedIcon: const Icon(
-                IconsaxPlusBold.search_normal_1,
+                IconsaxPlusBold.discover,
                 color: AppColors.cyan,
               ),
-              label: 'Browse',
+              label: 'Discover',
             ),
             NavigationDestination(
               icon: Icon(IconsaxPlusLinear.monitor, color: colors.textMuted),

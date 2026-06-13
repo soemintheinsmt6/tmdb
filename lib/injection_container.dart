@@ -3,6 +3,10 @@ import 'package:get_it/get_it.dart';
 import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/core/network/api_client.dart';
 import 'package:tmdb/core/storage/hive_storage.dart';
+import 'package:tmdb/features/discover/data/datasources/discover_remote_data_source.dart';
+import 'package:tmdb/features/discover/data/repositories/discover_repository_impl.dart';
+import 'package:tmdb/features/discover/domain/repositories/discover_repository.dart';
+import 'package:tmdb/features/discover/presentation/bloc/discover_bloc.dart';
 import 'package:tmdb/features/favourites/data/repositories/favourites_repository_impl.dart';
 import 'package:tmdb/features/favourites/domain/repositories/favourites_repository.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
@@ -73,6 +77,14 @@ Future<void> init() async {
   );
 
   sl.registerFactory(() => SearchBloc(repository: sl()));
+
+  // ── Discover feature ───────────────────────────────────
+  sl.registerLazySingleton(() => DiscoverRemoteDataSource(sl()));
+  sl.registerLazySingleton<DiscoverRepository>(
+    () => DiscoverRepositoryImpl(sl(), logger: sl<AppLogger>()),
+  );
+
+  sl.registerFactory(() => DiscoverBloc(repository: sl()));
 
   // ── Favourites feature ─────────────────────────────────
   sl.registerLazySingleton<FavouritesRepository>(

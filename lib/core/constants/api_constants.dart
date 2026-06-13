@@ -52,6 +52,9 @@ class ApiConstants {
   static const String movieGenres = '/genre/movie/list';
   static const String tvGenres = '/genre/tv/list';
 
+  // ── Discover ──────────────────────────────────────────
+  static const String discoverMovie = '/discover/movie';
+
   // ── Image helpers ─────────────────────────────────────
   static String posterUrl(String? path, {String size = 'w500'}) {
     if (path == null || path.isEmpty) return '';
