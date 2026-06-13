@@ -16,6 +16,10 @@ import 'package:tmdb/features/people/data/datasources/person_remote_data_source.
 import 'package:tmdb/features/people/data/repositories/person_repository_impl.dart';
 import 'package:tmdb/features/people/domain/repositories/person_repository.dart';
 import 'package:tmdb/features/people/presentation/bloc/person_detail_bloc/person_detail_bloc.dart';
+import 'package:tmdb/features/search/data/datasources/search_remote_data_source.dart';
+import 'package:tmdb/features/search/data/repositories/search_repository_impl.dart';
+import 'package:tmdb/features/search/domain/repositories/search_repository.dart';
+import 'package:tmdb/features/search/presentation/bloc/search_bloc/search_bloc.dart';
 import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
 import 'package:tmdb/features/tv/data/repositories/tv_repository_impl.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
@@ -61,6 +65,14 @@ Future<void> init() async {
   );
 
   sl.registerFactory(() => PersonDetailBloc(repository: sl()));
+
+  // ── Search feature ─────────────────────────────────────
+  sl.registerLazySingleton(() => SearchRemoteDataSource(sl()));
+  sl.registerLazySingleton<SearchRepository>(
+    () => SearchRepositoryImpl(sl(), logger: sl<AppLogger>()),
+  );
+
+  sl.registerFactory(() => SearchBloc(repository: sl()));
 
   // ── Favourites feature ─────────────────────────────────
   sl.registerLazySingleton<FavouritesRepository>(

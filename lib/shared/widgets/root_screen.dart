@@ -4,6 +4,7 @@ import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/features/favourites/presentation/screens/favourite_screen.dart';
 import 'package:tmdb/features/movies/presentation/screens/home/home_screen.dart';
 import 'package:tmdb/features/profile/presentation/screens/profile_screen.dart';
+import 'package:tmdb/features/search/presentation/screens/search_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_home/tv_screen.dart';
 
 /// App shell with a bottom navigation bar. Tabs are built lazily on first
@@ -17,14 +18,15 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen> {
   int _index = 0;
-  final List<Widget?> _tabs = List.filled(4, null);
+  final List<Widget?> _tabs = List.filled(5, null);
 
   Widget _buildTab(int index) {
     return _tabs[index] ??= switch (index) {
       0 => const HomeScreen(),
-      1 => const TvScreen(),
-      2 => const FavouriteScreen(),
-      3 => const ProfileScreen(),
+      1 => const SearchScreen(),
+      2 => const TvScreen(),
+      3 => const FavouriteScreen(),
+      4 => const ProfileScreen(),
       _ => const SizedBox.shrink(),
     };
   }
@@ -66,6 +68,17 @@ class _RootScreenState extends State<RootScreen> {
                 color: AppColors.cyan,
               ),
               label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(
+                IconsaxPlusLinear.search_normal_1,
+                color: colors.textMuted,
+              ),
+              selectedIcon: const Icon(
+                IconsaxPlusBold.search_normal_1,
+                color: AppColors.cyan,
+              ),
+              label: 'Browse',
             ),
             NavigationDestination(
               icon: Icon(IconsaxPlusLinear.monitor, color: colors.textMuted),
