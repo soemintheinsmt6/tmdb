@@ -7,8 +7,10 @@ import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_event.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_state.dart';
 import 'package:tmdb/features/tv/presentation/widgets/tv_detail_cards.dart';
+import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
+import 'package:tmdb/shared/widgets/trailer_player.dart';
 
 class TvDetailMobileLayout extends StatefulWidget {
   const TvDetailMobileLayout({
@@ -88,11 +90,18 @@ class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
             final loaded = state is TvDetailLoaded ? state.detail : null;
             final backdropPath =
                 loaded?.backdropPath ?? widget.seedBackdropPath;
+            final trailer = loaded?.videos.bestTrailer;
             return ListView(
               controller: _scrollController,
               padding: EdgeInsets.zero,
               children: [
-                DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
+                DetailHeader(
+                  backdropPath: backdropPath,
+                  heroTag: heroTag,
+                  onPlayTrailer: trailer == null
+                      ? null
+                      : () => playTrailer(context, trailer),
+                ),
                 if (loaded != null) ...[
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -106,6 +115,11 @@ class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
                         DetailOverview(overview: loaded.overview),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 24),
+                  DetailVideoRail(
+                    videos: loaded.videos.youTubeVideos,
+                    onTap: (video) => playTrailer(context, video),
                   ),
                   const SizedBox(height: 24),
                   DetailCastList(

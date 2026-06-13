@@ -8,8 +8,10 @@ import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_d
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_state.dart';
 import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dart';
 import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
+import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
+import 'package:tmdb/shared/widgets/trailer_player.dart';
 
 class MovieDetailMobileLayout extends StatefulWidget {
   const MovieDetailMobileLayout({
@@ -103,11 +105,18 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
             final loaded = state is MovieDetailLoaded ? state.detail : null;
             final backdropPath =
                 loaded?.backdropPath ?? widget.seedBackdropPath;
+            final trailer = loaded?.videos.bestTrailer;
             return ListView(
               controller: _scrollController,
               padding: EdgeInsets.zero,
               children: [
-                DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
+                DetailHeader(
+                  backdropPath: backdropPath,
+                  heroTag: heroTag,
+                  onPlayTrailer: trailer == null
+                      ? null
+                      : () => playTrailer(context, trailer),
+                ),
                 if (loaded != null) ...[
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -121,6 +130,11 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                         DetailOverview(overview: loaded.overview),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 24),
+                  DetailVideoRail(
+                    videos: loaded.videos.youTubeVideos,
+                    onTap: (video) => playTrailer(context, video),
                   ),
                   const SizedBox(height: 24),
                   DetailCastList(

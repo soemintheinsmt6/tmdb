@@ -168,4 +168,37 @@ void main() {
       ).called(1);
     });
   });
+
+  group('getMovieVideos', () {
+    test('hits /movie/{id}/videos and parses the results list', () async {
+      when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+        (_) async => <String, dynamic>{
+          'results': [
+            {'id': 'a', 'key': 'k1', 'site': 'YouTube', 'type': 'Trailer'},
+            {'id': 'b', 'key': 'k2', 'site': 'YouTube', 'type': 'Teaser'},
+          ],
+        },
+      );
+
+      final videos = await dataSource.getMovieVideos(550);
+
+      verify(
+        () => apiClient.get(
+          ApiConstants.movieVideos(550),
+          query: {'language': 'en-US'},
+        ),
+      ).called(1);
+      expect(videos.map((v) => v.key), ['k1', 'k2']);
+    });
+
+    test('returns an empty list when results key is missing', () async {
+      when(
+        () => apiClient.get(any(), query: any(named: 'query')),
+      ).thenAnswer((_) async => <String, dynamic>{});
+
+      final videos = await dataSource.getMovieVideos(1);
+
+      expect(videos, isEmpty);
+    });
+  });
 }

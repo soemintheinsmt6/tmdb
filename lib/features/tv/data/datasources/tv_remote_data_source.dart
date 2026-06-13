@@ -4,6 +4,7 @@ import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
+import 'package:tmdb/shared/domain/video.dart';
 
 /// Network-only client for the TV feature. Throws the exceptions defined in
 /// `core/error/exceptions.dart`; the repository converts them to `Failure`s.
@@ -74,5 +75,16 @@ class TvRemoteDataSource {
       query: {'language': 'en-US', 'page': '$page'},
     );
     return PaginatedTvShows.fromJson(response as Map<String, dynamic>);
+  }
+
+  Future<List<Video>> getTvVideos(int id) async {
+    final response = await _apiClient.get(
+      ApiConstants.tvVideos(id),
+      query: {'language': 'en-US'},
+    );
+    final json = response as Map<String, dynamic>;
+    return ((json['results'] as List?) ?? const [])
+        .map((e) => Video.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }

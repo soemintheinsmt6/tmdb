@@ -165,4 +165,37 @@ void main() {
       ).called(1);
     });
   });
+
+  group('getTvVideos', () {
+    test('hits /tv/{id}/videos and parses the results list', () async {
+      when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+        (_) async => <String, dynamic>{
+          'results': [
+            {'id': 'a', 'key': 'k1', 'site': 'YouTube', 'type': 'Trailer'},
+            {'id': 'b', 'key': 'k2', 'site': 'YouTube', 'type': 'Teaser'},
+          ],
+        },
+      );
+
+      final videos = await dataSource.getTvVideos(1399);
+
+      verify(
+        () => apiClient.get(
+          ApiConstants.tvVideos(1399),
+          query: {'language': 'en-US'},
+        ),
+      ).called(1);
+      expect(videos.map((v) => v.key), ['k1', 'k2']);
+    });
+
+    test('returns an empty list when results key is missing', () async {
+      when(
+        () => apiClient.get(any(), query: any(named: 'query')),
+      ).thenAnswer((_) async => <String, dynamic>{});
+
+      final videos = await dataSource.getTvVideos(1);
+
+      expect(videos, isEmpty);
+    });
+  });
 }

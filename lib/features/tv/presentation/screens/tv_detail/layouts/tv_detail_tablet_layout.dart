@@ -8,8 +8,10 @@ import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_event.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_state.dart';
 import 'package:tmdb/features/tv/presentation/widgets/tv_detail_cards.dart';
+import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
+import 'package:tmdb/shared/widgets/trailer_player.dart';
 
 class TvDetailTabletLayout extends StatefulWidget {
   const TvDetailTabletLayout({
@@ -90,11 +92,18 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
             final loaded = state is TvDetailLoaded ? state.detail : null;
             final backdropPath =
                 loaded?.backdropPath ?? widget.seedBackdropPath;
+            final trailer = loaded?.videos.bestTrailer;
             return ListView(
               controller: _scrollController,
               padding: EdgeInsets.zero,
               children: [
-                DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
+                DetailHeader(
+                  backdropPath: backdropPath,
+                  heroTag: heroTag,
+                  onPlayTrailer: trailer == null
+                      ? null
+                      : () => playTrailer(context, trailer),
+                ),
                 if (loaded != null) ...[
                   Padding(
                     padding: EdgeInsets.fromLTRB(padding, 0, padding, 0),
@@ -108,6 +117,12 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
                         DetailOverview(overview: loaded.overview),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 32),
+                  DetailVideoRail(
+                    videos: loaded.videos.youTubeVideos,
+                    horizontalPadding: padding,
+                    onTap: (video) => playTrailer(context, video),
                   ),
                   const SizedBox(height: 32),
                   DetailCastList(

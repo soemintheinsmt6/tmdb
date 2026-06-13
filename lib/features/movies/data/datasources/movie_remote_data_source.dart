@@ -4,6 +4,7 @@ import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
+import 'package:tmdb/shared/domain/video.dart';
 
 /// Network-only client for the movies feature. Throws the exceptions defined
 /// in `core/error/exceptions.dart`; the repository converts them to
@@ -78,5 +79,16 @@ class MovieRemoteDataSource {
       query: {'language': 'en-US', 'page': '$page'},
     );
     return PaginatedMovies.fromJson(response as Map<String, dynamic>);
+  }
+
+  Future<List<Video>> getMovieVideos(int id) async {
+    final response = await _apiClient.get(
+      ApiConstants.movieVideos(id),
+      query: {'language': 'en-US'},
+    );
+    final json = response as Map<String, dynamic>;
+    return ((json['results'] as List?) ?? const [])
+        .map((e) => Video.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }

@@ -9,6 +9,7 @@ import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
+import 'package:tmdb/shared/domain/video.dart';
 
 class MovieRepositoryImpl implements MovieRepository {
   const MovieRepositoryImpl(this._remote, {AppLogger? logger})
@@ -44,14 +45,17 @@ class MovieRepositoryImpl implements MovieRepository {
         _remote.getMovieDetail(id),
         _remote.getMovieCredits(id),
         _remote.getMovieRecommendations(id),
+        _remote.getMovieVideos(id),
       ]);
       final detail = results[0] as MovieDetail;
       final cast = results[1] as List<CastMember>;
       final recommendations = results[2] as PaginatedMovies;
+      final videos = results[3] as List<Video>;
 
       return detail.copyWith(
         cast: cast.take(20).toList(),
         recommendations: recommendations.movies,
+        videos: videos,
       );
     });
   }

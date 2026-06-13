@@ -9,6 +9,7 @@ import 'package:tmdb/features/tv/data/repositories/tv_repository_impl.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
+import 'package:tmdb/shared/domain/video.dart';
 
 import '../../../../helpers/tv_fixtures.dart';
 
@@ -40,6 +41,11 @@ void main() {
   setUp(() {
     remote = _MockRemote();
     repository = TvRepositoryImpl(remote);
+    // Videos joined the parallel detail fetch; default every composition test
+    // to an empty list so individual tests only stub what they assert on.
+    when(
+      () => remote.getTvVideos(any()),
+    ).thenAnswer((_) async => const <Video>[]);
   });
 
   group('getTvShows', () {
@@ -87,6 +93,7 @@ void main() {
         final recs = buildPaginatedTv(
           shows: [buildTvShow(id: 100), buildTvShow(id: 101)],
         );
+        final videos = [buildVideo(id: 'a'), buildVideo(id: 'b')];
 
         when(
           () => remote.getTvShowDetail(1399),
@@ -95,6 +102,7 @@ void main() {
         when(
           () => remote.getTvRecommendations(1399),
         ).thenAnswer((_) async => recs);
+        when(() => remote.getTvVideos(1399)).thenAnswer((_) async => videos);
 
         final result = await repository.getTvShowDetail(1399);
 
@@ -104,6 +112,7 @@ void main() {
         expect(composed.cast.first.id, 0);
         expect(composed.cast.last.id, 19);
         expect(composed.recommendations.map((s) => s.id), [100, 101]);
+        expect(composed.videos.map((v) => v.id), ['a', 'b']);
         // Base detail fields preserved via copyWith.
         expect(composed.id, detailBase.id);
         expect(composed.name, detailBase.name);
@@ -112,6 +121,7 @@ void main() {
         verify(() => remote.getTvShowDetail(1399)).called(1);
         verify(() => remote.getTvCredits(1399)).called(1);
         verify(() => remote.getTvRecommendations(1399)).called(1);
+        verify(() => remote.getTvVideos(1399)).called(1);
       },
     );
 

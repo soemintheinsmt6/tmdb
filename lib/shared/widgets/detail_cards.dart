@@ -7,15 +7,25 @@ import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
 import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/poster_image.dart';
 import 'package:tmdb/shared/widgets/rating_badge.dart';
 
 /// Backdrop hero with a bottom fade, shared by the movie and TV detail screens.
+///
+/// When [onPlayTrailer] is non-null, a centered play button is overlaid on the
+/// backdrop so the primary trailer is one tap away.
 class DetailHeader extends StatelessWidget {
-  const DetailHeader({super.key, required this.backdropPath, this.heroTag});
+  const DetailHeader({
+    super.key,
+    required this.backdropPath,
+    this.heroTag,
+    this.onPlayTrailer,
+  });
 
   final String? backdropPath;
   final Object? heroTag;
+  final VoidCallback? onPlayTrailer;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +65,37 @@ class DetailHeader extends StatelessWidget {
             ),
           ),
         ),
+        if (onPlayTrailer != null)
+          Positioned.fill(
+            child: Align(
+              alignment: const Alignment(0, -0.2),
+              child: _PlayTrailerButton(onTap: onPlayTrailer!),
+            ),
+          ),
       ],
+    );
+  }
+}
+
+/// Circular "play trailer" affordance overlaid on the [DetailHeader] backdrop.
+class _PlayTrailerButton extends StatelessWidget {
+  const _PlayTrailerButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black.withValues(alpha: 0.45),
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: const Padding(
+          padding: EdgeInsets.all(16),
+          child: Icon(IconsaxPlusBold.play, color: Colors.white, size: 32),
+        ),
+      ),
     );
   }
 }
@@ -395,6 +435,141 @@ class DetailPosterRail extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Horizontal rail of 16:9 video thumbnails (trailers, teasers, clips). Tapping
+/// a tile invokes [onTap] with the chosen [Video]. Shared by the movie and TV
+/// detail screens; renders nothing when [videos] is empty.
+class DetailVideoRail extends StatelessWidget {
+  const DetailVideoRail({
+    super.key,
+    required this.videos,
+    required this.onTap,
+    this.title = 'Trailers & Clips',
+    this.horizontalPadding = 16,
+  });
+
+  final List<Video> videos;
+  final void Function(Video video) onTap;
+  final String title;
+  final double horizontalPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    if (videos.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Text(title, style: AppTypography.subTitle),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 170,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            itemCount: videos.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (_, index) {
+              final video = videos[index];
+              return SizedBox(
+                width: 220,
+                child: _VideoTile(video: video, onTap: () => onTap(video)),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _VideoTile extends StatelessWidget {
+  const _VideoTile({required this.video, required this.onTap});
+
+  final Video video;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    Widget fallback() => Container(
+      color: colors.surfaceMuted,
+      alignment: Alignment.center,
+      child: Icon(IconsaxPlusLinear.video_play, color: colors.textMuted),
+    );
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  video.thumbnailUrl.isEmpty
+                      ? fallback()
+                      : CachedNetworkImage(
+                          imageUrl: video.thumbnailUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) =>
+                              Container(color: colors.surfaceMuted),
+                          errorWidget: (_, __, ___) => fallback(),
+                        ),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(color: Colors.black26),
+                  ),
+                  const Center(
+                    child: Icon(
+                      IconsaxPlusBold.play,
+                      color: Colors.white,
+                      size: 36,
+                    ),
+                  ),
+                  if (video.type.isNotEmpty)
+                    Positioned(
+                      left: 8,
+                      bottom: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          video.type,
+                          style: AppTypography.labelSmall.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            video.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.smallText.copyWith(
+              fontWeight: FontWeight.w600,
+              color: colors.textPrimary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

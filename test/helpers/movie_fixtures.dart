@@ -3,6 +3,7 @@ import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/video.dart';
 
 /// Reusable builders. Every parameter has a sensible default so tests only
 /// override the fields that matter to the assertion.
@@ -64,6 +65,26 @@ Genre buildGenre({int id = 18, String name = 'Drama'}) {
   return Genre(id: id, name: name);
 }
 
+Video buildVideo({
+  String id = 'v1',
+  String key = 'abc123',
+  String name = 'Official Trailer',
+  String site = 'YouTube',
+  String type = 'Trailer',
+  bool official = true,
+  String publishedAt = '2024-01-01T00:00:00.000Z',
+}) {
+  return Video(
+    id: id,
+    key: key,
+    name: name,
+    site: site,
+    type: type,
+    official: official,
+    publishedAt: publishedAt,
+  );
+}
+
 MovieDetail buildMovieDetail({
   int id = 550,
   String title = 'Fight Club',
@@ -79,6 +100,7 @@ MovieDetail buildMovieDetail({
   String status = 'Released',
   List<CastMember> cast = const [],
   List<Movie> recommendations = const [],
+  List<Video> videos = const [],
 }) {
   return MovieDetail(
     id: id,
@@ -95,5 +117,6 @@ MovieDetail buildMovieDetail({
     status: status,
     cast: cast,
     recommendations: recommendations,
+    videos: videos,
   );
 }

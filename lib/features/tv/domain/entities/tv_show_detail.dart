@@ -5,6 +5,7 @@ import 'package:tmdb/core/extensions/string_year.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/video.dart';
 
 /// Full TV show detail — combines `/tv/{id}` with credits and recommendations
 /// into a single domain object. Mirrors `MovieDetail`.
@@ -27,14 +28,17 @@ class TvShowDetail extends Equatable {
     required this.status,
     required this.cast,
     required this.recommendations,
+    required this.videos,
   });
 
-  /// Parses the `/tv/{id}` payload. Cast and recommendations come from separate
-  /// endpoints, so the repository injects them after the parallel fetch.
+  /// Parses the `/tv/{id}` payload. Cast, recommendations, and videos come from
+  /// separate endpoints, so the repository injects them after the parallel
+  /// fetch.
   factory TvShowDetail.fromJson(
     Map<String, dynamic> json, {
     List<CastMember> cast = const [],
     List<TvShow> recommendations = const [],
+    List<Video> videos = const [],
   }) {
     return TvShowDetail(
       id: json['id'] as int,
@@ -58,12 +62,14 @@ class TvShowDetail extends Equatable {
       status: json['status'] as String? ?? '',
       cast: cast,
       recommendations: recommendations,
+      videos: videos,
     );
   }
 
   TvShowDetail copyWith({
     List<CastMember>? cast,
     List<TvShow>? recommendations,
+    List<Video>? videos,
   }) {
     return TvShowDetail(
       id: id,
@@ -83,6 +89,7 @@ class TvShowDetail extends Equatable {
       status: status,
       cast: cast ?? this.cast,
       recommendations: recommendations ?? this.recommendations,
+      videos: videos ?? this.videos,
     );
   }
 
@@ -103,6 +110,7 @@ class TvShowDetail extends Equatable {
   final String status;
   final List<CastMember> cast;
   final List<TvShow> recommendations;
+  final List<Video> videos;
 
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
@@ -142,5 +150,6 @@ class TvShowDetail extends Equatable {
     status,
     cast,
     recommendations,
+    videos,
   ];
 }

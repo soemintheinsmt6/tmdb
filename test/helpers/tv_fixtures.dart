@@ -3,6 +3,7 @@ import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/video.dart';
 
 /// Reusable builders. Every parameter has a sensible default so tests only
 /// override the fields that matter to the assertion.
@@ -78,6 +79,7 @@ TvShowDetail buildTvShowDetail({
   String status = 'Ended',
   List<CastMember> cast = const [],
   List<TvShow> recommendations = const [],
+  List<Video> videos = const [],
 }) {
   return TvShowDetail(
     id: id,
@@ -97,5 +99,26 @@ TvShowDetail buildTvShowDetail({
     status: status,
     cast: cast,
     recommendations: recommendations,
+    videos: videos,
+  );
+}
+
+Video buildVideo({
+  String id = 'v1',
+  String key = 'abc123',
+  String name = 'Official Trailer',
+  String site = 'YouTube',
+  String type = 'Trailer',
+  bool official = true,
+  String publishedAt = '2024-01-01T00:00:00.000Z',
+}) {
+  return Video(
+    id: id,
+    key: key,
+    name: name,
+    site: site,
+    type: type,
+    official: official,
+    publishedAt: publishedAt,
   );
 }

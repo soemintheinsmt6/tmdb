@@ -35,6 +35,7 @@ class ApiConstants {
   static String tvDetail(int id) => '/tv/$id';
   static String tvCredits(int id) => '/tv/$id/credits';
   static String tvRecommendations(int id) => '/tv/$id/recommendations';
+  static String tvVideos(int id) => '/tv/$id/videos';
 
   // ── People ────────────────────────────────────────────
   static String personDetail(int id) => '/person/$id';

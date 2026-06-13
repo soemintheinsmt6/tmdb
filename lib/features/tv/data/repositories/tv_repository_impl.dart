@@ -9,6 +9,7 @@ import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
+import 'package:tmdb/shared/domain/video.dart';
 
 class TvRepositoryImpl implements TvRepository {
   const TvRepositoryImpl(this._remote, {AppLogger? logger}) : _logger = logger;
@@ -43,14 +44,17 @@ class TvRepositoryImpl implements TvRepository {
         _remote.getTvShowDetail(id),
         _remote.getTvCredits(id),
         _remote.getTvRecommendations(id),
+        _remote.getTvVideos(id),
       ]);
       final detail = results[0] as TvShowDetail;
       final cast = results[1] as List<CastMember>;
       final recommendations = results[2] as PaginatedTvShows;
+      final videos = results[3] as List<Video>;
 
       return detail.copyWith(
         cast: cast.take(20).toList(),
         recommendations: recommendations.shows,
+        videos: videos,
       );
     });
   }
