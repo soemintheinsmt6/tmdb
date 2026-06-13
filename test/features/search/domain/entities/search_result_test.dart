@@ -120,10 +120,7 @@ void main() {
     });
 
     test('returns an empty string when there is no image', () {
-      final movie = SearchResult.tryFromJson({
-        'id': 1,
-        'media_type': 'movie',
-      })!;
+      final movie = SearchResult.tryFromJson({'id': 1, 'media_type': 'movie'})!;
 
       expect(movie.imageUrl(), '');
     });

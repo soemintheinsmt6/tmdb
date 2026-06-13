@@ -38,9 +38,7 @@ void main() {
     blocTest<SearchBloc, SearchState>(
       'emits Loading then Loaded when the query has results',
       setUp: () {
-        when(
-          () => repository.searchMulti(query: 'matrix', page: 1),
-        ).thenAnswer(
+        when(() => repository.searchMulti(query: 'matrix', page: 1)).thenAnswer(
           (_) async => Right(
             buildPaginatedSearch(
               page: 1,
@@ -70,10 +68,7 @@ void main() {
       },
       build: () => SearchBloc(repository: repository),
       act: (bloc) => bloc.add(const SearchQueryChanged('x')),
-      expect: () => const [
-        SearchLoading(),
-        SearchError(message: 'offline'),
-      ],
+      expect: () => const [SearchLoading(), SearchError(message: 'offline')],
     );
   });
 
@@ -144,7 +139,8 @@ void main() {
     'SearchCleared resets to Idle',
     setUp: () {
       when(() => repository.searchMulti(query: 'x', page: 1)).thenAnswer(
-        (_) async => Right(buildPaginatedSearch(results: [buildSearchResult()])),
+        (_) async =>
+            Right(buildPaginatedSearch(results: [buildSearchResult()])),
       );
     },
     build: () => SearchBloc(repository: repository),
