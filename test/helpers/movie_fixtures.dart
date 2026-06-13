@@ -3,6 +3,7 @@ import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
 /// Reusable builders. Every parameter has a sensible default so tests only
@@ -85,6 +86,26 @@ Video buildVideo({
   );
 }
 
+Review buildReview({
+  String id = 'r1',
+  String author = 'Roger Ebert',
+  String username = 'rebert',
+  String? avatarPath = '/avatar.jpg',
+  double? rating = 8.0,
+  String content = 'A taut, surprising thriller.',
+  String createdAt = '2021-06-23T12:00:00.000Z',
+}) {
+  return Review(
+    id: id,
+    author: author,
+    username: username,
+    avatarPath: avatarPath,
+    rating: rating,
+    content: content,
+    createdAt: createdAt,
+  );
+}
+
 MovieDetail buildMovieDetail({
   int id = 550,
   String title = 'Fight Club',
@@ -101,6 +122,7 @@ MovieDetail buildMovieDetail({
   List<CastMember> cast = const [],
   List<Movie> recommendations = const [],
   List<Video> videos = const [],
+  List<Review> reviews = const [],
 }) {
   return MovieDetail(
     id: id,
@@ -118,5 +140,6 @@ MovieDetail buildMovieDetail({
     cast: cast,
     recommendations: recommendations,
     videos: videos,
+    reviews: reviews,
   );
 }

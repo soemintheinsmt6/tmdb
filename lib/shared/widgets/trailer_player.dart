@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/core/utils/navigation.dart';
@@ -36,6 +37,16 @@ class TrailerPlayerScreen extends StatefulWidget {
 class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   late final YoutubePlayerController _controller;
   bool _embedFailed = false;
+  bool _isFullScreen = false;
+
+  /// Preserves the player's state (and the underlying webview, so playback
+  /// doesn't restart) when it is reparented between the portrait and fullscreen
+  /// layouts.
+  final GlobalKey _playerKey = GlobalKey();
+
+  /// While the user is dragging the scrubber, holds the pending position (in
+  /// seconds) so the thumb tracks the finger instead of the live playhead.
+  double? _dragSeconds;
 
   @override
   void initState() {
@@ -46,9 +57,19 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
         autoPlay: true,
         mute: false,
         enableCaption: false,
+        // Hide the package's overlay (its always-on centre play/pause button);
+        // we draw a slim tap-to-toggle layer + red progress bar instead.
+        hideControls: true,
       ),
     );
     _controller.addListener(_onControllerUpdate);
+    // Stay portrait until the user opts into fullscreen, so rotating the device
+    // doesn't render the portrait layout sideways.
+    unawaited(
+      SystemChrome.setPreferredOrientations(const [
+        DeviceOrientation.portraitUp,
+      ]),
+    );
   }
 
   void _onControllerUpdate() {
@@ -61,7 +82,49 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   void dispose() {
     _controller.removeListener(_onControllerUpdate);
     _controller.dispose();
+    // Leave the app as we found it: bars back, orientation unlocked.
+    unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
+    unawaited(SystemChrome.setPreferredOrientations(DeviceOrientation.values));
     super.dispose();
+  }
+
+  void _togglePlayPause() {
+    if (_controller.value.isPlaying) {
+      _controller.pause();
+    } else {
+      _controller.play();
+    }
+  }
+
+  void _enterFullScreen() {
+    setState(() => _isFullScreen = true);
+    unawaited(
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky),
+    );
+    unawaited(
+      SystemChrome.setPreferredOrientations(const [
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]),
+    );
+  }
+
+  void _exitFullScreen() {
+    setState(() => _isFullScreen = false);
+    unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
+    unawaited(
+      SystemChrome.setPreferredOrientations(const [
+        DeviceOrientation.portraitUp,
+      ]),
+    );
+  }
+
+  void _toggleFullScreen() {
+    if (_isFullScreen) {
+      _exitFullScreen();
+    } else {
+      _enterFullScreen();
+    }
   }
 
   Future<void> _openOnYouTube() async {
@@ -92,6 +155,88 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
     );
   }
 
+  static String _formatDuration(Duration d) {
+    final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return d.inHours > 0
+        ? '${d.inHours}:$minutes:$seconds'
+        : '$minutes:$seconds';
+  }
+
+  /// Custom bottom control bar — current time, a draggable red scrubber, total
+  /// time, and a fullscreen toggle. Replaces the package overlay so there's no
+  /// centre play/pause button; playback is toggled by tapping the video.
+  Widget _controlsBar() {
+    return ValueListenableBuilder<YoutubePlayerValue>(
+      valueListenable: _controller,
+      builder: (context, value, _) {
+        final total = value.metaData.duration;
+        final totalSeconds = total.inSeconds.toDouble();
+        final liveSeconds = value.position.inSeconds.toDouble();
+        final current = _dragSeconds ?? liveSeconds;
+        final maxSeconds = totalSeconds > 0 ? totalSeconds : 1.0;
+        final shownPosition = Duration(seconds: current.round());
+
+        const textStyle = TextStyle(color: Colors.white, fontSize: 12);
+        return Container(
+          padding: const EdgeInsets.only(
+            left: 12,
+            right: 4,
+            top: 24,
+            bottom: 4,
+          ),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.transparent, Colors.black54],
+            ),
+          ),
+          child: Row(
+            children: [
+              Text(_formatDuration(shownPosition), style: textStyle),
+              Expanded(
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: _youTubeRed,
+                    inactiveTrackColor: Colors.white24,
+                    thumbColor: _youTubeRed,
+                    trackHeight: 2.5,
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 6,
+                    ),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 12,
+                    ),
+                  ),
+                  child: Slider(
+                    value: current.clamp(0.0, maxSeconds),
+                    max: maxSeconds,
+                    onChangeStart: (v) => setState(() => _dragSeconds = v),
+                    onChanged: (v) => setState(() => _dragSeconds = v),
+                    onChangeEnd: (v) {
+                      _controller.seekTo(Duration(seconds: v.round()));
+                      setState(() => _dragSeconds = null);
+                    },
+                  ),
+                ),
+              ),
+              Text(_formatDuration(total), style: textStyle),
+              IconButton(
+                tooltip: _isFullScreen ? 'Exit fullscreen' : 'Fullscreen',
+                color: Colors.white,
+                icon: Icon(
+                  _isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                ),
+                onPressed: _toggleFullScreen,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_embedFailed) {
@@ -101,20 +246,80 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
         body: _EmbedUnavailable(onWatch: () => unawaited(_openOnYouTube())),
       );
     }
-    return YoutubePlayerBuilder(
-      player: YoutubePlayer(
-        controller: _controller,
-        aspectRatio: 16 / 9,
-        showVideoProgressIndicator: true,
-        progressIndicatorColor: _youTubeRed,
+    // Keep the player alive across the portrait↔fullscreen reparent so toggling
+    // never reloads the video. The key goes on a wrapper, not on YoutubePlayer
+    // itself — the package forwards a widget key to its inner webview, so a
+    // GlobalKey on YoutubePlayer would land on two widgets at once.
+    final player = KeyedSubtree(
+      key: _playerKey,
+      child: YoutubePlayer(controller: _controller, aspectRatio: 16 / 9),
+    );
+
+    // Tap anywhere on the video to play/pause (replaces the removed centre
+    // button); intercepts taps so they don't reach the embed underneath.
+    final tapToToggle = Positioned.fill(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _togglePlayPause,
       ),
-      builder: (context, player) {
-        return Scaffold(
-          backgroundColor: Colors.black,
-          appBar: _appBar(),
-          body: Center(child: player),
-        );
+    );
+
+    final body = _isFullScreen
+        ? Stack(
+            fit: StackFit.expand,
+            children: [
+              Center(child: player),
+              tapToToggle,
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: SafeArea(top: false, child: _controlsBar()),
+              ),
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: _exitFullScreenButton(),
+                ),
+              ),
+            ],
+          )
+        : Center(
+            child: Stack(
+              children: [
+                player,
+                tapToToggle,
+                Positioned(left: 0, right: 0, bottom: 0, child: _controlsBar()),
+              ],
+            ),
+          );
+
+    return PopScope(
+      // While fullscreen, a back gesture returns to portrait instead of leaving.
+      canPop: !_isFullScreen,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _isFullScreen) _exitFullScreen();
       },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        appBar: _isFullScreen ? null : _appBar(),
+        body: body,
+      ),
+    );
+  }
+
+  /// Top-left "back to portrait" affordance shown only in fullscreen.
+  Widget _exitFullScreenButton() {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: CircleAvatar(
+        backgroundColor: Colors.black45,
+        child: IconButton(
+          tooltip: 'Back to portrait',
+          icon: const Icon(Icons.fullscreen_exit, color: Colors.white),
+          onPressed: _exitFullScreen,
+        ),
+      ),
     );
   }
 }

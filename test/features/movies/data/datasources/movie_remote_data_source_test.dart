@@ -201,4 +201,48 @@ void main() {
       expect(videos, isEmpty);
     });
   });
+
+  group('getMovieReviews', () {
+    test('hits /movie/{id}/reviews with page and parses results', () async {
+      when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+        (_) async => <String, dynamic>{
+          'results': [
+            {
+              'id': 'r1',
+              'author': 'Ann',
+              'author_details': {'username': 'ann', 'rating': 9.0},
+              'content': 'Great.',
+            },
+            {
+              'id': 'r2',
+              'author': 'Bob',
+              'author_details': {'username': 'bob'},
+              'content': 'Meh.',
+            },
+          ],
+        },
+      );
+
+      final reviews = await dataSource.getMovieReviews(550, page: 2);
+
+      verify(
+        () => apiClient.get(
+          ApiConstants.movieReviews(550),
+          query: {'language': 'en-US', 'page': '2'},
+        ),
+      ).called(1);
+      expect(reviews.map((r) => r.id), ['r1', 'r2']);
+      expect(reviews.first.rating, 9.0);
+    });
+
+    test('returns an empty list when results key is missing', () async {
+      when(
+        () => apiClient.get(any(), query: any(named: 'query')),
+      ).thenAnswer((_) async => <String, dynamic>{});
+
+      final reviews = await dataSource.getMovieReviews(1);
+
+      expect(reviews, isEmpty);
+    });
+  });
 }

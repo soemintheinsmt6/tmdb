@@ -26,6 +26,7 @@ class ApiConstants {
   static String movieCredits(int id) => '/movie/$id/credits';
   static String movieRecommendations(int id) => '/movie/$id/recommendations';
   static String movieVideos(int id) => '/movie/$id/videos';
+  static String movieReviews(int id) => '/movie/$id/reviews';
 
   // ── TV shows ──────────────────────────────────────────
   static const String popularTv = '/tv/popular';
@@ -36,6 +37,7 @@ class ApiConstants {
   static String tvCredits(int id) => '/tv/$id/credits';
   static String tvRecommendations(int id) => '/tv/$id/recommendations';
   static String tvVideos(int id) => '/tv/$id/videos';
+  static String tvReviews(int id) => '/tv/$id/reviews';
 
   // ── People ────────────────────────────────────────────
   static String personDetail(int id) => '/person/$id';

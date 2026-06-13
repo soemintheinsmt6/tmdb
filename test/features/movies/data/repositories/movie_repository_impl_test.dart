@@ -9,6 +9,7 @@ import 'package:tmdb/features/movies/data/repositories/movie_repository_impl.dar
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
+import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
 import '../../../../helpers/movie_fixtures.dart';
@@ -41,11 +42,14 @@ void main() {
   setUp(() {
     remote = _MockRemote();
     repository = MovieRepositoryImpl(remote);
-    // Videos joined the parallel detail fetch; default every composition test
-    // to an empty list so individual tests only stub what they assert on.
+    // Videos and reviews joined the parallel detail fetch; default every
+    // composition test to empty lists so tests only stub what they assert on.
     when(
       () => remote.getMovieVideos(any()),
     ).thenAnswer((_) async => const <Video>[]);
+    when(
+      () => remote.getMovieReviews(any()),
+    ).thenAnswer((_) async => const <Review>[]);
   });
 
   group('getMovies', () {
@@ -91,6 +95,7 @@ void main() {
           movies: [buildMovie(id: 100), buildMovie(id: 101)],
         );
         final videos = [buildVideo(id: 'a'), buildVideo(id: 'b')];
+        final reviews = List.generate(15, (i) => buildReview(id: 'r$i'));
 
         when(
           () => remote.getMovieDetail(550),
@@ -100,6 +105,9 @@ void main() {
           () => remote.getMovieRecommendations(550),
         ).thenAnswer((_) async => recs);
         when(() => remote.getMovieVideos(550)).thenAnswer((_) async => videos);
+        when(
+          () => remote.getMovieReviews(550),
+        ).thenAnswer((_) async => reviews);
 
         final result = await repository.getMovieDetail(550);
 
@@ -110,6 +118,9 @@ void main() {
         expect(composed.cast.last.id, 19);
         expect(composed.recommendations.map((m) => m.id), [100, 101]);
         expect(composed.videos.map((v) => v.id), ['a', 'b']);
+        // Reviews capped at 10.
+        expect(composed.reviews, hasLength(10));
+        expect(composed.reviews.first.id, 'r0');
         // Base detail fields preserved via copyWith.
         expect(composed.id, detailBase.id);
         expect(composed.title, detailBase.title);
@@ -119,6 +130,7 @@ void main() {
         verify(() => remote.getMovieCredits(550)).called(1);
         verify(() => remote.getMovieRecommendations(550)).called(1);
         verify(() => remote.getMovieVideos(550)).called(1);
+        verify(() => remote.getMovieReviews(550)).called(1);
       },
     );
 

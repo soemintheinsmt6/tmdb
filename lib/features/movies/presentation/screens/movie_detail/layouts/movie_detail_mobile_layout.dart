@@ -150,6 +150,8 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                   const SizedBox(height: 12),
                   MovieRecommendations(movies: loaded.recommendations),
                   const SizedBox(height: 24),
+                  DetailReviewsSection(reviews: loaded.reviews),
+                  const SizedBox(height: 24),
                 ] else if (state is MovieDetailError) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 48),

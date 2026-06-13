@@ -157,6 +157,11 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
                     horizontalPadding: padding,
                   ),
                   const SizedBox(height: 32),
+                  DetailReviewsSection(
+                    reviews: loaded.reviews,
+                    horizontalPadding: padding,
+                  ),
+                  const SizedBox(height: 32),
                 ] else if (state is MovieDetailError) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 48),

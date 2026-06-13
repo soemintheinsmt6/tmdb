@@ -4,6 +4,7 @@ import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
+import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
 /// Network-only client for the movies feature. Throws the exceptions defined
@@ -89,6 +90,17 @@ class MovieRemoteDataSource {
     final json = response as Map<String, dynamic>;
     return ((json['results'] as List?) ?? const [])
         .map((e) => Video.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<List<Review>> getMovieReviews(int id, {int page = 1}) async {
+    final response = await _apiClient.get(
+      ApiConstants.movieReviews(id),
+      query: {'language': 'en-US', 'page': '$page'},
+    );
+    final json = response as Map<String, dynamic>;
+    return ((json['results'] as List?) ?? const [])
+        .map((e) => Review.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }

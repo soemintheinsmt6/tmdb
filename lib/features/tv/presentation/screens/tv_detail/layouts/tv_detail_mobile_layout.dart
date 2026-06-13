@@ -135,6 +135,8 @@ class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
                   const SizedBox(height: 12),
                   TvRecommendations(shows: loaded.recommendations),
                   const SizedBox(height: 24),
+                  DetailReviewsSection(reviews: loaded.reviews),
+                  const SizedBox(height: 24),
                 ] else if (state is TvDetailError) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 48),

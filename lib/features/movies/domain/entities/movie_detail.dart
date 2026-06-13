@@ -6,6 +6,7 @@ import 'package:tmdb/core/extensions/string_year.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
 /// Full movie detail entity — combines `/movie/{id}` with credits and
@@ -27,16 +28,18 @@ class MovieDetail extends Equatable {
     required this.cast,
     required this.recommendations,
     required this.videos,
+    required this.reviews,
   });
 
-  /// Parses the `/movie/{id}` payload. Cast, recommendations, and videos come
-  /// from separate endpoints, so the repository injects them after the parallel
-  /// fetch.
+  /// Parses the `/movie/{id}` payload. Cast, recommendations, videos, and
+  /// reviews come from separate endpoints, so the repository injects them after
+  /// the parallel fetch.
   factory MovieDetail.fromJson(
     Map<String, dynamic> json, {
     List<CastMember> cast = const [],
     List<Movie> recommendations = const [],
     List<Video> videos = const [],
+    List<Review> reviews = const [],
   }) {
     return MovieDetail(
       id: json['id'] as int,
@@ -56,6 +59,7 @@ class MovieDetail extends Equatable {
       cast: cast,
       recommendations: recommendations,
       videos: videos,
+      reviews: reviews,
     );
   }
 
@@ -63,6 +67,7 @@ class MovieDetail extends Equatable {
     List<CastMember>? cast,
     List<Movie>? recommendations,
     List<Video>? videos,
+    List<Review>? reviews,
   }) {
     return MovieDetail(
       id: id,
@@ -80,6 +85,7 @@ class MovieDetail extends Equatable {
       cast: cast ?? this.cast,
       recommendations: recommendations ?? this.recommendations,
       videos: videos ?? this.videos,
+      reviews: reviews ?? this.reviews,
     );
   }
 
@@ -98,6 +104,7 @@ class MovieDetail extends Equatable {
   final List<CastMember> cast;
   final List<Movie> recommendations;
   final List<Video> videos;
+  final List<Review> reviews;
 
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
@@ -138,5 +145,6 @@ class MovieDetail extends Equatable {
     cast,
     recommendations,
     videos,
+    reviews,
   ];
 }

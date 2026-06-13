@@ -198,4 +198,41 @@ void main() {
       expect(videos, isEmpty);
     });
   });
+
+  group('getTvReviews', () {
+    test('hits /tv/{id}/reviews with page and parses results', () async {
+      when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+        (_) async => <String, dynamic>{
+          'results': [
+            {
+              'id': 'r1',
+              'author': 'Ann',
+              'author_details': {'username': 'ann', 'rating': 9.0},
+              'content': 'Great.',
+            },
+          ],
+        },
+      );
+
+      final reviews = await dataSource.getTvReviews(1399, page: 3);
+
+      verify(
+        () => apiClient.get(
+          ApiConstants.tvReviews(1399),
+          query: {'language': 'en-US', 'page': '3'},
+        ),
+      ).called(1);
+      expect(reviews.single.id, 'r1');
+    });
+
+    test('returns an empty list when results key is missing', () async {
+      when(
+        () => apiClient.get(any(), query: any(named: 'query')),
+      ).thenAnswer((_) async => <String, dynamic>{});
+
+      final reviews = await dataSource.getTvReviews(1);
+
+      expect(reviews, isEmpty);
+    });
+  });
 }

@@ -3,6 +3,7 @@ import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
 /// Reusable builders. Every parameter has a sensible default so tests only
@@ -80,6 +81,7 @@ TvShowDetail buildTvShowDetail({
   List<CastMember> cast = const [],
   List<TvShow> recommendations = const [],
   List<Video> videos = const [],
+  List<Review> reviews = const [],
 }) {
   return TvShowDetail(
     id: id,
@@ -100,6 +102,7 @@ TvShowDetail buildTvShowDetail({
     cast: cast,
     recommendations: recommendations,
     videos: videos,
+    reviews: reviews,
   );
 }
 
@@ -120,5 +123,25 @@ Video buildVideo({
     type: type,
     official: official,
     publishedAt: publishedAt,
+  );
+}
+
+Review buildReview({
+  String id = 'r1',
+  String author = 'Roger Ebert',
+  String username = 'rebert',
+  String? avatarPath = '/avatar.jpg',
+  double? rating = 8.0,
+  String content = 'Gripping from start to finish.',
+  String createdAt = '2021-06-23T12:00:00.000Z',
+}) {
+  return Review(
+    id: id,
+    author: author,
+    username: username,
+    avatarPath: avatarPath,
+    rating: rating,
+    content: content,
+    createdAt: createdAt,
   );
 }

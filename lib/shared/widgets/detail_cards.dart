@@ -7,6 +7,7 @@ import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
 import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/poster_image.dart';
 import 'package:tmdb/shared/widgets/rating_badge.dart';
@@ -569,6 +570,174 @@ class _VideoTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Vertical list of user [reviews] with author, rating, and expandable text.
+/// Shared by the movie and TV detail screens; renders nothing when empty.
+class DetailReviewsSection extends StatelessWidget {
+  const DetailReviewsSection({
+    super.key,
+    required this.reviews,
+    this.horizontalPadding = 16,
+  });
+
+  final List<Review> reviews;
+  final double horizontalPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    if (reviews.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Reviews', style: AppTypography.subTitle),
+          const SizedBox(height: 12),
+          for (final review in reviews) ...[
+            _ReviewCard(review: review),
+            const SizedBox(height: 12),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewCard extends StatefulWidget {
+  const _ReviewCard({required this.review});
+
+  final Review review;
+
+  @override
+  State<_ReviewCard> createState() => _ReviewCardState();
+}
+
+class _ReviewCardState extends State<_ReviewCard> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final review = widget.review;
+    // Roughly six lines of body text; only long reviews get a toggle.
+    final isLong = review.content.length > 280;
+    final subtitle = [
+      if (review.username.isNotEmpty) '@${review.username}',
+      if (review.year != null) review.year,
+    ].join(' · ');
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _Avatar(review: review),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      review.author,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.bodyText.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colors.textPrimary,
+                      ),
+                    ),
+                    if (subtitle.isNotEmpty)
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.labelSmall.copyWith(
+                          color: colors.textMuted,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (review.formattedRating.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                RatingBadge(rating: review.formattedRating, compact: true),
+              ],
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            review.content,
+            maxLines: _expanded ? null : 5,
+            overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+            style: AppTypography.bodyText.copyWith(
+              color: colors.textSecondary,
+              height: 1.5,
+            ),
+          ),
+          if (isLong)
+            GestureDetector(
+              onTap: () => setState(() => _expanded = !_expanded),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  _expanded ? 'Read less' : 'Read more',
+                  style: AppTypography.smallText.copyWith(
+                    color: AppColors.cyan,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  const _Avatar({required this.review});
+
+  final Review review;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final url = review.avatarUrl;
+    Widget fallback() => Container(
+      color: colors.surfaceMuted,
+      alignment: Alignment.center,
+      child: Text(
+        review.initial,
+        style: AppTypography.bodyText.copyWith(
+          color: colors.textSecondary,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(50),
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: url.isEmpty
+            ? fallback()
+            : CachedNetworkImage(
+                imageUrl: url,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => fallback(),
+                errorWidget: (_, __, ___) => fallback(),
+              ),
       ),
     );
   }
