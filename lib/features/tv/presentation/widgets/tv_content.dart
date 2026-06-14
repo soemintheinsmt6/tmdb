@@ -43,8 +43,15 @@ class _TvContentState extends State<TvContent>
   late final TabController _tabController;
   final _searchCtrl = TextEditingController();
   final _searchFocus = FocusNode();
-  final _scrollController = ScrollController();
   Timer? _debounce;
+
+  /// Drives the poster grids. We prefer the ambient [PrimaryScrollController]
+  /// (the active tab's controller, supplied by `RootScreen`) so an iOS
+  /// status-bar tap scrolls this list to the top. [_ownedController] is a
+  /// fallback used only when no primary is available (e.g. widget tests pumped
+  /// without a route); we never dispose a controller we don't own.
+  ScrollController? _scrollController;
+  ScrollController? _ownedController;
 
   @override
   void initState() {
@@ -53,7 +60,17 @@ class _TvContentState extends State<TvContent>
       length: TvCategory.values.length,
       vsync: this,
     );
-    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final controller =
+        PrimaryScrollController.maybeOf(context) ??
+        (_ownedController ??= ScrollController());
+    if (identical(controller, _scrollController)) return;
+    _scrollController?.removeListener(_onScroll);
+    _scrollController = controller..addListener(_onScroll);
   }
 
   @override
@@ -62,13 +79,17 @@ class _TvContentState extends State<TvContent>
     _tabController.dispose();
     _searchCtrl.dispose();
     _searchFocus.dispose();
-    _scrollController.dispose();
+    _scrollController?.removeListener(_onScroll);
+    _ownedController?.dispose();
     super.dispose();
   }
 
   void _onCategoryTap(TvCategory category) {
     context.read<TvListBloc>().add(TvListCategoryChanged(category));
-    _scrollController.jumpTo(0);
+    final controller = _scrollController;
+    if (controller != null && controller.hasClients) {
+      controller.jumpTo(0);
+    }
   }
 
   void _onSearchChanged(String value) {
@@ -83,8 +104,9 @@ class _TvContentState extends State<TvContent>
   }
 
   void _onScroll() {
-    if (!_scrollController.hasClients) return;
-    final position = _scrollController.position;
+    final controller = _scrollController;
+    if (controller == null || !controller.hasClients) return;
+    final position = controller.position;
     if (position.pixels < position.maxScrollExtent - 320) return;
 
     final searchState = context.read<TvSearchBloc>().state;

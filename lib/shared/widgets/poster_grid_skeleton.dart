@@ -17,6 +17,7 @@ class PosterGridSkeleton extends StatelessWidget {
       baseColor: colors.shimmerBase,
       highlightColor: colors.shimmerHighlight,
       child: GridView.builder(
+        primary: false,
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

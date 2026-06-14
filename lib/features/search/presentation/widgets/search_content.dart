@@ -30,13 +30,25 @@ class SearchContent extends StatefulWidget {
 class _SearchContentState extends State<SearchContent> {
   final _searchCtrl = TextEditingController();
   final _searchFocus = FocusNode();
-  final _scrollController = ScrollController();
   Timer? _debounce;
 
+  /// Drives the results list. We prefer the route's [PrimaryScrollController]
+  /// so an iOS status-bar tap — which [Scaffold] dispatches to that exact
+  /// controller — scrolls the list to the top. [_ownedController] is a
+  /// fallback used only when no primary is available (e.g. widget tests pumped
+  /// without a route); we never dispose a controller we don't own.
+  ScrollController? _scrollController;
+  ScrollController? _ownedController;
+
   @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final controller =
+        PrimaryScrollController.maybeOf(context) ??
+        (_ownedController ??= ScrollController());
+    if (identical(controller, _scrollController)) return;
+    _scrollController?.removeListener(_onScroll);
+    _scrollController = controller..addListener(_onScroll);
   }
 
   @override
@@ -44,7 +56,8 @@ class _SearchContentState extends State<SearchContent> {
     _debounce?.cancel();
     _searchCtrl.dispose();
     _searchFocus.dispose();
-    _scrollController.dispose();
+    _scrollController?.removeListener(_onScroll);
+    _ownedController?.dispose();
     super.dispose();
   }
 
@@ -60,8 +73,9 @@ class _SearchContentState extends State<SearchContent> {
   }
 
   void _onScroll() {
-    if (!_scrollController.hasClients) return;
-    final position = _scrollController.position;
+    final controller = _scrollController;
+    if (controller == null || !controller.hasClients) return;
+    final position = controller.position;
     if (position.pixels < position.maxScrollExtent - 320) return;
 
     final state = context.read<SearchBloc>().state;

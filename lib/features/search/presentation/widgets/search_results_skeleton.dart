@@ -16,6 +16,7 @@ class SearchResultsSkeleton extends StatelessWidget {
       baseColor: colors.shimmerBase,
       highlightColor: colors.shimmerHighlight,
       child: ListView.builder(
+        primary: false,
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: itemCount,

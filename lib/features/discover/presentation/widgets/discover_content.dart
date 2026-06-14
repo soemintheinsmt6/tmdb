@@ -24,24 +24,36 @@ class DiscoverContent extends StatefulWidget {
 }
 
 class _DiscoverContentState extends State<DiscoverContent> {
-  final _scrollController = ScrollController();
+  /// Drives the poster grid. We prefer the ambient [PrimaryScrollController]
+  /// (the active tab's controller, supplied by `RootScreen`) so an iOS
+  /// status-bar tap scrolls this list to the top. [_ownedController] is a
+  /// fallback used only when no primary is available (e.g. widget tests pumped
+  /// without a route); we never dispose a controller we don't own.
+  ScrollController? _scrollController;
+  ScrollController? _ownedController;
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final controller =
+        PrimaryScrollController.maybeOf(context) ??
+        (_ownedController ??= ScrollController());
+    if (identical(controller, _scrollController)) return;
+    _scrollController?.removeListener(_onScroll);
+    _scrollController = controller..addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    _scrollController?.removeListener(_onScroll);
+    _ownedController?.dispose();
     super.dispose();
   }
 
   void _onScroll() {
-    if (!_scrollController.hasClients) return;
-    final position = _scrollController.position;
+    final controller = _scrollController;
+    if (controller == null || !controller.hasClients) return;
+    final position = controller.position;
     if (position.pixels < position.maxScrollExtent - 320) return;
 
     final state = context.read<DiscoverBloc>().state;

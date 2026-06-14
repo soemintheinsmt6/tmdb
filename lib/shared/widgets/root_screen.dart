@@ -17,11 +17,32 @@ class RootScreen extends StatefulWidget {
 }
 
 class _RootScreenState extends State<RootScreen> {
+  static const int _tabCount = 5;
+
   int _index = 0;
-  final List<Widget?> _tabs = List.filled(5, null);
+  final List<Widget?> _tabs = List.filled(_tabCount, null);
+
+  /// One scroll controller per tab. Each tab scopes its lists to its own
+  /// controller (see [_buildTab]) so the kept-alive tabs never contend over a
+  /// single shared one. The active tab's controller is also exposed at the
+  /// root (see [build]) so an iOS status-bar tap — which the outer [Scaffold]
+  /// dispatches to the ambient [PrimaryScrollController] — scrolls the visible
+  /// tab back to the top.
+  final List<ScrollController> _scrollControllers = List.generate(
+    _tabCount,
+    (_) => ScrollController(),
+  );
+
+  @override
+  void dispose() {
+    for (final controller in _scrollControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   Widget _buildTab(int index) {
-    return _tabs[index] ??= switch (index) {
+    final tab = _tabs[index] ??= switch (index) {
       0 => const HomeScreen(),
       1 => const DiscoverScreen(),
       2 => const TvScreen(),
@@ -29,82 +50,99 @@ class _RootScreenState extends State<RootScreen> {
       4 => const ProfileScreen(),
       _ => const SizedBox.shrink(),
     };
+    // Scope each tab to its own controller so its lists attach independently
+    // of the other kept-alive tabs.
+    return PrimaryScrollController(
+      controller: _scrollControllers[index],
+      child: tab,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Scaffold(
-      body: IndexedStack(
-        index: _index,
-        children: List.generate(_tabs.length, (i) {
-          if (i == _index || _tabs[i] != null) return _buildTab(i);
-          return const SizedBox.shrink();
-        }),
-      ),
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          indicatorColor: Colors.transparent,
-          overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-          labelTextStyle: WidgetStateProperty.resolveWith(
-            (states) => TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: states.contains(WidgetState.selected)
-                  ? AppColors.cyan
-                  : colors.textMuted,
+    return PrimaryScrollController(
+      // The outer Scaffold owns the iOS status-bar tap target; expose the
+      // active tab's controller here so the tap scrolls the visible list.
+      controller: _scrollControllers[_index],
+      child: Scaffold(
+        body: IndexedStack(
+          index: _index,
+          children: List.generate(_tabs.length, (i) {
+            if (i == _index || _tabs[i] != null) return _buildTab(i);
+            return const SizedBox.shrink();
+          }),
+        ),
+        bottomNavigationBar: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            indicatorColor: Colors.transparent,
+            overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+            labelTextStyle: WidgetStateProperty.resolveWith(
+              (states) => TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: states.contains(WidgetState.selected)
+                    ? AppColors.cyan
+                    : colors.textMuted,
+              ),
             ),
           ),
-        ),
-        child: NavigationBar(
-          selectedIndex: _index,
-          onDestinationSelected: (i) => setState(() => _index = i),
-          backgroundColor: colors.surface,
-          destinations: [
-            NavigationDestination(
-              icon: Icon(IconsaxPlusLinear.category_2, color: colors.textMuted),
-              selectedIcon: const Icon(
-                IconsaxPlusBold.category_2,
-                color: AppColors.cyan,
+          child: NavigationBar(
+            selectedIndex: _index,
+            onDestinationSelected: (i) => setState(() => _index = i),
+            backgroundColor: colors.surface,
+            destinations: [
+              NavigationDestination(
+                icon: Icon(
+                  IconsaxPlusLinear.category_2,
+                  color: colors.textMuted,
+                ),
+                selectedIcon: const Icon(
+                  IconsaxPlusBold.category_2,
+                  color: AppColors.cyan,
+                ),
+                label: 'Home',
               ),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: Icon(IconsaxPlusLinear.discover_1, color: colors.textMuted),
-              selectedIcon: const Icon(
-                IconsaxPlusBold.discover,
-                color: AppColors.cyan,
+              NavigationDestination(
+                icon: Icon(
+                  IconsaxPlusLinear.discover_1,
+                  color: colors.textMuted,
+                ),
+                selectedIcon: const Icon(
+                  IconsaxPlusBold.discover,
+                  color: AppColors.cyan,
+                ),
+                label: 'Discover',
               ),
-              label: 'Discover',
-            ),
-            NavigationDestination(
-              icon: Icon(
-                IconsaxPlusLinear.video_square,
-                color: colors.textMuted,
+              NavigationDestination(
+                icon: Icon(
+                  IconsaxPlusLinear.video_square,
+                  color: colors.textMuted,
+                ),
+                selectedIcon: const Icon(
+                  IconsaxPlusBold.video_square,
+                  color: AppColors.cyan,
+                ),
+                label: 'Series',
               ),
-              selectedIcon: const Icon(
-                IconsaxPlusBold.video_square,
-                color: AppColors.cyan,
+              NavigationDestination(
+                icon: Icon(IconsaxPlusLinear.heart, color: colors.textMuted),
+                selectedIcon: const Icon(
+                  IconsaxPlusBold.heart,
+                  color: AppColors.cyan,
+                ),
+                label: 'Favourites',
               ),
-              label: 'Series',
-            ),
-            NavigationDestination(
-              icon: Icon(IconsaxPlusLinear.heart, color: colors.textMuted),
-              selectedIcon: const Icon(
-                IconsaxPlusBold.heart,
-                color: AppColors.cyan,
+              NavigationDestination(
+                icon: Icon(IconsaxPlusLinear.user, color: colors.textMuted),
+                selectedIcon: const Icon(
+                  IconsaxPlusBold.user,
+                  color: AppColors.cyan,
+                ),
+                label: 'Profile',
               ),
-              label: 'Favourites',
-            ),
-            NavigationDestination(
-              icon: Icon(IconsaxPlusLinear.user, color: colors.textMuted),
-              selectedIcon: const Icon(
-                IconsaxPlusBold.user,
-                color: AppColors.cyan,
-              ),
-              label: 'Profile',
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

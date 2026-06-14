@@ -43,8 +43,16 @@ class _HomeContentState extends State<HomeContent>
   late final TabController _tabController;
   final _searchCtrl = TextEditingController();
   final _searchFocus = FocusNode();
-  final _scrollController = ScrollController();
   Timer? _debounce;
+
+  /// Drives the poster grids. We prefer the route's [PrimaryScrollController]
+  /// so an iOS status-bar tap — which [Scaffold] dispatches to that exact
+  /// controller — scrolls the list back to the top. [_ownedController] is a
+  /// fallback used only when no primary is available (e.g. widget tests
+  /// pumped without a route); the route owns the primary, so we never dispose
+  /// it ourselves.
+  ScrollController? _scrollController;
+  ScrollController? _ownedController;
 
   @override
   void initState() {
@@ -53,7 +61,17 @@ class _HomeContentState extends State<HomeContent>
       length: MovieCategory.values.length,
       vsync: this,
     );
-    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final controller =
+        PrimaryScrollController.maybeOf(context) ??
+        (_ownedController ??= ScrollController());
+    if (identical(controller, _scrollController)) return;
+    _scrollController?.removeListener(_onScroll);
+    _scrollController = controller..addListener(_onScroll);
   }
 
   @override
@@ -62,13 +80,17 @@ class _HomeContentState extends State<HomeContent>
     _tabController.dispose();
     _searchCtrl.dispose();
     _searchFocus.dispose();
-    _scrollController.dispose();
+    _scrollController?.removeListener(_onScroll);
+    _ownedController?.dispose();
     super.dispose();
   }
 
   void _onCategoryTap(MovieCategory category) {
     context.read<MovieListBloc>().add(MovieListCategoryChanged(category));
-    _scrollController.jumpTo(0);
+    final controller = _scrollController;
+    if (controller != null && controller.hasClients) {
+      controller.jumpTo(0);
+    }
   }
 
   void _onSearchChanged(String value) {
@@ -83,8 +105,9 @@ class _HomeContentState extends State<HomeContent>
   }
 
   void _onScroll() {
-    if (!_scrollController.hasClients) return;
-    final position = _scrollController.position;
+    final controller = _scrollController;
+    if (controller == null || !controller.hasClients) return;
+    final position = controller.position;
     if (position.pixels < position.maxScrollExtent - 320) return;
 
     final searchState = context.read<MovieSearchBloc>().state;
