@@ -52,6 +52,19 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   Timer? _controlsHideTimer;
   static const Duration _controlsHideDelay = Duration(seconds: 3);
 
+  /// The video's real width/height ratio, so vertical "short"-style teasers
+  /// fill the player instead of being pillar-boxed inside a 16:9 box. Null
+  /// until measured from the thumbnail; [_aspectRatio] falls back to 16:9.
+  double? _videoAspectRatio;
+  double get _aspectRatio => _videoAspectRatio ?? 16 / 9;
+
+  /// Whether [_detectAspectRatio] has finished. The player is built only once
+  /// this is true, because [YoutubePlayer] reads its `aspectRatio` once in its
+  /// own initState and never picks up later changes — so the ratio must be
+  /// known *before* the player is first created, or the box stays 16:9.
+  bool _aspectResolved = false;
+  bool get _isVertical => _aspectRatio < 1;
+
   /// Preserves the player's state (and the underlying webview, so playback
   /// doesn't restart) when it is reparented between the portrait and fullscreen
   /// layouts.
@@ -89,6 +102,7 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
       ),
     );
     _controller.addListener(_onControllerUpdate);
+    unawaited(_detectAspectRatio());
     // Stay portrait until the user opts into fullscreen, so rotating the device
     // doesn't render the portrait layout sideways.
     unawaited(
@@ -118,6 +132,53 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
         _controlsHideTimer?.cancel();
         if (!_controlsVisible) setState(() => _controlsVisible = true);
       }
+    }
+  }
+
+  /// Measures the video's true aspect ratio so vertical "short"-style teasers
+  /// render upright and full-size instead of pillar-boxed inside a 16:9 frame.
+  ///
+  /// Reads YouTube's `oardefault.jpg` ("original aspect ratio") thumbnail: it
+  /// exists only for non-16:9 videos and reports their real dimensions (a
+  /// vertical teaser is e.g. 1080×1920). For ordinary landscape videos it 404s
+  /// — the catch below then keeps the 16:9 default. (The `maxresdefault.jpg` is
+  /// no use here: it's always a 16:9 canvas with the video letterboxed inside.)
+  Future<void> _detectAspectRatio() async {
+    final provider = NetworkImage(
+      'https://i.ytimg.com/vi/${widget.video.key}/oardefault.jpg',
+    );
+    final stream = provider.resolve(ImageConfiguration.empty);
+    final completer = Completer<Size>();
+    late final ImageStreamListener listener;
+    listener = ImageStreamListener(
+      (info, _) {
+        if (!completer.isCompleted) {
+          completer.complete(
+            Size(info.image.width.toDouble(), info.image.height.toDouble()),
+          );
+        }
+        stream.removeListener(listener);
+      },
+      onError: (error, _) {
+        if (!completer.isCompleted) completer.completeError(error);
+        stream.removeListener(listener);
+      },
+    );
+    stream.addListener(listener);
+
+    try {
+      final size = await completer.future.timeout(const Duration(seconds: 3));
+      if (size.height != 0) {
+        _videoAspectRatio = (size.width / size.height)
+            .clamp(0.4, 2.0)
+            .toDouble();
+      }
+    } catch (_) {
+      // No `oardefault` thumbnail (404), or it timed out — the video is
+      // standard 16:9, so the default is already correct.
+    } finally {
+      // Unblock the player build either way (with the measured ratio or 16:9).
+      if (mounted) setState(() => _aspectResolved = true);
     }
   }
 
@@ -271,11 +332,17 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
     unawaited(
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky),
     );
+    // Vertical videos go immersive but stay upright — rotating them to
+    // landscape would only shrink them again behind huge side bars.
     unawaited(
-      SystemChrome.setPreferredOrientations(const [
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]),
+      SystemChrome.setPreferredOrientations(
+        _isVertical
+            ? const [DeviceOrientation.portraitUp]
+            : const [
+                DeviceOrientation.landscapeLeft,
+                DeviceOrientation.landscapeRight,
+              ],
+      ),
     );
   }
 
@@ -424,10 +491,22 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
     // never reloads the video. The key goes on a wrapper, not on YoutubePlayer
     // itself — the package forwards a widget key to its inner webview, so a
     // GlobalKey on YoutubePlayer would land on two widgets at once.
-    final player = KeyedSubtree(
-      key: _playerKey,
-      child: YoutubePlayer(controller: _controller, aspectRatio: 16 / 9),
-    );
+    //
+    // Build the player only once the aspect ratio is known: YoutubePlayer locks
+    // in its `aspectRatio` at construction (see [_aspectResolved]), so a 16:9
+    // placeholder is shown (under the black loading overlay) until then.
+    final player = _aspectResolved
+        ? KeyedSubtree(
+            key: _playerKey,
+            child: YoutubePlayer(
+              controller: _controller,
+              aspectRatio: _aspectRatio,
+            ),
+          )
+        : const AspectRatio(
+            aspectRatio: 16 / 9,
+            child: ColoredBox(color: Colors.black),
+          );
 
     final body = _isFullScreen
         ? Stack(

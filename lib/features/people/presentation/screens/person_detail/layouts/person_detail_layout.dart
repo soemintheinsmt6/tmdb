@@ -25,6 +25,7 @@ class PersonDetailLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0,
         title: BlocBuilder<PersonDetailBloc, PersonDetailState>(
           builder: (context, state) {
             final name = state is PersonDetailLoaded
