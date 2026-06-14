@@ -40,6 +40,18 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   bool _isFullScreen = false;
   bool _playerReady = false;
 
+  /// Whether the playback controls (scrubber + buttons) are currently shown.
+  /// Hidden on launch; a tap reveals them. They auto-hide after
+  /// [_controlsHideDelay] while playing, and stay up while paused.
+  bool _controlsVisible = false;
+
+  /// Last observed player state, so [_onControllerUpdate] reacts only to real
+  /// play/pause transitions (and ignores buffering/cued churn).
+  PlayerState? _lastPlayerState;
+
+  Timer? _controlsHideTimer;
+  static const Duration _controlsHideDelay = Duration(seconds: 3);
+
   /// Preserves the player's state (and the underlying webview, so playback
   /// doesn't restart) when it is reparented between the portrait and fullscreen
   /// layouts.
@@ -88,17 +100,31 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
 
   void _onControllerUpdate() {
     if (!mounted) return;
-    if (_controller.value.hasError && !_embedFailed) {
+    final value = _controller.value;
+    if (value.hasError && !_embedFailed) {
       setState(() => _embedFailed = true);
     }
-    if (!_playerReady && _controller.value.isReady) {
+    if (!_playerReady && value.isReady) {
       setState(() => _playerReady = true);
+    }
+    final state = value.playerState;
+    if (state != _lastPlayerState) {
+      _lastPlayerState = state;
+      if (state == PlayerState.playing) {
+        // Resumed: let the controls fade out shortly.
+        _scheduleControlsHide();
+      } else if (state == PlayerState.paused) {
+        // Paused: surface the controls and keep them up.
+        _controlsHideTimer?.cancel();
+        if (!_controlsVisible) setState(() => _controlsVisible = true);
+      }
     }
   }
 
   @override
   void dispose() {
     _seekFeedbackTimer?.cancel();
+    _controlsHideTimer?.cancel();
     _controller.removeListener(_onControllerUpdate);
     _controller.dispose();
     // Leave the app as we found it: bars back, orientation unlocked.
@@ -107,12 +133,54 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
     super.dispose();
   }
 
+  /// A tap on the video either reveals the controls (when hidden) or toggles
+  /// play/pause (when they're already showing) — so the first tap never
+  /// pauses, and the next tap within the visible window does.
+  void _handleTap() {
+    if (_controlsVisible) {
+      _togglePlayPause();
+    } else {
+      _showControls();
+    }
+  }
+
   void _togglePlayPause() {
+    _controlsHideTimer?.cancel();
     if (_controller.value.isPlaying) {
       _controller.pause();
     } else {
       _controller.play();
     }
+  }
+
+  /// Reveals the controls and arms the auto-hide timer.
+  void _showControls() {
+    if (!_controlsVisible) setState(() => _controlsVisible = true);
+    _scheduleControlsHide();
+  }
+
+  /// Schedules the controls to fade out after [_controlsHideDelay] — but only
+  /// while playing; paused leaves them up.
+  void _scheduleControlsHide() {
+    _controlsHideTimer?.cancel();
+    if (!_controller.value.isPlaying) return;
+    _controlsHideTimer = Timer(_controlsHideDelay, () {
+      if (mounted) setState(() => _controlsVisible = false);
+    });
+  }
+
+  /// Wraps a control widget so it fades with [_controlsVisible] and stops
+  /// intercepting taps while hidden — letting a tap reach the gesture layer and
+  /// reveal the controls instead of being swallowed.
+  Widget _animatedControls(Widget child) {
+    return IgnorePointer(
+      ignoring: !_controlsVisible,
+      child: AnimatedOpacity(
+        opacity: _controlsVisible ? 1 : 0,
+        duration: const Duration(milliseconds: 200),
+        child: child,
+      ),
+    );
   }
 
   /// Seeks by [seconds] (negative = back), clamped to the video bounds, and
@@ -140,7 +208,7 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
         builder: (context, constraints) {
           return GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: _togglePlayPause,
+            onTap: _handleTap,
             onDoubleTapDown: (details) =>
                 _lastDoubleTapDx = details.localPosition.dx,
             onDoubleTap: () => _seekBy(
@@ -314,11 +382,15 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
                   child: Slider(
                     value: current.clamp(0.0, maxSeconds),
                     max: maxSeconds,
-                    onChangeStart: (v) => setState(() => _dragSeconds = v),
+                    onChangeStart: (v) {
+                      _controlsHideTimer?.cancel();
+                      setState(() => _dragSeconds = v);
+                    },
                     onChanged: (v) => setState(() => _dragSeconds = v),
                     onChangeEnd: (v) {
                       _controller.seekTo(Duration(seconds: v.round()));
                       setState(() => _dragSeconds = null);
+                      _scheduleControlsHide();
                     },
                   ),
                 ),
@@ -369,12 +441,14 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: SafeArea(top: false, child: _controlsBar()),
+                child: _animatedControls(
+                  SafeArea(top: false, child: _controlsBar()),
+                ),
               ),
               SafeArea(
                 child: Align(
                   alignment: Alignment.topLeft,
-                  child: _exitFullScreenButton(),
+                  child: _animatedControls(_exitFullScreenButton()),
                 ),
               ),
               _loadingOverlay(),
@@ -386,7 +460,12 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
                 player,
                 _seekFeedbackOverlay(),
                 _gestureLayer(),
-                Positioned(left: 0, right: 0, bottom: 0, child: _controlsBar()),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: _animatedControls(_controlsBar()),
+                ),
                 _loadingOverlay(),
               ],
             ),
