@@ -13,6 +13,7 @@ import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/image_gallery_viewer.dart';
 import 'package:tmdb/shared/widgets/poster_image.dart';
 import 'package:tmdb/shared/widgets/rating_badge.dart';
+import 'package:tmdb/shared/widgets/rating_stars.dart';
 
 /// Backdrop hero with a bottom fade, shared by the movie and TV detail screens.
 class DetailHeader extends StatelessWidget {
@@ -86,7 +87,7 @@ Widget _backdropFlightShuttle(
   );
 }
 
-/// Poster + title/tagline + a rating badge, caller-supplied [metaChips], and
+/// Poster + title/tagline + a star rating, caller-supplied [metaChips], and
 /// genre chips. The meta row differs per feature (runtime vs. seasons), so the
 /// owning screen builds the [metaChips].
 class DetailSummary extends StatelessWidget {
@@ -94,7 +95,8 @@ class DetailSummary extends StatelessWidget {
     super.key,
     required this.posterUrl,
     required this.title,
-    required this.rating,
+    required this.voteAverage,
+    required this.voteCount,
     required this.metaChips,
     required this.genres,
     this.tagline = '',
@@ -103,7 +105,8 @@ class DetailSummary extends StatelessWidget {
   final String posterUrl;
   final String title;
   final String tagline;
-  final String rating;
+  final double voteAverage;
+  final int voteCount;
   final List<Widget> metaChips;
   final List<Genre> genres;
 
@@ -136,15 +139,16 @@ class DetailSummary extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  RatingBadge(rating: rating),
-                  ...metaChips,
-                ],
-              ),
+              RatingStars(voteAverage: voteAverage, voteCount: voteCount),
+              if (metaChips.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: metaChips,
+                ),
+              ],
               if (genres.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Wrap(

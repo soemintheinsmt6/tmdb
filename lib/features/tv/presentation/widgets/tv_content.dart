@@ -148,6 +148,7 @@ class _TvContentState extends State<TvContent>
             onChanged: _onSearchChanged,
             onClear: () {
               _debounce?.cancel();
+              _searchFocus.unfocus();
               context.read<TvSearchBloc>().add(const TvSearchCleared());
             },
           ),

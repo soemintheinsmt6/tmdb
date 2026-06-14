@@ -26,7 +26,7 @@ class PosterCard extends StatelessWidget {
               PosterImage(url: item.posterUrl()),
               Positioned(
                 top: 8,
-                left: 8,
+                right: 8,
                 child: RatingBadge(rating: item.formattedRating),
               ),
             ],

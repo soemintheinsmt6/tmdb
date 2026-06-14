@@ -19,7 +19,8 @@ class TvDetailSummary extends StatelessWidget {
       posterUrl: detail.posterUrl(),
       title: detail.name,
       tagline: detail.tagline,
-      rating: detail.formattedRating,
+      voteAverage: detail.voteAverage,
+      voteCount: detail.voteCount,
       genres: detail.genres,
       metaChips: [
         DetailMetaChip(

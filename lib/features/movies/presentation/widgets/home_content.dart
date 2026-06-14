@@ -149,6 +149,7 @@ class _HomeContentState extends State<HomeContent>
             onChanged: _onSearchChanged,
             onClear: () {
               _debounce?.cancel();
+              _searchFocus.unfocus();
               context.read<MovieSearchBloc>().add(const MovieSearchCleared());
             },
           ),
