@@ -12,9 +12,11 @@ import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_stat
 import 'package:tmdb/features/tv/presentation/widgets/tv_detail_cards.dart';
 import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
 import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_toggle_button.dart';
+import 'package:tmdb/shared/domain/shareable_media.dart';
 import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
+import 'package:tmdb/shared/widgets/share_button.dart';
 import 'package:tmdb/shared/widgets/trailer_player.dart';
 
 class TvDetailTabletLayout extends StatefulWidget {
@@ -104,6 +106,16 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
                     ),
                     WatchlistToggleButton(
                       item: WatchlistItem.fromTvShow(show),
+                      color: foreground,
+                    ),
+                    ShareButton(
+                      media: ShareableMedia(
+                        mediaType: MediaType.tv,
+                        id: show.id,
+                        title: show.name,
+                        year: show.firstAirYear,
+                        backdropUrl: show.backdropUrl(),
+                      ),
                       color: foreground,
                     ),
                   ],

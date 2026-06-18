@@ -11,9 +11,11 @@ import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dar
 import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
 import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
 import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_toggle_button.dart';
+import 'package:tmdb/shared/domain/shareable_media.dart';
 import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
+import 'package:tmdb/shared/widgets/share_button.dart';
 import 'package:tmdb/shared/widgets/trailer_player.dart';
 
 class MovieDetailMobileLayout extends StatefulWidget {
@@ -103,6 +105,16 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                     ),
                     WatchlistToggleButton(
                       item: WatchlistItem.fromMovie(movie),
+                      color: foreground,
+                    ),
+                    ShareButton(
+                      media: ShareableMedia(
+                        mediaType: MediaType.movie,
+                        id: movie.id,
+                        title: movie.title,
+                        year: movie.releaseYear,
+                        backdropUrl: movie.backdropUrl(),
+                      ),
                       color: foreground,
                     ),
                   ],

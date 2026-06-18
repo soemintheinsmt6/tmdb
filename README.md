@@ -12,7 +12,7 @@ A movie & TV browser built on top of [The Movie Database (TMDB) API](https://dev
 - **http** for networking (wrapped by `core/network/api_client.dart`)
 - **hive** for local persistence of favourites & watchlist
 - **cached_network_image**, **shimmer**, **iconsax_plus**, **google_fonts** for UI
-- **youtube_player_flutter** (in-app trailers) · **url_launcher** ("Watch on YouTube" fallback) · **saver_gallery** (save backdrops to the device gallery)
+- **youtube_player_flutter** (in-app trailers) · **url_launcher** ("Watch on YouTube" fallback) · **saver_gallery** (save backdrops to the device gallery) · **share_plus** (system share sheet)
 - **bloc_test**, **mocktail**, **integration_test** for tests
 - **GitHub Actions** CI (format + analyze + test + coverage), curated lints on top of **flutter_lints**, and ADRs in `docs/adr/`
 
@@ -30,6 +30,7 @@ lib/
 │   ├── logging/            # AppLogger seam + ConsoleLogger + global error handlers
 │   ├── network/            # api_client.dart (api_key auth, retry/backoff, exception mapping)
 │   ├── responsive/         # breakpoints + ResponsiveBuilder
+│   ├── sharing/            # media_share.dart (TMDB link + backdrop → share sheet)
 │   ├── storage/            # Hive wrapper (favourite movie/TV + watchlist boxes)
 │   ├── theme/              # AppColors, AppTypography, AppTheme, AppDecoration
 │   └── utils/              # navigation.dart, typedef.dart
@@ -104,13 +105,13 @@ lib/
 ├── shared/
 │   ├── domain/                 # PosterItem (poster view contract), MediaType (movie|tv),
 │   │                           # LibrarySort + SortableSavedItem (ordering), LibraryView,
-│   │                           # Genre, CastMember, Video, Review, MediaImage
+│   │                           # Genre, CastMember, Video, Review, MediaImage, ShareableMedia
 │   └── widgets/                # Poster kernel shared by movies + TV — PosterGrid,
 │                               # PosterCard, PosterImage, RatingBadge, PosterGridSkeleton,
 │                               # CategoryTabBar, detail_cards (DetailHeader/Summary/CastList/
 │                               # PosterRail/VideoRail/ReviewsSection/ImageGallery) — plus
 │                               # TrailerPlayerScreen, ImageGalleryViewer, AppSearchField,
-│                               # AppErrorView, AppEmptyView, RootScreen (5-tab shell)
+│                               # ShareButton, AppErrorView, AppEmptyView, RootScreen (5-tab shell)
 ├── injection_container.dart    # GetIt registrations
 ├── app.dart                    # MaterialApp + global providers
 └── main.dart                   # boot: Env.init → di.init → runApp
@@ -148,7 +149,7 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 309 host-side tests + one device E2E.
+The project has three test layers; together they're 313 host-side tests + one device E2E.
 
 ```bash
 dart format --set-exit-if-changed .   # formatting gate
@@ -165,7 +166,8 @@ Test layout mirrors `lib/`:
 
 ```
 test/
-├── core/                       # extensions, breakpoints, URL helpers, Failure, ApiClient retry
+├── core/                       # extensions, breakpoints, URL helpers, Failure, ApiClient retry,
+│                               # share links (TMDB URL + message)
 ├── features/
 │   ├── movies/
 │   │   ├── data/               # repository impl, remote data source
@@ -212,6 +214,7 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Trailers** — tapping a video opens an in-app YouTube player (`youtube_player_flutter`) with a custom control bar: red scrubber, tap to play/pause, **double-tap left/right to seek ±10 s**, and a fullscreen toggle that rotates to landscape. Owner-disabled / region- or age-restricted videos fall back to a "Watch on YouTube" action.
 - **Photos** — a backdrop gallery on movie & TV detail opens a full-screen viewer: swipe between images, pinch-zoom, **double-tap to zoom** (centred on the tap), and **save to the device gallery** (`saver_gallery`, with photo-library permission handling on iOS & Android).
 - **Reviews** — author, score, and expandable review text on movie & TV detail.
+- **Share** — a share action on movie & TV detail opens the native share sheet (`share_plus`) with the title, year, and canonical TMDB link, best-effort attaching the backdrop image (fetched with a timeout; falls back to text + link).
 - **TV shows** on their own tab (Popular / Top Rated / On The Air / Airing Today) with the same search, infinite scroll, and detail layout — season & episode counts replace runtime. TV detail pages are saveable to favourites and the watchlist. Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
 - **People / cast** — tap any cast member to open a person page with their profile photo, known-for department, birthday / age / birthplace, an expandable biography, and a combined movie + TV **filmography** (sorted by popularity) whose posters route back into the matching movie or TV detail. Reuses the same poster kernel as the browse grids.
 - **Favourites** spanning **both movies and TV shows**, persisted locally via Hive; reactive — toggling the heart on any movie or TV detail screen updates the Library tab in real time.
