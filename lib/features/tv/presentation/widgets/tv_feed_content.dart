@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/utils/navigation.dart';
+import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_feed_bloc/tv_feed_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_feed_bloc/tv_feed_event.dart';
@@ -12,7 +13,7 @@ import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen
 import 'package:tmdb/shared/domain/poster_item.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
-import 'package:tmdb/shared/widgets/featured_hero.dart';
+import 'package:tmdb/shared/widgets/featured_carousel.dart';
 import 'package:tmdb/shared/widgets/rail_feed_skeleton.dart';
 
 /// The editorial series body: a trending hero over a vertical stack of TV
@@ -22,6 +23,24 @@ class TvFeedContent extends StatelessWidget {
 
   void _open(BuildContext context, PosterItem item) => unawaited(
     pushView(context, TvDetailScreen(tvShowId: item.id, title: item.title)),
+  );
+
+  /// Route-unique hero tag for a featured slide, prefixed so the series and
+  /// home carousels never collide while both are alive in the IndexedStack.
+  Object _heroTag(PosterItem item) => 'series-featured-tv-${item.id}';
+
+  /// Opens a featured (carousel) item with a shared backdrop hero transition,
+  /// seeding the backdrop so the detail header matches during the flight.
+  void _openFeatured(BuildContext context, PosterItem item) => unawaited(
+    pushView(
+      context,
+      TvDetailScreen(
+        tvShowId: item.id,
+        title: item.title,
+        heroTag: _heroTag(item),
+        backdropPath: item is TvShow ? item.backdropPath : null,
+      ),
+    ),
   );
 
   void _seeAll(BuildContext context, TvCategory category, String title) =>
@@ -66,11 +85,6 @@ class TvFeedContent extends StatelessWidget {
         );
     }
 
-    // The hero already features trending[0]; the rail shows the rest.
-    addRail(
-      'Trending',
-      state.trending.length > 1 ? state.trending.sublist(1) : const [],
-    );
     addRail(
       'Popular',
       state.popular,
@@ -99,9 +113,10 @@ class TvFeedContent extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 24),
         children: [
           if (state.trending.isNotEmpty)
-            FeaturedHero(
-              item: state.trending.first,
-              onTap: () => _open(context, state.trending.first),
+            FeaturedCarousel(
+              items: state.trending.take(6).toList(),
+              onTap: (item) => _openFeatured(context, item),
+              heroTag: _heroTag,
             ),
           ...rails,
         ],

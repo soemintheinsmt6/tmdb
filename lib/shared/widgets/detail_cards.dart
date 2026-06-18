@@ -370,13 +370,31 @@ class DetailPosterRail extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding - 4, 0),
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            0,
+            horizontalPadding - 8,
+            0,
+          ),
           child: Row(
             children: [
               Expanded(child: Text(title, style: AppTypography.subTitle)),
               if (onSeeAll != null)
+                // Compact so the row's height is driven by the title text, not
+                // the button's default 48px tap target — this keeps rails with
+                // a "See all" vertically aligned with rails without one.
                 TextButton(
                   onPressed: onSeeAll,
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.cyan,
+                    minimumSize: Size.zero,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
                   child: const Text('See all'),
                 ),
             ],

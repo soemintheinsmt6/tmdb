@@ -6,6 +6,7 @@ import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/home/presentation/bloc/home_bloc.dart';
 import 'package:tmdb/features/home/presentation/bloc/home_event.dart';
 import 'package:tmdb/features/home/presentation/bloc/home_state.dart';
+import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_category_screen.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
@@ -16,7 +17,7 @@ import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen
 import 'package:tmdb/shared/domain/poster_item.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
-import 'package:tmdb/shared/widgets/featured_hero.dart';
+import 'package:tmdb/shared/widgets/featured_carousel.dart';
 import 'package:tmdb/shared/widgets/rail_feed_skeleton.dart';
 
 /// The editorial home body: a hero over a vertical stack of horizontal rails.
@@ -28,6 +29,37 @@ class HomeContent extends StatelessWidget {
     final Widget screen = item is TvShow
         ? TvDetailScreen(tvShowId: item.id, title: item.title)
         : MovieDetailScreen(movieId: item.id, title: item.title);
+    unawaited(pushView(context, screen));
+  }
+
+  /// Route-unique hero tag for a featured slide, prefixed so the home and
+  /// series carousels never collide while both are alive in the IndexedStack.
+  Object _heroTag(PosterItem item) => item is TvShow
+      ? 'home-featured-tv-${item.id}'
+      : 'home-featured-movie-${item.id}';
+
+  /// Opens a featured (carousel) item with a shared backdrop hero transition.
+  /// Seeds [backdropPath] so the detail header shows the same image instantly
+  /// during the flight.
+  void _openFeatured(BuildContext context, PosterItem item) {
+    final Widget screen;
+    if (item is TvShow) {
+      screen = TvDetailScreen(
+        tvShowId: item.id,
+        title: item.title,
+        heroTag: _heroTag(item),
+        backdropPath: item.backdropPath,
+      );
+    } else if (item is Movie) {
+      screen = MovieDetailScreen(
+        movieId: item.id,
+        title: item.title,
+        heroTag: _heroTag(item),
+        backdropPath: item.backdropPath,
+      );
+    } else {
+      screen = MovieDetailScreen(movieId: item.id, title: item.title);
+    }
     unawaited(pushView(context, screen));
   }
 
@@ -69,11 +101,6 @@ class HomeContent extends StatelessWidget {
     }
 
     addRail('For You', state.forYou);
-    // The hero already features trending[0]; the rail shows the rest.
-    addRail(
-      'Trending now',
-      state.trending.length > 1 ? state.trending.sublist(1) : const [],
-    );
     addRail(
       'Now Playing',
       state.nowPlaying,
@@ -102,9 +129,10 @@ class HomeContent extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 24),
         children: [
           if (state.trending.isNotEmpty)
-            FeaturedHero(
-              item: state.trending.first,
-              onTap: () => _open(context, state.trending.first),
+            FeaturedCarousel(
+              items: state.trending.take(6).toList(),
+              onTap: (item) => _openFeatured(context, item),
+              heroTag: _heroTag,
             ),
           ...rails,
         ],
