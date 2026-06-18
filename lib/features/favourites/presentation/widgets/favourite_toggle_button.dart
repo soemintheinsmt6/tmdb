@@ -3,21 +3,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:tmdb/core/theme/app_colors.dart';
+import 'package:tmdb/features/favourites/domain/entities/favourite_item.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_state.dart';
-import 'package:tmdb/features/movies/domain/entities/movie.dart';
 
-/// Heart icon that toggles whether [movie] is stored as a favourite.
+/// Heart icon that toggles whether [item] is stored as a favourite.
+/// Works for both movies and TV shows.
 class FavouriteToggleButton extends StatelessWidget {
-  const FavouriteToggleButton({super.key, required this.movie, this.color});
+  const FavouriteToggleButton({super.key, required this.item, this.color});
 
-  final Movie movie;
+  final FavouriteItem item;
   final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return BlocSelector<FavouritesCubit, FavouritesState, bool>(
-      selector: (state) => state.contains(movie.id),
+      selector: (state) => state.contains(item.mediaType, item.id),
       builder: (context, isFav) {
         final tint = isFav ? AppColors.cyan : (color ?? Colors.white);
         return IconButton(
@@ -26,7 +27,7 @@ class FavouriteToggleButton extends StatelessWidget {
             isFav ? IconsaxPlusBold.heart : IconsaxPlusLinear.heart,
             color: tint,
           ),
-          onPressed: () => context.read<FavouritesCubit>().toggle(movie),
+          onPressed: () => context.read<FavouritesCubit>().toggle(item),
         );
       },
     );

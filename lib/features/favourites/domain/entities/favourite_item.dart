@@ -9,15 +9,12 @@ import 'package:tmdb/shared/domain/poster_item.dart';
 
 export 'package:tmdb/shared/domain/media_type.dart';
 
-/// A saved entry in the watchlist. Unlike favourites (movies only), the
-/// watchlist holds both movies and TV shows, so every entry carries a
-/// [mediaType] discriminator and is keyed by [storageKey] — movie and TV IDs
-/// can collide, so the type must be part of the key.
-///
-/// Implements [PosterItem] so it renders through the shared poster widgets just
-/// like a `Movie` or `TvShow`.
-class WatchlistItem extends Equatable implements PosterItem {
-  const WatchlistItem({
+/// A favourited title — a movie or a TV show. Carries a [mediaType]
+/// discriminator (favourites span both verticals) and implements [PosterItem]
+/// so it renders through the shared poster widgets. Structurally parallel to
+/// the watchlist's saved item.
+class FavouriteItem extends Equatable implements PosterItem {
+  const FavouriteItem({
     required this.mediaType,
     required this.id,
     required this.title,
@@ -30,7 +27,7 @@ class WatchlistItem extends Equatable implements PosterItem {
     required this.savedAt,
   });
 
-  factory WatchlistItem.fromMovie(Movie m) => WatchlistItem(
+  factory FavouriteItem.fromMovie(Movie m) => FavouriteItem(
     mediaType: MediaType.movie,
     id: m.id,
     title: m.title,
@@ -43,7 +40,7 @@ class WatchlistItem extends Equatable implements PosterItem {
     savedAt: DateTime.now(),
   );
 
-  factory WatchlistItem.fromTvShow(TvShow s) => WatchlistItem(
+  factory FavouriteItem.fromTvShow(TvShow s) => FavouriteItem(
     mediaType: MediaType.tv,
     id: s.id,
     title: s.name,
@@ -71,7 +68,7 @@ class WatchlistItem extends Equatable implements PosterItem {
   final int voteCount;
   final DateTime savedAt;
 
-  /// Stable, collision-free key: `"movie:550"` / `"tv:1399"`.
+  /// Stable, collision-free in-memory key: `"movie:550"` / `"tv:1399"`.
   String get storageKey => keyFor(mediaType, id);
 
   /// Builds the same key from a (type, id) pair without an instance.

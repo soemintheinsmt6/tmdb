@@ -30,7 +30,7 @@ lib/
 │   ├── logging/            # AppLogger seam + ConsoleLogger + global error handlers
 │   ├── network/            # api_client.dart (api_key auth, retry/backoff, exception mapping)
 │   ├── responsive/         # breakpoints + ResponsiveBuilder
-│   ├── storage/            # Hive wrapper (favourites + watchlist boxes)
+│   ├── storage/            # Hive wrapper (favourite movie/TV + watchlist boxes)
 │   ├── theme/              # AppColors, AppTypography, AppTheme, AppDecoration
 │   └── utils/              # navigation.dart, typedef.dart
 ├── features/
@@ -56,8 +56,8 @@ lib/
 │   │                           # TvShowDetail, TvRepository, remote data source,
 │   │                           # tv_list/tv_search/tv_detail blocs, tv_screen + tv_detail.
 │   │                           # Categories: Popular / Top Rated / On The Air / Airing Today.
-│   │                           # Browse + detail; TV detail is saveable to the watchlist
-│   │                           # (favouriting stays movies-only).
+│   │                           # Browse + detail; TV detail is saveable to favourites
+│   │                           # and the watchlist.
 │   ├── discover/               # /discover/movie browse: DiscoverFilter (genres/sort/year/
 │   │                           # min-rating → query params), DiscoverRepository, remote data
 │   │                           # source, DiscoverBloc (flat state: genres + filter +
@@ -73,12 +73,14 @@ lib/
 │   │                           # detail; filmography posters route back into movie/TV detail.
 │   ├── favourites/
 │   │   ├── data/
-│   │   │   ├── models/         # FavouriteMovie (Hive TypeAdapter, persistence-only)
-│   │   │   └── repositories/   # FavouritesRepositoryImpl (queries Box; returns Movie)
+│   │   │   ├── models/         # FavouriteMovie (typeId 1) + FavouriteTvShow (typeId 3)
+│   │   │   │                   #   — hand-written Hive TypeAdapters, persistence-only
+│   │   │   └── repositories/   # FavouritesRepositoryImpl (merges both boxes → FavouriteItem)
 │   │   ├── domain/
+│   │   │   ├── entities/       # FavouriteItem (MediaType movie|tv, implements PosterItem)
 │   │   │   └── repositories/   # FavouritesRepository (abstract — test seam)
 │   │   └── presentation/
-│   │       ├── cubit/          # FavouritesCubit + FavouritesState({movies, ids})
+│   │       ├── cubit/          # FavouritesCubit + FavouritesState({items, keys})
 │   │       ├── screens/        # FavouriteScreen (standalone; body = FavouritesListView)
 │   │       └── widgets/        # FavouriteHeroCard, FavouriteToggleButton, FavouritesListView
 │   ├── watchlist/
@@ -99,8 +101,8 @@ lib/
 │           ├── screens/        # ProfileScreen (favourite count + clear / about)
 │           └── widgets/        # ProfileHeader, SettingsTile
 ├── shared/
-│   ├── domain/                 # PosterItem (poster view contract), Genre, CastMember,
-│   │                           # Video, Review, MediaImage (detail sub-resources)
+│   ├── domain/                 # PosterItem (poster view contract), MediaType (movie|tv),
+│   │                           # Genre, CastMember, Video, Review, MediaImage
 │   └── widgets/                # Poster kernel shared by movies + TV — PosterGrid,
 │                               # PosterCard, PosterImage, RatingBadge, PosterGridSkeleton,
 │                               # CategoryTabBar, detail_cards (DetailHeader/Summary/CastList/
@@ -116,7 +118,7 @@ lib/
 
 **Observability.** Code logs through the injected `AppLogger` abstraction, never `print`. The default `ConsoleLogger` routes to `dart:developer`; global Flutter/platform errors are funnelled in at boot. Shipping a crash reporter is a one-line DI swap — see [ADR 0005](docs/adr/0005-observability-seam.md). The network logger logs endpoint paths only, never the `api_key`-bearing URL.
 
-**Persistence boundary.** `FavouriteMovie` and `WatchlistEntry` (each Hive-encoded via a hand-written `TypeAdapter`, type ids `1` and `2`) live only in their feature data layers. The repositories convert to domain types (`Movie` / `WatchlistItem`) at the boundary, so widgets and cubits never see the persistence rows. The watchlist spans both movies and TV shows, so its rows carry a media-type discriminator and are keyed `"movie:ID"` / `"tv:ID"` — numeric ids can collide across the two verticals, so the type is part of the key.
+**Persistence boundary.** The Hive row types (`FavouriteMovie` / `FavouriteTvShow` and `WatchlistEntry` — hand-written `TypeAdapter`s, type ids `1`, `3`, `2`) live only in their feature data layers. The repositories convert to domain types (`FavouriteItem` / `WatchlistItem`) at the boundary, so widgets and cubits never see the persistence rows. Both stores span movies and TV: the watchlist uses one box keyed `"movie:ID"` / `"tv:ID"`; favourites keeps two type-specific boxes (movies keep their original box untouched) and merges them. Either way, membership is checked by `(mediaType, id)` — numeric ids can collide across the two verticals, so the type is always part of the key.
 
 ## Setup
 
@@ -144,7 +146,7 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 301 host-side tests + one device E2E.
+The project has three test layers; together they're 302 host-side tests + one device E2E.
 
 ```bash
 dart format --set-exit-if-changed .   # formatting gate
@@ -172,7 +174,7 @@ test/
 │   ├── people/                 # PersonCredit/Person entities, data (datasource + repo),
 │   │                           # PersonDetail bloc
 │   ├── favourites/
-│   │   ├── data/models/        # FavouriteMovie mapper
+│   │   ├── data/models/        # FavouriteMovie + FavouriteTvShow mappers
 │   │   └── presentation/cubit/ # FavouritesState, FavouritesCubit
 │   └── watchlist/
 │       ├── data/models/        # WatchlistEntry round-trip (incl. movie/TV id-collision)
@@ -208,9 +210,9 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Trailers** — tapping a video opens an in-app YouTube player (`youtube_player_flutter`) with a custom control bar: red scrubber, tap to play/pause, **double-tap left/right to seek ±10 s**, and a fullscreen toggle that rotates to landscape. Owner-disabled / region- or age-restricted videos fall back to a "Watch on YouTube" action.
 - **Photos** — a backdrop gallery on movie & TV detail opens a full-screen viewer: swipe between images, pinch-zoom, **double-tap to zoom** (centred on the tap), and **save to the device gallery** (`saver_gallery`, with photo-library permission handling on iOS & Android).
 - **Reviews** — author, score, and expandable review text on movie & TV detail.
-- **TV shows** on their own tab (Popular / Top Rated / On The Air / Airing Today) with the same search, infinite scroll, and detail layout — season & episode counts replace runtime. TV detail pages are saveable to the watchlist (favouriting stays movies-only). Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
+- **TV shows** on their own tab (Popular / Top Rated / On The Air / Airing Today) with the same search, infinite scroll, and detail layout — season & episode counts replace runtime. TV detail pages are saveable to favourites and the watchlist. Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
 - **People / cast** — tap any cast member to open a person page with their profile photo, known-for department, birthday / age / birthplace, an expandable biography, and a combined movie + TV **filmography** (sorted by popularity) whose posters route back into the matching movie or TV detail. Reuses the same poster kernel as the browse grids.
-- **Favourites** (movies) persisted locally via Hive; reactive — toggling on the detail screen updates the home grid heart and the Library tab in real time.
+- **Favourites** spanning **both movies and TV shows**, persisted locally via Hive; reactive — toggling the heart on any movie or TV detail screen updates the Library tab in real time.
 - **Watchlist** — a separate "watch later" list spanning **both movies and TV shows**, persisted locally via Hive and reactive like favourites. A bookmark toggle on movie & TV detail saves/removes; each saved card carries a MOVIE/TV chip and routes back to the matching detail screen.
 - **Shared-element transition** — tapping a favourites or watchlist card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
 - **Profile tab** showing favourites count plus a destructive "Clear favourites" flow with confirm dialog.

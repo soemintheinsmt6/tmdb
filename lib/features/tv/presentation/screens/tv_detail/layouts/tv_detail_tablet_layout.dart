@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/utils/navigation.dart';
+import 'package:tmdb/features/favourites/domain/entities/favourite_item.dart';
+import 'package:tmdb/features/favourites/presentation/widgets/favourite_toggle_button.dart';
 import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_event.dart';
@@ -92,9 +94,19 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
             BlocBuilder<TvDetailBloc, TvDetailState>(
               builder: (context, state) {
                 if (state is! TvDetailLoaded) return const SizedBox.shrink();
-                return WatchlistToggleButton(
-                  item: WatchlistItem.fromTvShow(state.detail.toTvShow()),
-                  color: foreground,
+                final show = state.detail.toTvShow();
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FavouriteToggleButton(
+                      item: FavouriteItem.fromTvShow(show),
+                      color: foreground,
+                    ),
+                    WatchlistToggleButton(
+                      item: WatchlistItem.fromTvShow(show),
+                      color: foreground,
+                    ),
+                  ],
                 );
               },
             ),

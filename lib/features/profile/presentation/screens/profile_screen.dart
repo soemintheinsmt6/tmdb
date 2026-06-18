@@ -20,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
           BlocSelector<FavouritesCubit, FavouritesState, int>(
-            selector: (state) => state.movies.length,
+            selector: (state) => state.items.length,
             builder: (context, count) {
               return ProfileHeader(
                 name: 'Movie Fan',
@@ -42,7 +42,7 @@ class ProfileScreen extends StatelessWidget {
           SettingsTile(
             icon: IconsaxPlusLinear.trash,
             title: 'Clear favourites',
-            subtitle: 'Remove every saved movie',
+            subtitle: 'Remove every saved title',
             iconColor: AppColors.error,
             onTap: () => _confirmClearFavourites(context),
           ),
@@ -59,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
 
   Future<void> _confirmClearFavourites(BuildContext context) async {
     final cubit = context.read<FavouritesCubit>();
-    if (cubit.state.movies.isEmpty) {
+    if (cubit.state.items.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('No favourites to clear')));
@@ -71,7 +71,7 @@ class ProfileScreen extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Clear favourites?'),
         content: const Text(
-          'This will remove every movie from your favourites. This action cannot be undone.',
+          'This will remove every title from your favourites. This action cannot be undone.',
         ),
         actions: [
           TextButton(

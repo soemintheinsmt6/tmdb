@@ -4,14 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tmdb/features/favourites/domain/entities/favourite_item.dart';
 import 'package:tmdb/features/favourites/domain/repositories/favourites_repository.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
 import 'package:tmdb/features/favourites/presentation/screens/favourite_screen.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourite_hero_card.dart';
-import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/shared/widgets/app_empty_view.dart';
 
 import '../helpers/movie_fixtures.dart';
+import '../helpers/tv_fixtures.dart';
 
 class _MockFavouritesRepository extends Mock implements FavouritesRepository {}
 
@@ -19,11 +20,15 @@ class _MockFavouritesRepository extends Mock implements FavouritesRepository {}
 /// seeds from `getAll()` and listens to a controllable `watchAll()` stream.
 void main() {
   late _MockFavouritesRepository repo;
-  late StreamController<List<Movie>> stream;
+  late StreamController<List<FavouriteItem>> stream;
+
+  setUpAll(() {
+    registerFallbackValue(MediaType.movie);
+  });
 
   setUp(() {
     repo = _MockFavouritesRepository();
-    stream = StreamController<List<Movie>>.broadcast();
+    stream = StreamController<List<FavouriteItem>>.broadcast();
     when(() => repo.watchAll()).thenAnswer((_) => stream.stream);
   });
 
@@ -55,15 +60,16 @@ void main() {
     expect(find.byType(FavouriteHeroCard), findsNothing);
   });
 
-  testWidgets('renders a hero card per favourited movie', (tester) async {
+  testWidgets('renders a hero card per favourited movie and TV show', (
+    tester,
+  ) async {
     when(() => repo.getAll()).thenReturn([
-      buildMovie(
-        id: 1,
-        title: 'Inception',
-        posterPath: null,
-        backdropPath: null,
+      FavouriteItem.fromMovie(
+        buildMovie(id: 1, title: 'Inception', posterPath: null, backdropPath: null),
       ),
-      buildMovie(id: 2, title: 'Tenet', posterPath: null, backdropPath: null),
+      FavouriteItem.fromTvShow(
+        buildTvShow(id: 2, name: 'The Wire', posterPath: null, backdropPath: null),
+      ),
     ]);
 
     await pumpScreen(tester);
@@ -72,7 +78,7 @@ void main() {
     expect(find.byType(AppEmptyView), findsNothing);
     expect(find.byType(FavouriteHeroCard), findsNWidgets(2));
     expect(find.text('Inception'), findsOneWidget);
-    expect(find.text('Tenet'), findsOneWidget);
+    expect(find.text('The Wire'), findsOneWidget);
   });
 
   testWidgets('reactively re-renders when the repo stream emits', (
@@ -85,11 +91,13 @@ void main() {
     expect(find.byType(AppEmptyView), findsOneWidget);
 
     stream.add([
-      buildMovie(
-        id: 99,
-        title: 'Late Arrival',
-        posterPath: null,
-        backdropPath: null,
+      FavouriteItem.fromMovie(
+        buildMovie(
+          id: 99,
+          title: 'Late Arrival',
+          posterPath: null,
+          backdropPath: null,
+        ),
       ),
     ]);
     await tester.pumpAndSettle();
@@ -102,14 +110,11 @@ void main() {
     tester,
   ) async {
     when(() => repo.getAll()).thenReturn([
-      buildMovie(
-        id: 42,
-        title: 'To Remove',
-        posterPath: null,
-        backdropPath: null,
+      FavouriteItem.fromMovie(
+        buildMovie(id: 42, title: 'To Remove', posterPath: null, backdropPath: null),
       ),
     ]);
-    when(() => repo.remove(any())).thenAnswer((_) async {});
+    when(() => repo.remove(any(), any())).thenAnswer((_) async {});
 
     await pumpScreen(tester);
     await tester.pump();
@@ -117,6 +122,6 @@ void main() {
     await tester.tap(find.byTooltip('Remove from favourites'));
     await tester.pump();
 
-    verify(() => repo.remove(42)).called(1);
+    verify(() => repo.remove(MediaType.movie, 42)).called(1);
   });
 }

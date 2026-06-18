@@ -16,7 +16,7 @@ class FavouritesListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<FavouritesCubit, FavouritesState>(
       builder: (context, state) {
-        if (state.movies.isEmpty) {
+        if (state.items.isEmpty) {
           return const AppEmptyView(
             message: 'No favourites yet',
             icon: IconsaxPlusLinear.heart,
@@ -24,10 +24,9 @@ class FavouritesListView extends StatelessWidget {
         }
         return ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          itemCount: state.movies.length,
+          itemCount: state.items.length,
           separatorBuilder: (_, __) => const SizedBox(height: 14),
-          itemBuilder: (_, index) =>
-              FavouriteHeroCard(movie: state.movies[index]),
+          itemBuilder: (_, index) => FavouriteHeroCard(item: state.items[index]),
         );
       },
     );

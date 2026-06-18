@@ -1,62 +1,39 @@
 import 'package:hive/hive.dart';
 
 import 'package:tmdb/features/favourites/domain/entities/favourite_item.dart';
-import 'package:tmdb/features/movies/domain/entities/movie.dart';
 
-class FavouriteMovie {
-  FavouriteMovie({
-    required this.movieId,
-    required this.title,
+/// Hive row for a favourited TV show. Mirrors `FavouriteMovie` for the TV
+/// vertical; lives in its own box so numeric ids never collide with movies.
+class FavouriteTvShow {
+  FavouriteTvShow({
+    required this.tvShowId,
+    required this.name,
     required this.overview,
     this.posterPath,
     this.backdropPath,
-    required this.releaseDate,
+    required this.firstAirDate,
     required this.voteAverage,
     required this.voteCount,
     required this.savedAt,
   });
 
-  final int movieId;
-  final String title;
+  final int tvShowId;
+  final String name;
   final String overview;
   final String? posterPath;
   final String? backdropPath;
-  final String releaseDate;
+  final String firstAirDate;
   final double voteAverage;
   final int voteCount;
   final DateTime savedAt;
 
-  factory FavouriteMovie.fromMovie(Movie m) => FavouriteMovie(
-    movieId: m.id,
-    title: m.title,
-    overview: m.overview,
-    posterPath: m.posterPath,
-    backdropPath: m.backdropPath,
-    releaseDate: m.releaseDate,
-    voteAverage: m.voteAverage,
-    voteCount: m.voteCount,
-    savedAt: DateTime.now(),
-  );
-
-  Movie toMovie() => Movie(
-    id: movieId,
-    title: title,
-    overview: overview,
-    posterPath: posterPath,
-    backdropPath: backdropPath,
-    releaseDate: releaseDate,
-    voteAverage: voteAverage,
-    voteCount: voteCount,
-    genreIds: const [],
-  );
-
-  factory FavouriteMovie.fromItem(FavouriteItem item) => FavouriteMovie(
-    movieId: item.id,
-    title: item.title,
+  factory FavouriteTvShow.fromItem(FavouriteItem item) => FavouriteTvShow(
+    tvShowId: item.id,
+    name: item.title,
     overview: item.overview,
     posterPath: item.posterPath,
     backdropPath: item.backdropPath,
-    releaseDate: item.date,
+    firstAirDate: item.date,
     voteAverage: item.voteAverage,
     voteCount: item.voteCount,
     savedAt: item.savedAt,
@@ -64,13 +41,13 @@ class FavouriteMovie {
 
   /// Maps to the domain [FavouriteItem], preserving the stored [savedAt].
   FavouriteItem toFavouriteItem() => FavouriteItem(
-    mediaType: MediaType.movie,
-    id: movieId,
-    title: title,
+    mediaType: MediaType.tv,
+    id: tvShowId,
+    title: name,
     overview: overview,
     posterPath: posterPath,
     backdropPath: backdropPath,
-    date: releaseDate,
+    date: firstAirDate,
     voteAverage: voteAverage,
     voteCount: voteCount,
     savedAt: savedAt,
@@ -78,26 +55,26 @@ class FavouriteMovie {
 }
 
 /// Hand-written [TypeAdapter] — keeps the project free of `build_runner`.
-/// Bump [kTypeId] only on a breaking schema change (and migrate on read).
-class FavouriteMovieAdapter extends TypeAdapter<FavouriteMovie> {
-  static const int kTypeId = 1;
+/// Type ids in use: `1` FavouriteMovie, `2` WatchlistEntry, `3` here.
+class FavouriteTvShowAdapter extends TypeAdapter<FavouriteTvShow> {
+  static const int kTypeId = 3;
 
   @override
   int get typeId => kTypeId;
 
   @override
-  FavouriteMovie read(BinaryReader reader) {
+  FavouriteTvShow read(BinaryReader reader) {
     final fieldsCount = reader.readByte();
     final fields = <int, dynamic>{
       for (var i = 0; i < fieldsCount; i++) reader.readByte(): reader.read(),
     };
-    return FavouriteMovie(
-      movieId: fields[0] as int,
-      title: fields[1] as String,
+    return FavouriteTvShow(
+      tvShowId: fields[0] as int,
+      name: fields[1] as String,
       overview: fields[2] as String,
       posterPath: fields[3] as String?,
       backdropPath: fields[4] as String?,
-      releaseDate: fields[5] as String,
+      firstAirDate: fields[5] as String,
       voteAverage: fields[6] as double,
       voteCount: fields[7] as int,
       savedAt: fields[8] as DateTime,
@@ -105,13 +82,13 @@ class FavouriteMovieAdapter extends TypeAdapter<FavouriteMovie> {
   }
 
   @override
-  void write(BinaryWriter writer, FavouriteMovie obj) {
+  void write(BinaryWriter writer, FavouriteTvShow obj) {
     writer
       ..writeByte(9)
       ..writeByte(0)
-      ..write(obj.movieId)
+      ..write(obj.tvShowId)
       ..writeByte(1)
-      ..write(obj.title)
+      ..write(obj.name)
       ..writeByte(2)
       ..write(obj.overview)
       ..writeByte(3)
@@ -119,7 +96,7 @@ class FavouriteMovieAdapter extends TypeAdapter<FavouriteMovie> {
       ..writeByte(4)
       ..write(obj.backdropPath)
       ..writeByte(5)
-      ..write(obj.releaseDate)
+      ..write(obj.firstAirDate)
       ..writeByte(6)
       ..write(obj.voteAverage)
       ..writeByte(7)

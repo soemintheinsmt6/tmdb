@@ -56,10 +56,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byTooltip('Remove from favourites'), findsOneWidget);
 
-    // 5. Pop back to home, then switch to the Favourites bottom-nav tab.
+    // 5. Pop back to home, then switch to the Library tab (favourites live in
+    // its default first segment).
     await tester.pageBack();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Favourites'));
+    await tester.tap(find.text('Library'));
     await tester.pumpAndSettle();
 
     // 6. The favourited movie shows up there — Hive round-tripped it and

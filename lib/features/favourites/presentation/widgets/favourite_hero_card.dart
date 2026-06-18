@@ -6,51 +6,70 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/core/utils/navigation.dart';
+import 'package:tmdb/features/favourites/domain/entities/favourite_item.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
-import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
+import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
 import 'package:tmdb/shared/widgets/rating_badge.dart';
 
 /// Full-width 16:9 card with the backdrop as a hero image, a heart in the
-/// top-right, and title / rating / year overlaid at the bottom.
+/// top-right, a media-type chip in the top-left, and title / rating / year
+/// overlaid at the bottom. Routes to the movie or TV detail screen based on
+/// [FavouriteItem.mediaType].
 class FavouriteHeroCard extends StatelessWidget {
-  const FavouriteHeroCard({super.key, required this.movie});
+  const FavouriteHeroCard({super.key, required this.item});
 
-  final Movie movie;
+  final FavouriteItem item;
+
+  Future<void> _openDetail(BuildContext context, Object? heroTag) async {
+    switch (item.mediaType) {
+      case MediaType.movie:
+        await pushView(
+          context,
+          MovieDetailScreen(
+            movieId: item.id,
+            title: item.title,
+            backdropPath: item.backdropPath,
+            heroTag: heroTag,
+          ),
+        );
+      case MediaType.tv:
+        await pushView(
+          context,
+          TvDetailScreen(
+            tvShowId: item.id,
+            title: item.title,
+            backdropPath: item.backdropPath,
+            heroTag: heroTag,
+          ),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final hasBackdrop =
-        movie.backdropPath != null && movie.backdropPath!.isNotEmpty;
-    final heroTag = hasBackdrop ? 'favourite-backdrop-${movie.id}' : null;
+        item.backdropPath != null && item.backdropPath!.isNotEmpty;
+    final heroTag = hasBackdrop ? 'favourite-backdrop-${item.storageKey}' : null;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Stack(
         children: [
-          _BackgroundImage(movie: movie, heroTag: heroTag),
+          _BackgroundImage(item: item, heroTag: heroTag),
           const Positioned.fill(child: _BottomGradient()),
           Positioned.fill(
             child: Material(
               color: Colors.transparent,
-              child: InkWell(
-                onTap: () => pushView(
-                  context,
-                  MovieDetailScreen(
-                    movieId: movie.id,
-                    title: movie.title,
-                    backdropPath: movie.backdropPath,
-                    heroTag: heroTag,
-                  ),
-                ),
-              ),
+              child: InkWell(onTap: () => _openDetail(context, heroTag)),
             ),
           ),
-          Positioned(top: 8, right: 8, child: _RemoveButton(movieId: movie.id)),
+          Positioned(top: 10, left: 12, child: _TypeChip(type: item.mediaType)),
+          Positioned(top: 8, right: 8, child: _RemoveButton(item: item)),
           Positioned(
             left: 14,
             right: 14,
             bottom: 12,
-            child: _CardFooter(movie: movie),
+            child: _CardFooter(item: item),
           ),
         ],
       ),
@@ -59,19 +78,19 @@ class FavouriteHeroCard extends StatelessWidget {
 }
 
 class _BackgroundImage extends StatelessWidget {
-  const _BackgroundImage({required this.movie, required this.heroTag});
+  const _BackgroundImage({required this.item, required this.heroTag});
 
-  final Movie movie;
+  final FavouriteItem item;
   final Object? heroTag;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final hasBackdrop =
-        movie.backdropPath != null && movie.backdropPath!.isNotEmpty;
+        item.backdropPath != null && item.backdropPath!.isNotEmpty;
     final imageUrl = hasBackdrop
-        ? movie.backdropUrl(size: 'w780')
-        : movie.posterUrl(size: 'w500');
+        ? item.backdropUrl(size: 'w780')
+        : item.posterUrl(size: 'w500');
 
     final image = imageUrl.isEmpty
         ? Container(color: colors.surfaceMuted)
@@ -113,10 +132,35 @@ class _BottomGradient extends StatelessWidget {
   }
 }
 
-class _CardFooter extends StatelessWidget {
-  const _CardFooter({required this.movie});
+class _TypeChip extends StatelessWidget {
+  const _TypeChip({required this.type});
 
-  final Movie movie;
+  final MediaType type;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        type == MediaType.movie ? 'MOVIE' : 'TV',
+        style: AppTypography.smallText.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _CardFooter extends StatelessWidget {
+  const _CardFooter({required this.item});
+
+  final FavouriteItem item;
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +169,7 @@ class _CardFooter extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          movie.title,
+          item.title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: AppTypography.subTitle.copyWith(
@@ -136,7 +180,7 @@ class _CardFooter extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            RatingBadge(rating: movie.formattedRating, compact: true),
+            RatingBadge(rating: item.formattedRating, compact: true),
             const SizedBox(width: 10),
             const Icon(
               IconsaxPlusLinear.calendar_1,
@@ -145,7 +189,7 @@ class _CardFooter extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              movie.releaseYear ?? '—',
+              item.year ?? '—',
               style: AppTypography.smallText.copyWith(color: Colors.white70),
             ),
           ],
@@ -156,9 +200,9 @@ class _CardFooter extends StatelessWidget {
 }
 
 class _RemoveButton extends StatelessWidget {
-  const _RemoveButton({required this.movieId});
+  const _RemoveButton({required this.item});
 
-  final int movieId;
+  final FavouriteItem item;
 
   @override
   Widget build(BuildContext context) {
@@ -171,7 +215,8 @@ class _RemoveButton extends StatelessWidget {
         iconSize: 20,
         visualDensity: VisualDensity.compact,
         icon: const Icon(IconsaxPlusBold.heart, color: AppColors.cyan),
-        onPressed: () => context.read<FavouritesCubit>().remove(movieId),
+        onPressed: () =>
+            context.read<FavouritesCubit>().remove(item.mediaType, item.id),
       ),
     );
   }

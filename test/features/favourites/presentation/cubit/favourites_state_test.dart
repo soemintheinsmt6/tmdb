@@ -1,47 +1,62 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tmdb/features/favourites/domain/entities/favourite_item.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_state.dart';
 
 import '../../../../helpers/movie_fixtures.dart';
+import '../../../../helpers/tv_fixtures.dart';
 
 void main() {
   group('FavouritesState', () {
     test('default state is empty', () {
       const state = FavouritesState();
 
-      expect(state.movies, isEmpty);
-      expect(state.ids, isEmpty);
+      expect(state.items, isEmpty);
+      expect(state.keys, isEmpty);
     });
 
-    test('fromMovies derives ids from movie IDs', () {
-      final state = FavouritesState.fromMovies([
-        buildMovie(id: 1),
-        buildMovie(id: 7),
-        buildMovie(id: 42),
+    test('fromItems derives composite keys', () {
+      final state = FavouritesState.fromItems([
+        FavouriteItem.fromMovie(buildMovie(id: 1)),
+        FavouriteItem.fromTvShow(buildTvShow(id: 7)),
       ]);
 
-      expect(state.movies, hasLength(3));
-      expect(state.ids, {1, 7, 42});
+      expect(state.items, hasLength(2));
+      expect(state.keys, {'movie:1', 'tv:7'});
     });
 
-    test('contains is O(1) and reflects membership', () {
-      final state = FavouritesState.fromMovies([buildMovie(id: 7)]);
+    test('contains respects the media type', () {
+      final state = FavouritesState.fromItems([
+        FavouriteItem.fromMovie(buildMovie(id: 7)),
+      ]);
 
-      expect(state.contains(7), isTrue);
-      expect(state.contains(8), isFalse);
+      expect(state.contains(MediaType.movie, 7), isTrue);
+      expect(state.contains(MediaType.tv, 7), isFalse);
     });
 
-    test('Equatable: two states with the same movies are equal', () {
-      final a = FavouritesState.fromMovies([buildMovie(id: 1)]);
-      final b = FavouritesState.fromMovies([buildMovie(id: 1)]);
+    test('a movie and a TV show with the same id do not collide', () {
+      final state = FavouritesState.fromItems([
+        FavouriteItem.fromMovie(buildMovie(id: 5)),
+        FavouriteItem.fromTvShow(buildTvShow(id: 5)),
+      ]);
+
+      expect(state.keys, {'movie:5', 'tv:5'});
+      expect(state.contains(MediaType.movie, 5), isTrue);
+      expect(state.contains(MediaType.tv, 5), isTrue);
+    });
+
+    test('Equatable: same membership is equal, differing is not', () {
+      final a = FavouritesState.fromItems([
+        FavouriteItem.fromMovie(buildMovie(id: 1)),
+      ]);
+      final b = FavouritesState.fromItems([
+        FavouriteItem.fromMovie(buildMovie(id: 1)),
+      ]);
+      final c = FavouritesState.fromItems([
+        FavouriteItem.fromMovie(buildMovie(id: 2)),
+      ]);
 
       expect(a, equals(b));
-    });
-
-    test('Equatable: differing membership is not equal', () {
-      final a = FavouritesState.fromMovies([buildMovie(id: 1)]);
-      final b = FavouritesState.fromMovies([buildMovie(id: 2)]);
-
-      expect(a, isNot(equals(b)));
+      expect(a, isNot(equals(c)));
     });
   });
 }
