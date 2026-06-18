@@ -1,27 +1,37 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tmdb/core/responsive/responsive_builder.dart';
-import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_bloc.dart';
-import 'package:tmdb/features/tv/presentation/bloc/tv_search_bloc/tv_search_bloc.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:tmdb/core/utils/navigation.dart';
+import 'package:tmdb/features/search/presentation/screens/search_screen.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_feed_bloc/tv_feed_bloc.dart';
+import 'package:tmdb/features/tv/presentation/widgets/tv_feed_content.dart';
 import 'package:tmdb/injection_container.dart';
 
-import 'layouts/tv_mobile_layout.dart';
-import 'layouts/tv_tablet_layout.dart';
-
-/// Routes between mobile and tablet TV layouts.
+/// The series landing tab: a trending hero plus curated TV category rails.
+/// Search lives in the global [SearchScreen], reached from the app-bar icon.
 class TvScreen extends StatelessWidget {
   const TvScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => sl<TvListBloc>()),
-        BlocProvider(create: (_) => sl<TvSearchBloc>()),
-      ],
-      child: ResponsiveBuilder(
-        mobile: (_, __) => const TvMobileLayout(),
-        tablet: (_, __) => const TvTabletLayout(),
+    return BlocProvider(
+      create: (_) => sl<TvFeedBloc>(),
+      child: Scaffold(
+        appBar: AppBar(
+          titleSpacing: NavigationToolbar.kMiddleSpacing,
+          title: const Text('Series'),
+          actions: [
+            IconButton(
+              tooltip: 'Search',
+              icon: const Icon(IconsaxPlusLinear.search_normal_1),
+              onPressed: () =>
+                  unawaited(pushView(context, const SearchScreen())),
+            ),
+          ],
+        ),
+        body: const SafeArea(child: TvFeedContent()),
       ),
     );
   }

@@ -41,6 +41,14 @@ class ApiConstants {
   static String tvReviews(int id) => '/tv/$id/reviews';
   static String tvImages(int id) => '/tv/$id/images';
 
+  // ── Trending ──────────────────────────────────────────
+  /// Mixed movie + TV (+ people, which the app filters out) trending titles.
+  /// `window` is `day` or `week`.
+  static String trendingAll({String window = 'day'}) => '/trending/all/$window';
+
+  /// Trending TV shows only. `window` is `day` or `week`.
+  static String trendingTv({String window = 'day'}) => '/trending/tv/$window';
+
   // ── People ────────────────────────────────────────────
   static String personDetail(int id) => '/person/$id';
   static String personCombinedCredits(int id) => '/person/$id/combined_credits';
@@ -56,6 +64,7 @@ class ApiConstants {
 
   // ── Discover ──────────────────────────────────────────
   static const String discoverMovie = '/discover/movie';
+  static const String discoverTv = '/discover/tv';
 
   // ── Image helpers ─────────────────────────────────────
   static String posterUrl(String? path, {String size = 'w500'}) {

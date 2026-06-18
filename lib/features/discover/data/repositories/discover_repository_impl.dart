@@ -8,6 +8,7 @@ import 'package:tmdb/features/discover/data/datasources/discover_remote_data_sou
 import 'package:tmdb/features/discover/domain/entities/discover_filter.dart';
 import 'package:tmdb/features/discover/domain/repositories/discover_repository.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
+import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
 import 'package:tmdb/shared/domain/genre.dart';
 
 class DiscoverRepositoryImpl implements DiscoverRepository {
@@ -26,8 +27,21 @@ class DiscoverRepositoryImpl implements DiscoverRepository {
   }
 
   @override
+  ResultFuture<PaginatedTvShows> discoverTv({
+    required DiscoverFilter filter,
+    int page = 1,
+  }) {
+    return _guard(() => _remote.discoverTv(filter: filter, page: page));
+  }
+
+  @override
   ResultFuture<List<Genre>> getMovieGenres() {
     return _guard(_remote.getMovieGenres);
+  }
+
+  @override
+  ResultFuture<List<Genre>> getTvGenres() {
+    return _guard(_remote.getTvGenres);
   }
 
   /// Runs [body] and converts the layered exceptions into typed failures so

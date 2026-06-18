@@ -81,4 +81,30 @@ void main() {
       expect(filter.activeCount, 4);
     });
   });
+
+  group('DiscoverFilter.toQuery (TV)', () {
+    test('uses TV date sort values and first_air_date_year', () {
+      const filter = DiscoverFilter(
+        mediaType: MediaType.tv,
+        sort: DiscoverSort.releaseDesc,
+        year: 2020,
+      );
+
+      final query = filter.toQuery();
+
+      expect(query['sort_by'], 'first_air_date.desc');
+      expect(query['first_air_date_year'], '2020');
+      expect(query.containsKey('primary_release_year'), isFalse);
+    });
+
+    test('title sort maps to name.asc for TV', () {
+      expect(
+        const DiscoverFilter(
+          mediaType: MediaType.tv,
+          sort: DiscoverSort.titleAsc,
+        ).toQuery()['sort_by'],
+        'name.asc',
+      );
+    });
+  });
 }

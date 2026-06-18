@@ -66,6 +66,11 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
+        // Default to a flush title (hugging the back button) on pushed screens
+        // — including framework pages like the licenses page. The five bottom-
+        // nav screens have no back button, so they override this back to the
+        // Material default ([NavigationToolbar.kMiddleSpacing]).
+        titleSpacing: 0,
         iconTheme: const IconThemeData(color: AppColors.white),
         titleTextStyle: AppTypography.subTitle.copyWith(
           fontFamily: fontFamily,

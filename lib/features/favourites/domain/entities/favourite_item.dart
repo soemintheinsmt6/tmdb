@@ -82,6 +82,7 @@ class FavouriteItem extends Equatable implements PosterItem, SortableSavedItem {
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
 
+  @override
   String backdropUrl({String size = 'w1280'}) =>
       ApiConstants.backdropUrl(backdropPath, size: size);
 

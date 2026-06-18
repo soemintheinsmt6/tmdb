@@ -104,4 +104,75 @@ void main() {
       expect(genres, isEmpty);
     });
   });
+
+  group('discoverTv', () {
+    test('hits /discover/tv with the filter query, language, and page', () {
+      when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+        (_) async => <String, dynamic>{
+          'page': 1,
+          'results': const <dynamic>[],
+          'total_pages': 1,
+          'total_results': 0,
+        },
+      );
+
+      const filter = DiscoverFilter(mediaType: MediaType.tv, genreIds: {18});
+
+      return dataSource.discoverTv(filter: filter, page: 2).then((_) {
+        verify(
+          () => apiClient.get(
+            ApiConstants.discoverTv,
+            query: {
+              'sort_by': 'popularity.desc',
+              'include_adult': 'false',
+              'with_genres': '18',
+              'language': 'en-US',
+              'page': '2',
+            },
+          ),
+        ).called(1);
+      });
+    });
+
+    test('parses the response into PaginatedTvShows', () async {
+      when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+        (_) async => <String, dynamic>{
+          'page': 1,
+          'results': [
+            {'id': 1, 'name': 'A'},
+            {'id': 2, 'name': 'B'},
+          ],
+          'total_pages': 4,
+          'total_results': 80,
+        },
+      );
+
+      final result = await dataSource.discoverTv(
+        filter: const DiscoverFilter(mediaType: MediaType.tv),
+      );
+
+      expect(result.shows.map((s) => s.id), [1, 2]);
+      expect(result.totalPages, 4);
+    });
+  });
+
+  group('getTvGenres', () {
+    test('hits /genre/tv/list and parses the genres list', () async {
+      when(() => apiClient.get(any(), query: any(named: 'query'))).thenAnswer(
+        (_) async => <String, dynamic>{
+          'genres': [
+            {'id': 10765, 'name': 'Sci-Fi & Fantasy'},
+          ],
+        },
+      );
+
+      final genres = await dataSource.getTvGenres();
+
+      verify(
+        () =>
+            apiClient.get(ApiConstants.tvGenres, query: {'language': 'en-US'}),
+      ).called(1);
+      expect(genres.map((g) => g.name), ['Sci-Fi & Fantasy']);
+    });
+  });
 }

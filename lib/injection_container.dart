@@ -10,6 +10,10 @@ import 'package:tmdb/features/discover/presentation/bloc/discover_bloc.dart';
 import 'package:tmdb/features/favourites/data/repositories/favourites_repository_impl.dart';
 import 'package:tmdb/features/favourites/domain/repositories/favourites_repository.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
+import 'package:tmdb/features/home/data/datasources/trending_remote_data_source.dart';
+import 'package:tmdb/features/home/data/repositories/trending_repository_impl.dart';
+import 'package:tmdb/features/home/domain/repositories/trending_repository.dart';
+import 'package:tmdb/features/home/presentation/bloc/home_bloc.dart';
 import 'package:tmdb/features/movies/data/datasources/movie_remote_data_source.dart';
 import 'package:tmdb/features/movies/data/repositories/movie_repository_impl.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
@@ -20,6 +24,8 @@ import 'package:tmdb/features/people/data/datasources/person_remote_data_source.
 import 'package:tmdb/features/people/data/repositories/person_repository_impl.dart';
 import 'package:tmdb/features/people/domain/repositories/person_repository.dart';
 import 'package:tmdb/features/people/presentation/bloc/person_detail_bloc/person_detail_bloc.dart';
+import 'package:tmdb/features/recommendations/data/repositories/recommendations_repository_impl.dart';
+import 'package:tmdb/features/recommendations/domain/repositories/recommendations_repository.dart';
 import 'package:tmdb/features/search/data/datasources/search_remote_data_source.dart';
 import 'package:tmdb/features/search/data/repositories/search_repository_impl.dart';
 import 'package:tmdb/features/search/domain/repositories/search_repository.dart';
@@ -28,6 +34,7 @@ import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
 import 'package:tmdb/features/tv/data/repositories/tv_repository_impl.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc.dart';
+import 'package:tmdb/features/tv/presentation/bloc/tv_feed_bloc/tv_feed_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_search_bloc/tv_search_bloc.dart';
 import 'package:tmdb/features/watchlist/data/repositories/watchlist_repository_impl.dart';
@@ -64,6 +71,9 @@ Future<void> init() async {
   sl.registerFactory(() => TvListBloc(repository: sl()));
   sl.registerFactory(() => TvSearchBloc(repository: sl()));
   sl.registerFactory(() => TvDetailBloc(repository: sl()));
+  sl.registerFactory(
+    () => TvFeedBloc(tvRepository: sl(), trendingRepository: sl()),
+  );
 
   // ── People feature ─────────────────────────────────────
   sl.registerLazySingleton(() => PersonRemoteDataSource(sl()));
@@ -88,6 +98,29 @@ Future<void> init() async {
   );
 
   sl.registerFactory(() => DiscoverBloc(repository: sl()));
+
+  // ── Home / Trending feature ────────────────────────────
+  sl.registerLazySingleton(() => TrendingRemoteDataSource(sl()));
+  sl.registerLazySingleton<TrendingRepository>(
+    () => TrendingRepositoryImpl(sl(), logger: sl<AppLogger>()),
+  );
+
+  // ── Recommendations feature ────────────────────────────
+  sl.registerLazySingleton<RecommendationsRepository>(
+    () => RecommendationsRepositoryImpl(sl(), sl(), logger: sl<AppLogger>()),
+  );
+
+  // ── Home feature (aggregates the above) ────────────────
+  sl.registerFactory(
+    () => HomeBloc(
+      trendingRepository: sl(),
+      movieRepository: sl(),
+      tvRepository: sl(),
+      recommendationsRepository: sl(),
+      favouritesRepository: sl(),
+      watchlistRepository: sl(),
+    ),
+  );
 
   // ── Favourites feature ─────────────────────────────────
   sl.registerLazySingleton<FavouritesRepository>(

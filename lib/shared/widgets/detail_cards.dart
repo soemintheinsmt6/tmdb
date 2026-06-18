@@ -349,12 +349,18 @@ class DetailPosterRail extends StatelessWidget {
     required this.title,
     required this.items,
     required this.onTap,
+    this.onSeeAll,
     this.horizontalPadding = 16,
   });
 
   final String title;
   final List<PosterItem> items;
   final void Function(PosterItem item) onTap;
+
+  /// When non-null, a "See all" affordance is shown in the header — used by the
+  /// editorial home/series rails that page into a full grid. Detail screens
+  /// leave it null.
+  final VoidCallback? onSeeAll;
   final double horizontalPadding;
 
   @override
@@ -364,8 +370,17 @@ class DetailPosterRail extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Text(title, style: AppTypography.subTitle),
+          padding: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding - 4, 0),
+          child: Row(
+            children: [
+              Expanded(child: Text(title, style: AppTypography.subTitle)),
+              if (onSeeAll != null)
+                TextButton(
+                  onPressed: onSeeAll,
+                  child: const Text('See all'),
+                ),
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         SizedBox(

@@ -8,6 +8,8 @@ import 'package:tmdb/features/discover/presentation/bloc/discover_bloc.dart';
 import 'package:tmdb/features/discover/presentation/bloc/discover_event.dart';
 import 'package:tmdb/features/discover/presentation/bloc/discover_state.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
+import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
+import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
 import 'package:tmdb/shared/domain/poster_item.dart';
 import 'package:tmdb/shared/widgets/app_empty_view.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
@@ -69,9 +71,10 @@ class _DiscoverContentState extends State<DiscoverContent> {
   }
 
   void _openDetail(PosterItem item) {
-    unawaited(
-      pushView(context, MovieDetailScreen(movieId: item.id, title: item.title)),
-    );
+    final Widget screen = item is TvShow
+        ? TvDetailScreen(tvShowId: item.id, title: item.title)
+        : MovieDetailScreen(movieId: item.id, title: item.title);
+    unawaited(pushView(context, screen));
   }
 
   @override
@@ -89,14 +92,14 @@ class _DiscoverContentState extends State<DiscoverContent> {
                   context.read<DiscoverBloc>().add(const DiscoverRefreshed()),
             );
           case DiscoverStatus.loaded:
-            if (state.movies.isEmpty) {
+            if (state.items.isEmpty) {
               return const AppEmptyView(
                 message: 'No results. Try adjusting your filters.',
               );
             }
             return PosterGrid(
               scrollController: _scrollController,
-              items: state.movies,
+              items: state.items,
               onTap: _openDetail,
               onRefresh: _onRefresh,
               footer: state.isLoadingMore

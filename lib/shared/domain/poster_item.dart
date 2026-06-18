@@ -17,4 +17,8 @@ abstract interface class PosterItem {
 
   /// Fully-qualified poster image URL, or `''` when there is no poster.
   String posterUrl({String size});
+
+  /// Fully-qualified backdrop image URL, or `''` when there is no backdrop.
+  /// Used by the editorial hero; every title type already exposes one.
+  String backdropUrl({String size});
 }

@@ -44,6 +44,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          titleSpacing: NavigationToolbar.kMiddleSpacing,
           title: const Text('Library'),
           actions: [
             IconButton(

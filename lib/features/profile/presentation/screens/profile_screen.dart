@@ -15,7 +15,10 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        titleSpacing: NavigationToolbar.kMiddleSpacing,
+        title: const Text('Profile'),
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [

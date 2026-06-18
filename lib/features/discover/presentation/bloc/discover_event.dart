@@ -14,6 +14,17 @@ class DiscoverStarted extends DiscoverEvent {
   const DiscoverStarted();
 }
 
+/// Switches the browse vertical (movies ↔ TV). Resets the genre selection
+/// (genre ids differ between verticals), reloads that vertical's genres, and
+/// fetches page 1.
+class DiscoverMediaTypeChanged extends DiscoverEvent {
+  const DiscoverMediaTypeChanged(this.mediaType);
+  final MediaType mediaType;
+
+  @override
+  List<Object?> get props => [mediaType];
+}
+
 /// Applies a new [filter] and reloads from page 1.
 class DiscoverFilterApplied extends DiscoverEvent {
   const DiscoverFilterApplied(this.filter);

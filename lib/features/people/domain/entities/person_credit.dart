@@ -69,6 +69,11 @@ class PersonCredit extends Equatable implements PosterItem {
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
 
+  /// Credits carry no backdrop; they only ever render in a poster rail, never
+  /// as a hero. Satisfies [PosterItem] with an empty URL.
+  @override
+  String backdropUrl({String size = 'w1280'}) => '';
+
   /// [PosterItem] year — release / first-air year.
   @override
   String? get year => releaseDate.year;

@@ -11,6 +11,8 @@ import 'package:tmdb/features/discover/presentation/bloc/discover_state.dart';
 import 'package:tmdb/shared/domain/genre.dart';
 
 import '../../../../helpers/movie_fixtures.dart';
+import '../../../../helpers/tv_fixtures.dart'
+    show buildTvShow, buildPaginatedTv;
 
 class _MockDiscoverRepository extends Mock implements DiscoverRepository {}
 
@@ -22,6 +24,7 @@ void main() {
   setUp(() => repository = _MockDiscoverRepository());
 
   const genres = [Genre(id: 28, name: 'Action')];
+  const tvGenres = [Genre(id: 10765, name: 'Sci-Fi & Fantasy')];
   final page1 = buildPaginated(
     page: 1,
     totalPages: 3,
@@ -52,7 +55,7 @@ void main() {
         DiscoverState(
           status: DiscoverStatus.loaded,
           genres: genres,
-          movies: page1.movies,
+          items: page1.movies,
           page: 1,
           totalPages: 3,
         ),
@@ -76,7 +79,7 @@ void main() {
         const DiscoverState(status: DiscoverStatus.loading),
         DiscoverState(
           status: DiscoverStatus.loaded,
-          movies: page1.movies,
+          items: page1.movies,
           page: 1,
           totalPages: 3,
         ),
@@ -110,6 +113,51 @@ void main() {
     );
   });
 
+  group('DiscoverMediaTypeChanged', () {
+    final tvPage = buildPaginatedTv(
+      page: 1,
+      totalPages: 2,
+      shows: [buildTvShow(id: 99)],
+    );
+    blocTest<DiscoverBloc, DiscoverState>(
+      'switches to TV: resets genres, loads TV genres and page 1',
+      setUp: () {
+        when(
+          () => repository.getTvGenres(),
+        ).thenAnswer((_) async => const Right(tvGenres));
+        when(
+          () => repository.discoverTv(filter: any(named: 'filter'), page: 1),
+        ).thenAnswer((_) async => Right(tvPage));
+      },
+      build: () => DiscoverBloc(repository: repository),
+      seed: () => DiscoverState(
+        status: DiscoverStatus.loaded,
+        genres: genres,
+        items: page1.movies,
+        page: 1,
+        totalPages: 3,
+      ),
+      act: (bloc) => bloc.add(const DiscoverMediaTypeChanged(MediaType.tv)),
+      expect: () => [
+        DiscoverState(
+          status: DiscoverStatus.loading,
+          filter: const DiscoverFilter(mediaType: MediaType.tv),
+          items: page1.movies,
+          page: 1,
+          totalPages: 3,
+        ),
+        DiscoverState(
+          status: DiscoverStatus.loaded,
+          filter: const DiscoverFilter(mediaType: MediaType.tv),
+          genres: tvGenres,
+          items: tvPage.shows,
+          page: 1,
+          totalPages: 2,
+        ),
+      ],
+    );
+  });
+
   group('DiscoverFilterApplied', () {
     const filter = DiscoverFilter(genreIds: {28});
     blocTest<DiscoverBloc, DiscoverState>(
@@ -123,7 +171,7 @@ void main() {
       seed: () => const DiscoverState(
         status: DiscoverStatus.loaded,
         genres: genres,
-        movies: [],
+        items: [],
       ),
       act: (bloc) => bloc.add(const DiscoverFilterApplied(filter)),
       expect: () => [
@@ -136,7 +184,7 @@ void main() {
           status: DiscoverStatus.loaded,
           genres: genres,
           filter: filter,
-          movies: page1.movies,
+          items: page1.movies,
           page: 1,
           totalPages: 3,
         ),
@@ -156,7 +204,7 @@ void main() {
       build: () => DiscoverBloc(repository: repository),
       seed: () => DiscoverState(
         status: DiscoverStatus.loaded,
-        movies: page1.movies,
+        items: page1.movies,
         page: 1,
         totalPages: 3,
       ),
@@ -164,14 +212,14 @@ void main() {
       expect: () => [
         DiscoverState(
           status: DiscoverStatus.loaded,
-          movies: page1.movies,
+          items: page1.movies,
           page: 1,
           totalPages: 3,
           isLoadingMore: true,
         ),
         DiscoverState(
           status: DiscoverStatus.loaded,
-          movies: [...page1.movies, ...page2.movies],
+          items: [...page1.movies, ...page2.movies],
           page: 2,
           totalPages: 3,
         ),
@@ -183,7 +231,7 @@ void main() {
       build: () => DiscoverBloc(repository: repository),
       seed: () => DiscoverState(
         status: DiscoverStatus.loaded,
-        movies: page1.movies,
+        items: page1.movies,
         page: 3,
         totalPages: 3,
       ),

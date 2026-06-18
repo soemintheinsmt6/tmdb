@@ -63,12 +63,15 @@ class _DiscoverFilterSheetState extends State<_DiscoverFilterSheet> {
   }
 
   void _apply() {
+    // copyWith (not a fresh DiscoverFilter) so the active media type is
+    // preserved; clearYear handles the "Any year" → null case.
     Navigator.of(context).pop(
-      DiscoverFilter(
+      widget.filter.copyWith(
         genreIds: _genreIds,
         sort: _sort,
         minRating: _minRating,
         year: _year,
+        clearYear: _year == null,
       ),
     );
   }
@@ -133,7 +136,7 @@ class _DiscoverFilterSheetState extends State<_DiscoverFilterSheet> {
                       // reflects the value live as it changes.
                       onChanged: (v) => setState(() => _minRating = v),
                     ),
-                    _label('Release year'),
+                    _label('Year'),
                     _YearDropdown(
                       year: _year,
                       minYear: _minYear,

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/features/discover/presentation/screens/discover_screen.dart';
+import 'package:tmdb/features/home/presentation/screens/home_screen.dart';
 import 'package:tmdb/features/library/presentation/screens/library_screen.dart';
-import 'package:tmdb/features/movies/presentation/screens/home/home_screen.dart';
 import 'package:tmdb/features/profile/presentation/screens/profile_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_home/tv_screen.dart';
 
