@@ -95,13 +95,15 @@ lib/
 │   │       └── widgets/        # WatchlistHeroCard, WatchlistToggleButton, WatchlistListView
 │   ├── library/
 │   │   └── presentation/
-│   │       └── screens/        # LibraryScreen (Favourites + Watchlist tabs; the nav tab)
+│   │       ├── screens/        # LibraryScreen (Favourites + Watchlist tabs + sort; nav tab)
+│   │       └── widgets/        # LibrarySortSheet (sort-order bottom sheet)
 │   └── profile/
 │       └── presentation/
 │           ├── screens/        # ProfileScreen (favourite count + clear / about)
 │           └── widgets/        # ProfileHeader, SettingsTile
 ├── shared/
 │   ├── domain/                 # PosterItem (poster view contract), MediaType (movie|tv),
+│   │                           # LibrarySort + SortableSavedItem (saved-list ordering),
 │   │                           # Genre, CastMember, Video, Review, MediaImage
 │   └── widgets/                # Poster kernel shared by movies + TV — PosterGrid,
 │                               # PosterCard, PosterImage, RatingBadge, PosterGridSkeleton,
@@ -146,7 +148,7 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 302 host-side tests + one device E2E.
+The project has three test layers; together they're 307 host-side tests + one device E2E.
 
 ```bash
 dart format --set-exit-if-changed .   # formatting gate
@@ -179,7 +181,7 @@ test/
 │   └── watchlist/
 │       ├── data/models/        # WatchlistEntry round-trip (incl. movie/TV id-collision)
 │       └── presentation/cubit/ # WatchlistState, WatchlistCubit
-├── shared/domain/              # Video, Review, MediaImage entity + selection tests
+├── shared/domain/              # Video/Review/MediaImage entities, LibrarySort comparators
 ├── integration/                # screen-level: real bloc + real widgets + mocked repo
 │   ├── home_content_test.dart
 │   ├── tv_content_test.dart
@@ -216,6 +218,6 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Watchlist** — a separate "watch later" list spanning **both movies and TV shows**, persisted locally via Hive and reactive like favourites. A bookmark toggle on movie & TV detail saves/removes; each saved card carries a MOVIE/TV chip and routes back to the matching detail screen.
 - **Shared-element transition** — tapping a favourites or watchlist card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
 - **Profile tab** showing favourites count plus a destructive "Clear favourites" flow with confirm dialog.
-- **Five-tab shell** — Home · Discover · TV · Library · Profile, lazily built and kept alive via `IndexedStack`. The **Library** tab combines Favourites and Watchlist under one app bar with two segments.
+- **Five-tab shell** — Home · Discover · TV · Library · Profile, lazily built and kept alive via `IndexedStack`. The **Library** tab combines Favourites and Watchlist under one app bar with two segments, plus a shared **sort control** (recently added · title A–Z · top rated · release date) that reorders both lists.
 - **Responsive grid** — 3 columns on mobile, scaling 4–7 on tablet (clamped on `width / 180`); aspect ratio shifts slightly between tiers.
 - **Light & dark mode** — `MaterialApp` is wired with `themeMode: ThemeMode.system`. Theme-dependent surfaces/text live on `AppColors` instances (`AppColors.light` / `AppColors.dark`) and resolve at the call site via `context.colors`; brand and semantic colors stay as static constants.

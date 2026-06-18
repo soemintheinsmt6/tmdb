@@ -5,12 +5,15 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_state.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourite_hero_card.dart';
+import 'package:tmdb/shared/domain/library_sort.dart';
 import 'package:tmdb/shared/widgets/app_empty_view.dart';
 
 /// Reactive list body for the favourites segment of the Library tab (also used
-/// standalone by [FavouriteScreen]).
+/// standalone by [FavouriteScreen]). Items are ordered by [sort].
 class FavouritesListView extends StatelessWidget {
-  const FavouritesListView({super.key});
+  const FavouritesListView({super.key, this.sort = LibrarySort.recentlyAdded});
+
+  final LibrarySort sort;
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +25,12 @@ class FavouritesListView extends StatelessWidget {
             icon: IconsaxPlusLinear.heart,
           );
         }
+        final items = [...state.items]..sort(sort.comparator);
         return ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          itemCount: state.items.length,
+          itemCount: items.length,
           separatorBuilder: (_, __) => const SizedBox(height: 14),
-          itemBuilder: (_, index) => FavouriteHeroCard(item: state.items[index]),
+          itemBuilder: (_, index) => FavouriteHeroCard(item: items[index]),
         );
       },
     );

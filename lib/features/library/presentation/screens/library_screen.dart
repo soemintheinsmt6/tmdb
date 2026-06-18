@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourites_list_view.dart';
+import 'package:tmdb/features/library/presentation/widgets/library_sort_sheet.dart';
 import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_list_view.dart';
+import 'package:tmdb/shared/domain/library_sort.dart';
 
 /// Combined "Library" tab hosting the user's saved titles under one app bar:
-/// Favourites (movies) and the Watchlist (movies + TV) as two segments.
-class LibraryScreen extends StatelessWidget {
+/// Favourites (movies + TV) and the Watchlist (movies + TV) as two segments.
+/// A single sort control in the app bar applies to both segments.
+class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
+
+  @override
+  State<LibraryScreen> createState() => _LibraryScreenState();
+}
+
+class _LibraryScreenState extends State<LibraryScreen> {
+  LibrarySort _sort = LibrarySort.recentlyAdded;
+
+  Future<void> _pickSort() async {
+    final picked = await showLibrarySortSheet(context, selected: _sort);
+    if (picked != null && picked != _sort && mounted) {
+      setState(() => _sort = picked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +35,13 @@ class LibraryScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Library'),
+          actions: [
+            IconButton(
+              tooltip: 'Sort',
+              icon: const Icon(IconsaxPlusLinear.sort),
+              onPressed: _pickSort,
+            ),
+          ],
           bottom: TabBar(
             indicatorColor: AppColors.cyan,
             labelColor: AppColors.cyan,
@@ -27,8 +52,11 @@ class LibraryScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          children: [FavouritesListView(), WatchlistListView()],
+        body: TabBarView(
+          children: [
+            FavouritesListView(sort: _sort),
+            WatchlistListView(sort: _sort),
+          ],
         ),
       ),
     );

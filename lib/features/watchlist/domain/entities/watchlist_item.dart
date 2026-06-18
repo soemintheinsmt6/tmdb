@@ -6,6 +6,7 @@ import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/shared/domain/media_type.dart';
 import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/sortable_saved_item.dart';
 
 export 'package:tmdb/shared/domain/media_type.dart';
 
@@ -16,7 +17,7 @@ export 'package:tmdb/shared/domain/media_type.dart';
 ///
 /// Implements [PosterItem] so it renders through the shared poster widgets just
 /// like a `Movie` or `TvShow`.
-class WatchlistItem extends Equatable implements PosterItem {
+class WatchlistItem extends Equatable implements PosterItem, SortableSavedItem {
   const WatchlistItem({
     required this.mediaType,
     required this.id,
@@ -66,9 +67,12 @@ class WatchlistItem extends Equatable implements PosterItem {
   final String? backdropPath;
 
   /// Release date (movies) or first-air date (TV), `YYYY-MM-DD`.
+  @override
   final String date;
+  @override
   final double voteAverage;
   final int voteCount;
+  @override
   final DateTime savedAt;
 
   /// Stable, collision-free key: `"movie:550"` / `"tv:1399"`.
