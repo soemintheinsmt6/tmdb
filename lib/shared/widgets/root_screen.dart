@@ -127,11 +127,11 @@ class _RootScreenState extends State<RootScreen> {
               ),
               NavigationDestination(
                 icon: Icon(
-                  IconsaxPlusLinear.archive_book,
+                  IconsaxPlusLinear.archive_1,
                   color: colors.textMuted,
                 ),
                 selectedIcon: const Icon(
-                  IconsaxPlusBold.archive_book,
+                  IconsaxPlusBold.archive_1,
                   color: AppColors.cyan,
                 ),
                 label: 'Library',

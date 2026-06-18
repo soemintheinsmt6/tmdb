@@ -5,7 +5,7 @@ A movie & TV browser built on top of [The Movie Database (TMDB) API](https://dev
 ## Tech stack
 
 - **Flutter** (Material 3, light + dark themes that follow the system setting)
-- **flutter_bloc** for state management (BLoCs for movies, TV & discover, Cubits for favourites & watchlist)
+- **flutter_bloc** for state management (BLoCs for the editorial home, movies, TV, discover & search; Cubits for favourites & watchlist)
 - **dartz** `Either<Failure, T>` for error handling
 - **equatable** for value objects
 - **get_it** for dependency injection
@@ -35,6 +35,12 @@ lib/
 │   ├── theme/              # AppColors, AppTypography, AppTheme, AppDecoration
 │   └── utils/              # navigation.dart, typedef.dart
 ├── features/
+│   ├── home/                   # Editorial landing tab. Trending data source + repo
+│   │                           # (/trending/all + /trending/tv → PosterItem) and HomeBloc,
+│   │                           # which aggregates trending (hero carousel), For You, Now
+│   │                           # Playing, Top Rated, Upcoming & Popular Series rails
+│   │                           # (best-effort; subscribes to favourites/watchlist for live
+│   │                           # For You). home_screen + content; each rail's "See all" → grid.
 │   ├── movies/
 │   │   ├── data/
 │   │   │   ├── datasources/    # MovieRemoteDataSource (concrete, wraps ApiClient)
@@ -46,26 +52,35 @@ lib/
 │   │   └── presentation/
 │   │       ├── bloc/
 │   │       │   ├── movie_list_bloc/    # Popular / Now Playing / Top Rated / Upcoming
-│   │       │   ├── movie_search_bloc/  # debounced search
+│   │       │   │                       #   — powers the "See all" category grids
+│   │       │   ├── movie_search_bloc/  # per-vertical debounced search (superseded by global)
 │   │       │   └── movie_detail_bloc/  # /movie/{id} + credits + recs + videos + reviews + images
 │   │       │                           #   (one parallel fetch, merged via copyWith)
 │   │       ├── screens/
-│   │       │   ├── home/{home_screen.dart, layouts/}
+│   │       │   ├── movie_category_screen.dart  # full grid for one category ("See all")
 │   │       │   └── movie_detail/{movie_detail_screen.dart, layouts/}
-│   │       └── widgets/        # home_content + movie_detail_cards (compose the shared kernel)
-│   ├── tv/                     # Same shape as movies: TvShow (implements PosterItem),
-│   │                           # TvShowDetail, TvRepository, remote data source,
-│   │                           # tv_list/tv_search/tv_detail blocs, tv_screen + tv_detail.
-│   │                           # Categories: Popular / Top Rated / On The Air / Airing Today.
-│   │                           # Browse + detail; TV detail is saveable to favourites
-│   │                           # and the watchlist.
-│   ├── discover/               # /discover/movie browse: DiscoverFilter (genres/sort/year/
-│   │                           # min-rating → query params), DiscoverRepository, remote data
+│   │       └── widgets/        # movie_detail_cards (compose the shared kernel)
+│   ├── tv/                     # Series vertical, mirrors movies: TvShow (implements
+│   │                           # PosterItem), TvShowDetail, TvRepository, remote data source.
+│   │                           # TvFeedBloc drives the editorial Series tab (trending-TV hero
+│   │                           # + Popular / Top Rated / On The Air / Airing Today rails);
+│   │                           # tv_list_bloc powers the "See all" grids, tv_detail_bloc the
+│   │                           # detail. tv_category_screen + tv_detail; TV detail is saveable
+│   │                           # to favourites and the watchlist.
+│   ├── discover/               # /discover/{movie,tv} browse with a Movies/TV toggle:
+│   │                           # DiscoverFilter (mediaType + genres/sort/year/min-rating →
+│   │                           # per-vertical query params), DiscoverRepository, remote data
 │   │                           # source, DiscoverBloc (flat state: genres + filter +
-│   │                           # pagination), discover_screen + filter sheet. Its own tab;
-│   │                           # also hosts the global multi-search (search icon → SearchScreen).
+│   │                           # PosterItem results + pagination), discover_screen (toggle +
+│   │                           # removable filter chips) + filter sheet. Its own tab; also
+│   │                           # hosts the global multi-search (search icon → SearchScreen).
 │   ├── search/                 # Global /search/multi (movies + TV + people) — SearchBloc,
-│   │                           # search_screen + content; opened from the Discover tab.
+│   │                           # search_screen + content; opened from the Home, Series &
+│   │                           # Discover app-bar search icons.
+│   ├── recommendations/        # "For You" engine: RecommendationsRepository.getForYou(seeds)
+│   │                           # fans out /movie|tv recommendations over the user's recent
+│   │                           # favourites + watchlist, ranks by cross-seed frequency, and
+│   │                           # drops already-saved titles. Consumed by HomeBloc.
 │   ├── people/                 # Person (detail) + PersonCredit (implements PosterItem),
 │   │                           # PersonRepository, remote data source (/person/{id} +
 │   │                           # /person/{id}/combined_credits), person_detail bloc, and
@@ -103,15 +118,18 @@ lib/
 │           ├── screens/        # ProfileScreen (favourite count + clear / about)
 │           └── widgets/        # ProfileHeader, SettingsTile
 ├── shared/
-│   ├── domain/                 # PosterItem (poster view contract), MediaType (movie|tv),
+│   ├── domain/                 # PosterItem (poster + backdrop view contract), MediaType,
 │   │                           # LibrarySort + SortableSavedItem (ordering), LibraryView,
 │   │                           # Genre, CastMember, Video, Review, MediaImage, ShareableMedia
 │   └── widgets/                # Poster kernel shared by movies + TV — PosterGrid,
 │                               # PosterCard, PosterImage, RatingBadge, PosterGridSkeleton,
 │                               # CategoryTabBar, detail_cards (DetailHeader/Summary/CastList/
-│                               # PosterRail/VideoRail/ReviewsSection/ImageGallery) — plus
-│                               # TrailerPlayerScreen, ImageGalleryViewer, AppSearchField,
-│                               # ShareButton, AppErrorView, AppEmptyView, RootScreen (5-tab shell)
+│                               # PosterRail/VideoRail/ReviewsSection/ImageGallery), the
+│                               # editorial FeaturedHero + FeaturedCarousel (auto-sliding
+│                               # trending hero) and RailFeedSkeleton/DetailSkeleton shimmer
+│                               # loaders — plus TrailerPlayerScreen, ImageGalleryViewer,
+│                               # AppSearchField, ShareButton, AppErrorView, AppEmptyView,
+│                               # RootScreen (5-tab shell)
 ├── injection_container.dart    # GetIt registrations
 ├── app.dart                    # MaterialApp + global providers
 └── main.dart                   # boot: Env.init → di.init → runApp
@@ -149,7 +167,7 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 313 host-side tests + one device E2E.
+The project has three test layers; together they're 325 host-side tests + one device E2E.
 
 ```bash
 dart format --set-exit-if-changed .   # formatting gate
@@ -169,14 +187,16 @@ test/
 ├── core/                       # extensions, breakpoints, URL helpers, Failure, ApiClient retry,
 │                               # share links (TMDB URL + message)
 ├── features/
+│   ├── home/                   # HomeBloc (rail aggregation, best-effort, live For You)
 │   ├── movies/
 │   │   ├── data/               # repository impl, remote data source
 │   │   ├── domain/entities/    # fromJson, copyWith, computed props
 │   │   └── presentation/bloc/  # MovieList, MovieSearch, MovieDetail blocs
-│   ├── tv/                     # mirrors movies: entities, data, TvList/TvSearch/TvDetail blocs
-│   ├── discover/               # DiscoverFilter, remote data source, repo impl, DiscoverBloc
+│   ├── tv/                     # mirrors movies: entities, data, TvList/TvSearch/TvDetail/TvFeed
+│   ├── discover/               # DiscoverFilter (movie+TV), remote data source, repo impl, DiscoverBloc
 │   ├── people/                 # PersonCredit/Person entities, data (datasource + repo),
 │   │                           # PersonDetail bloc
+│   ├── recommendations/        # RecommendationsRepository ranking / dedupe / exclusion
 │   ├── favourites/
 │   │   ├── data/models/        # FavouriteMovie + FavouriteTvShow mappers
 │   │   └── presentation/cubit/ # FavouritesState, FavouritesCubit
@@ -185,8 +205,6 @@ test/
 │       └── presentation/cubit/ # WatchlistState, WatchlistCubit
 ├── shared/domain/              # Video/Review/MediaImage entities, LibrarySort comparators
 ├── integration/                # screen-level: real bloc + real widgets + mocked repo
-│   ├── home_content_test.dart
-│   ├── tv_content_test.dart
 │   └── favourite_screen_test.dart
 └── helpers/                    # movie_fixtures.dart, tv_fixtures.dart, people_fixtures.dart
                                 # (shared builders)
@@ -206,21 +224,23 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 
 ## Features
 
-- **Browse** Popular, Now Playing, Top Rated, Upcoming with a horizontal tab switcher.
-- **Search** with 400 ms debounce; falls back to category browse when cleared.
-- **Infinite scroll** + pull-to-refresh on the category grid.
-- **Movie detail** with full-bleed backdrop header, runtime / year / genres chips, top-billed cast (capped at 20, each face tappable → person page), a **trailers & clips** rail, a **photos** gallery, **More Like This** recommendations, and **user reviews**. The detail, credits, recommendations, videos, reviews and images are fetched in one parallel request and merged. Header renders immediately from a seed backdrop path passed via the route, so navigation lands on the image instead of a spinner.
-- **Discover & filters** — a dedicated tab over `/discover/movie`: filter by genre, sort order, release year, and minimum rating in a bottom-sheet, with infinite-scroll results. The global multi-search (movies + TV + people via `/search/multi`) lives behind a search icon in this tab.
+- **Editorial home** — a trending **hero carousel** (auto-advancing, seamless loop, page-indicator dots) over curated rails: **For You**, Now Playing, Top Rated, Upcoming, and Popular Series. Each rail's **See all** opens a full, infinite-scroll category grid.
+- **For You** — personalised recommendations seeded from your recent favourites & watchlist, ranked by how many of them recommend each title and de-duplicated against everything you've already saved; refreshes live as you save/unsave.
+- **Global search** (movies + TV + people via `/search/multi`) with 400 ms debounce, reachable from the Home, Series & Discover app bars.
+- **Infinite scroll** + pull-to-refresh on the "See all" category and Discover grids.
+- **Movie detail** with full-bleed backdrop header, runtime / year / genres chips, top-billed cast (capped at 20, each face tappable → person page), a **trailers & clips** rail, a **photos** gallery, **More Like This** recommendations, and **user reviews**. The detail, credits, recommendations, videos, reviews and images are fetched in one parallel request and merged. The header renders immediately from a seed backdrop passed via the route, and the rest of the page loads behind a **shimmer skeleton** that mirrors the layout — so navigation lands on the image, not a spinner.
+- **Discover & filters** — a dedicated tab over `/discover/movie` and `/discover/tv` with a **Movies / TV toggle**: filter by genre, sort order, release year, and minimum rating in a bottom sheet; active filters surface as **removable chips** and results infinite-scroll. A search icon opens the global multi-search.
 - **Trailers** — tapping a video opens an in-app YouTube player (`youtube_player_flutter`) with a custom control bar: red scrubber, tap to play/pause, **double-tap left/right to seek ±10 s**, and a fullscreen toggle that rotates to landscape. Owner-disabled / region- or age-restricted videos fall back to a "Watch on YouTube" action.
 - **Photos** — a backdrop gallery on movie & TV detail opens a full-screen viewer: swipe between images, pinch-zoom, **double-tap to zoom** (centred on the tap), and **save to the device gallery** (`saver_gallery`, with photo-library permission handling on iOS & Android).
 - **Reviews** — author, score, and expandable review text on movie & TV detail.
 - **Share** — a share action on movie & TV detail opens the native share sheet (`share_plus`) with the title, year, and canonical TMDB link, best-effort attaching the backdrop image (fetched with a timeout; falls back to text + link).
-- **TV shows** on their own tab (Popular / Top Rated / On The Air / Airing Today) with the same search, infinite scroll, and detail layout — season & episode counts replace runtime. TV detail pages are saveable to favourites and the watchlist. Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
+- **TV shows** on their own **Series** tab — a trending-TV **hero carousel** over Popular / Top Rated / On The Air / Airing Today rails (each with See all), sharing the detail layout where season & episode counts replace runtime. TV detail pages are saveable to favourites and the watchlist. Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/`FeaturedCarousel`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
 - **People / cast** — tap any cast member to open a person page with their profile photo, known-for department, birthday / age / birthplace, an expandable biography, and a combined movie + TV **filmography** (sorted by popularity) whose posters route back into the matching movie or TV detail. Reuses the same poster kernel as the browse grids.
 - **Favourites** spanning **both movies and TV shows**, persisted locally via Hive; reactive — toggling the heart on any movie or TV detail screen updates the Library tab in real time.
 - **Watchlist** — a separate "watch later" list spanning **both movies and TV shows**, persisted locally via Hive and reactive like favourites. A bookmark toggle on movie & TV detail saves/removes; each saved card carries a MOVIE/TV chip and routes back to the matching detail screen.
-- **Shared-element transition** — tapping a favourites or watchlist card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
+- **Shared-element transition** — tapping a trending hero slide or a favourites/watchlist card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0), on **both push and pop**. The detail route pops normally, so the iOS edge-swipe-back gesture works alongside the hero flight.
 - **Profile tab** showing favourites count plus a destructive "Clear favourites" flow with confirm dialog.
 - **Five-tab shell** — Home · Discover · TV · Library · Profile, lazily built and kept alive via `IndexedStack`. The **Library** tab combines Favourites and Watchlist under one app bar with two segments, plus shared **sort** (recently added · title A–Z · top rated · release date) and **list/grid view** controls that reorder and re-lay-out both segments (the grid reuses the shared `PosterGrid`).
+- **Skeleton loading** — Home, Series, Discover, Library, Search, and the movie/TV detail pages load behind shimmer skeletons that mirror their real layouts (no spinners, no layout shift).
 - **Responsive grid** — 3 columns on mobile, scaling 4–7 on tablet (clamped on `width / 180`); aspect ratio shifts slightly between tiers.
 - **Light & dark mode** — `MaterialApp` is wired with `themeMode: ThemeMode.system`. Theme-dependent surfaces/text live on `AppColors` instances (`AppColors.light` / `AppColors.dark`) and resolve at the call site via `context.colors`; brand and semantic colors stay as static constants.

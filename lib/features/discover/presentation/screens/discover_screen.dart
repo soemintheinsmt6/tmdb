@@ -91,8 +91,23 @@ class _MediaToggle extends StatelessWidget {
       child: BlocBuilder<DiscoverBloc, DiscoverState>(
         buildWhen: (a, b) => a.filter.mediaType != b.filter.mediaType,
         builder: (context, state) {
+          final colors = context.colors;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
           return SegmentedButton<MediaType>(
             showSelectedIcon: false,
+            // The Material default selected tone (secondaryContainer) is nearly
+            // indistinguishable from the surface in this app's dark scheme, so
+            // give the selected segment an explicit cyan fill (matching the
+            // filter chips) for a clear active state in both themes.
+            style: SegmentedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              foregroundColor: colors.textSecondary,
+              selectedBackgroundColor: AppColors.cyan,
+              selectedForegroundColor: isDark
+                  ? AppColors.navy
+                  : AppColors.white,
+              side: BorderSide(color: colors.border),
+            ),
             segments: const [
               ButtonSegment(value: MediaType.movie, label: Text('Movies')),
               ButtonSegment(value: MediaType.tv, label: Text('TV Shows')),

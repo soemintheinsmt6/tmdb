@@ -16,6 +16,7 @@ import 'package:tmdb/shared/domain/shareable_media.dart';
 import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
+import 'package:tmdb/shared/widgets/detail_skeleton.dart';
 import 'package:tmdb/shared/widgets/share_button.dart';
 import 'package:tmdb/shared/widgets/trailer_player.dart';
 
@@ -40,7 +41,6 @@ class TvDetailTabletLayout extends StatefulWidget {
 class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
   final _scrollController = ScrollController();
   bool _isScrolled = false;
-  bool _suppressHero = false;
 
   @override
   void initState() {
@@ -60,147 +60,127 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
     if (scrolled != _isScrolled) setState(() => _isScrolled = scrolled);
   }
 
-  void _onPopInvoked(bool didPop, Object? result) {
-    if (didPop || widget.heroTag == null) return;
-    setState(() => _suppressHero = true);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      Navigator.of(context).pop(result);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final padding = context.horizontalPadding;
     final colors = context.colors;
     final foreground = _isScrolled ? colors.textPrimary : Colors.white;
-    final heroTag = _suppressHero ? null : widget.heroTag;
-    return PopScope(
-      canPop: widget.heroTag == null,
-      onPopInvokedWithResult: _onPopInvoked,
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: _isScrolled ? colors.background : Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          titleSpacing: 0,
-          iconTheme: IconThemeData(color: foreground),
-          titleTextStyle: TextStyle(
-            color: foreground,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+    final heroTag = widget.heroTag;
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: _isScrolled ? colors.background : Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        titleSpacing: 0,
+        iconTheme: IconThemeData(color: foreground),
+        titleTextStyle: TextStyle(
+          color: foreground,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
+        title: Text(_isScrolled ? (widget.fallbackTitle ?? '') : ''),
+        actions: [
+          BlocBuilder<TvDetailBloc, TvDetailState>(
+            builder: (context, state) {
+              if (state is! TvDetailLoaded) return const SizedBox.shrink();
+              final show = state.detail.toTvShow();
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FavouriteToggleButton(
+                    item: FavouriteItem.fromTvShow(show),
+                    color: foreground,
+                  ),
+                  WatchlistToggleButton(
+                    item: WatchlistItem.fromTvShow(show),
+                    color: foreground,
+                  ),
+                  ShareButton(
+                    media: ShareableMedia(
+                      mediaType: MediaType.tv,
+                      id: show.id,
+                      title: show.name,
+                      year: show.firstAirYear,
+                      backdropUrl: show.backdropUrl(),
+                    ),
+                    color: foreground,
+                  ),
+                ],
+              );
+            },
           ),
-          title: Text(_isScrolled ? (widget.fallbackTitle ?? '') : ''),
-          actions: [
-            BlocBuilder<TvDetailBloc, TvDetailState>(
-              builder: (context, state) {
-                if (state is! TvDetailLoaded) return const SizedBox.shrink();
-                final show = state.detail.toTvShow();
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    FavouriteToggleButton(
-                      item: FavouriteItem.fromTvShow(show),
-                      color: foreground,
-                    ),
-                    WatchlistToggleButton(
-                      item: WatchlistItem.fromTvShow(show),
-                      color: foreground,
-                    ),
-                    ShareButton(
-                      media: ShareableMedia(
-                        mediaType: MediaType.tv,
-                        id: show.id,
-                        title: show.name,
-                        year: show.firstAirYear,
-                        backdropUrl: show.backdropUrl(),
+        ],
+      ),
+      body: BlocBuilder<TvDetailBloc, TvDetailState>(
+        builder: (context, state) {
+          final loaded = state is TvDetailLoaded ? state.detail : null;
+          final backdropPath = loaded?.backdropPath ?? widget.seedBackdropPath;
+          return ListView(
+            controller: _scrollController,
+            padding: EdgeInsets.zero,
+            children: [
+              DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
+              if (loaded != null) ...[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(padding, 0, padding, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Transform.translate(
+                        offset: const Offset(0, -64),
+                        child: TvDetailSummary(detail: loaded),
                       ),
-                      color: foreground,
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-        body: BlocBuilder<TvDetailBloc, TvDetailState>(
-          builder: (context, state) {
-            final loaded = state is TvDetailLoaded ? state.detail : null;
-            final backdropPath =
-                loaded?.backdropPath ?? widget.seedBackdropPath;
-            return ListView(
-              controller: _scrollController,
-              padding: EdgeInsets.zero,
-              children: [
-                DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
-                if (loaded != null) ...[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(padding, 0, padding, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Transform.translate(
-                          offset: const Offset(0, -64),
-                          child: TvDetailSummary(detail: loaded),
-                        ),
-                        DetailOverview(overview: loaded.overview),
-                      ],
-                    ),
+                      DetailOverview(overview: loaded.overview),
+                    ],
                   ),
-                  const SizedBox(height: 32),
-                  DetailVideoRail(
-                    videos: loaded.videos.youTubeVideos,
-                    horizontalPadding: padding,
-                    onTap: (video) => playTrailer(context, video),
+                ),
+                const SizedBox(height: 32),
+                DetailVideoRail(
+                  videos: loaded.videos.youTubeVideos,
+                  horizontalPadding: padding,
+                  onTap: (video) => playTrailer(context, video),
+                ),
+                const SizedBox(height: 32),
+                DetailImageGallery(
+                  images: loaded.images,
+                  horizontalPadding: padding,
+                ),
+                const SizedBox(height: 32),
+                DetailCastList(
+                  cast: loaded.cast,
+                  horizontalPadding: padding,
+                  onTap: (member) => pushView(
+                    context,
+                    PersonDetailScreen(personId: member.id, name: member.name),
                   ),
-                  const SizedBox(height: 32),
-                  DetailImageGallery(
-                    images: loaded.images,
-                    horizontalPadding: padding,
-                  ),
-                  const SizedBox(height: 32),
-                  DetailCastList(
-                    cast: loaded.cast,
-                    horizontalPadding: padding,
-                    onTap: (member) => pushView(
-                      context,
-                      PersonDetailScreen(
-                        personId: member.id,
-                        name: member.name,
-                      ),
+                ),
+                const SizedBox(height: 16),
+                TvRecommendations(
+                  shows: loaded.recommendations,
+                  horizontalPadding: padding,
+                ),
+                const SizedBox(height: 32),
+                DetailReviewsSection(
+                  reviews: loaded.reviews,
+                  horizontalPadding: padding,
+                ),
+                const SizedBox(height: 32),
+              ] else if (state is TvDetailError) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 48),
+                  child: AppErrorView(
+                    message: state.message,
+                    onRetry: () => context.read<TvDetailBloc>().add(
+                      TvDetailFetched(widget.tvShowId),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TvRecommendations(
-                    shows: loaded.recommendations,
-                    horizontalPadding: padding,
-                  ),
-                  const SizedBox(height: 32),
-                  DetailReviewsSection(
-                    reviews: loaded.reviews,
-                    horizontalPadding: padding,
-                  ),
-                  const SizedBox(height: 32),
-                ] else if (state is TvDetailError) ...[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 48),
-                    child: AppErrorView(
-                      message: state.message,
-                      onRetry: () => context.read<TvDetailBloc>().add(
-                        TvDetailFetched(widget.tvShowId),
-                      ),
-                    ),
-                  ),
-                ] else
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 48),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-              ],
-            );
-          },
-        ),
+                ),
+              ] else
+                DetailSkeleton(horizontalPadding: padding),
+            ],
+          );
+        },
       ),
     );
   }
