@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/theme/app_theme.dart';
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
+import 'package:tmdb/features/watchlist/presentation/cubit/watchlist_cubit.dart';
 import 'package:tmdb/injection_container.dart';
 import 'package:tmdb/shared/widgets/root_screen.dart';
 
@@ -10,8 +11,11 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<FavouritesCubit>.value(
-      value: sl<FavouritesCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<FavouritesCubit>.value(value: sl<FavouritesCubit>()),
+        BlocProvider<WatchlistCubit>.value(value: sl<WatchlistCubit>()),
+      ],
       child: MaterialApp(
         title: 'TMDB',
         debugShowCheckedModeBanner: false,

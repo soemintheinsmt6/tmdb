@@ -30,6 +30,9 @@ import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_search_bloc/tv_search_bloc.dart';
+import 'package:tmdb/features/watchlist/data/repositories/watchlist_repository_impl.dart';
+import 'package:tmdb/features/watchlist/domain/repositories/watchlist_repository.dart';
+import 'package:tmdb/features/watchlist/presentation/cubit/watchlist_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -91,4 +94,10 @@ Future<void> init() async {
     () => FavouritesRepositoryImpl(sl<HiveStorage>()),
   );
   sl.registerLazySingleton<FavouritesCubit>(() => FavouritesCubit(sl()));
+
+  // ── Watchlist feature ──────────────────────────────────
+  sl.registerLazySingleton<WatchlistRepository>(
+    () => WatchlistRepositoryImpl(sl<HiveStorage>()),
+  );
+  sl.registerLazySingleton<WatchlistCubit>(() => WatchlistCubit(sl()));
 }

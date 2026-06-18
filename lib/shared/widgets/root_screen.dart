@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/features/discover/presentation/screens/discover_screen.dart';
-import 'package:tmdb/features/favourites/presentation/screens/favourite_screen.dart';
+import 'package:tmdb/features/library/presentation/screens/library_screen.dart';
 import 'package:tmdb/features/movies/presentation/screens/home/home_screen.dart';
 import 'package:tmdb/features/profile/presentation/screens/profile_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_home/tv_screen.dart';
@@ -46,7 +46,7 @@ class _RootScreenState extends State<RootScreen> {
       0 => const HomeScreen(),
       1 => const DiscoverScreen(),
       2 => const TvScreen(),
-      3 => const FavouriteScreen(),
+      3 => const LibraryScreen(),
       4 => const ProfileScreen(),
       _ => const SizedBox.shrink(),
     };
@@ -126,12 +126,15 @@ class _RootScreenState extends State<RootScreen> {
                 label: 'Series',
               ),
               NavigationDestination(
-                icon: Icon(IconsaxPlusLinear.heart, color: colors.textMuted),
+                icon: Icon(
+                  IconsaxPlusLinear.archive_book,
+                  color: colors.textMuted,
+                ),
                 selectedIcon: const Icon(
-                  IconsaxPlusBold.heart,
+                  IconsaxPlusBold.archive_book,
                   color: AppColors.cyan,
                 ),
-                label: 'Favourites',
+                label: 'Library',
               ),
               NavigationDestination(
                 icon: Icon(IconsaxPlusLinear.user, color: colors.textMuted),

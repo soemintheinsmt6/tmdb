@@ -8,6 +8,8 @@ import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_d
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_state.dart';
 import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dart';
 import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
+import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
+import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_toggle_button.dart';
 import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
@@ -89,13 +91,18 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
           actions: [
             BlocBuilder<MovieDetailBloc, MovieDetailState>(
               builder: (context, state) {
-                if (state is MovieDetailLoaded) {
-                  return FavouriteToggleButton(
-                    movie: state.detail.toMovie(),
-                    color: foreground,
-                  );
-                }
-                return const SizedBox.shrink();
+                if (state is! MovieDetailLoaded) return const SizedBox.shrink();
+                final movie = state.detail.toMovie();
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FavouriteToggleButton(movie: movie, color: foreground),
+                    WatchlistToggleButton(
+                      item: WatchlistItem.fromMovie(movie),
+                      color: foreground,
+                    ),
+                  ],
+                );
               },
             ),
           ],

@@ -5,12 +5,12 @@ A movie & TV browser built on top of [The Movie Database (TMDB) API](https://dev
 ## Tech stack
 
 - **Flutter** (Material 3, light + dark themes that follow the system setting)
-- **flutter_bloc** for state management (BLoCs for movies, TV & discover, Cubit for favourites)
+- **flutter_bloc** for state management (BLoCs for movies, TV & discover, Cubits for favourites & watchlist)
 - **dartz** `Either<Failure, T>` for error handling
 - **equatable** for value objects
 - **get_it** for dependency injection
 - **http** for networking (wrapped by `core/network/api_client.dart`)
-- **hive** for local persistence of favourites
+- **hive** for local persistence of favourites & watchlist
 - **cached_network_image**, **shimmer**, **iconsax_plus**, **google_fonts** for UI
 - **youtube_player_flutter** (in-app trailers) · **url_launcher** ("Watch on YouTube" fallback) · **saver_gallery** (save backdrops to the device gallery)
 - **bloc_test**, **mocktail**, **integration_test** for tests
@@ -30,7 +30,7 @@ lib/
 │   ├── logging/            # AppLogger seam + ConsoleLogger + global error handlers
 │   ├── network/            # api_client.dart (api_key auth, retry/backoff, exception mapping)
 │   ├── responsive/         # breakpoints + ResponsiveBuilder
-│   ├── storage/            # Hive wrapper (favourites box)
+│   ├── storage/            # Hive wrapper (favourites + watchlist boxes)
 │   ├── theme/              # AppColors, AppTypography, AppTheme, AppDecoration
 │   └── utils/              # navigation.dart, typedef.dart
 ├── features/
@@ -56,7 +56,8 @@ lib/
 │   │                           # TvShowDetail, TvRepository, remote data source,
 │   │                           # tv_list/tv_search/tv_detail blocs, tv_screen + tv_detail.
 │   │                           # Categories: Popular / Top Rated / On The Air / Airing Today.
-│   │                           # Browse + detail only — no favouriting in v1.
+│   │                           # Browse + detail; TV detail is saveable to the watchlist
+│   │                           # (favouriting stays movies-only).
 │   ├── discover/               # /discover/movie browse: DiscoverFilter (genres/sort/year/
 │   │                           # min-rating → query params), DiscoverRepository, remote data
 │   │                           # source, DiscoverBloc (flat state: genres + filter +
@@ -78,8 +79,21 @@ lib/
 │   │   │   └── repositories/   # FavouritesRepository (abstract — test seam)
 │   │   └── presentation/
 │   │       ├── cubit/          # FavouritesCubit + FavouritesState({movies, ids})
-│   │       ├── screens/        # FavouriteScreen
-│   │       └── widgets/        # FavouriteHeroCard, FavouriteToggleButton
+│   │       ├── screens/        # FavouriteScreen (standalone; body = FavouritesListView)
+│   │       └── widgets/        # FavouriteHeroCard, FavouriteToggleButton, FavouritesListView
+│   ├── watchlist/
+│   │   ├── data/
+│   │   │   ├── models/         # WatchlistEntry (Hive TypeAdapter, typeId 2; movies + TV)
+│   │   │   └── repositories/   # WatchlistRepositoryImpl ("movie:ID"/"tv:ID" composite keys)
+│   │   ├── domain/
+│   │   │   ├── entities/       # WatchlistItem (MediaType movie|tv, implements PosterItem)
+│   │   │   └── repositories/   # WatchlistRepository (abstract — test seam)
+│   │   └── presentation/
+│   │       ├── cubit/          # WatchlistCubit + WatchlistState({items, keys})
+│   │       └── widgets/        # WatchlistHeroCard, WatchlistToggleButton, WatchlistListView
+│   ├── library/
+│   │   └── presentation/
+│   │       └── screens/        # LibraryScreen (Favourites + Watchlist tabs; the nav tab)
 │   └── profile/
 │       └── presentation/
 │           ├── screens/        # ProfileScreen (favourite count + clear / about)
@@ -102,7 +116,7 @@ lib/
 
 **Observability.** Code logs through the injected `AppLogger` abstraction, never `print`. The default `ConsoleLogger` routes to `dart:developer`; global Flutter/platform errors are funnelled in at boot. Shipping a crash reporter is a one-line DI swap — see [ADR 0005](docs/adr/0005-observability-seam.md). The network logger logs endpoint paths only, never the `api_key`-bearing URL.
 
-**Persistence boundary.** `FavouriteMovie` (Hive-encoded via a hand-written `TypeAdapter`) lives only in the favourites data layer. The repository converts to `Movie` at the boundary, so widgets and the cubit only see domain types.
+**Persistence boundary.** `FavouriteMovie` and `WatchlistEntry` (each Hive-encoded via a hand-written `TypeAdapter`, type ids `1` and `2`) live only in their feature data layers. The repositories convert to domain types (`Movie` / `WatchlistItem`) at the boundary, so widgets and cubits never see the persistence rows. The watchlist spans both movies and TV shows, so its rows carry a media-type discriminator and are keyed `"movie:ID"` / `"tv:ID"` — numeric ids can collide across the two verticals, so the type is part of the key.
 
 ## Setup
 
@@ -130,7 +144,7 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 289 host-side tests + one device E2E.
+The project has three test layers; together they're 301 host-side tests + one device E2E.
 
 ```bash
 dart format --set-exit-if-changed .   # formatting gate
@@ -157,9 +171,12 @@ test/
 │   ├── discover/               # DiscoverFilter, remote data source, repo impl, DiscoverBloc
 │   ├── people/                 # PersonCredit/Person entities, data (datasource + repo),
 │   │                           # PersonDetail bloc
-│   └── favourites/
-│       ├── data/models/        # FavouriteMovie mapper
-│       └── presentation/cubit/ # FavouritesState, FavouritesCubit
+│   ├── favourites/
+│   │   ├── data/models/        # FavouriteMovie mapper
+│   │   └── presentation/cubit/ # FavouritesState, FavouritesCubit
+│   └── watchlist/
+│       ├── data/models/        # WatchlistEntry round-trip (incl. movie/TV id-collision)
+│       └── presentation/cubit/ # WatchlistState, WatchlistCubit
 ├── shared/domain/              # Video, Review, MediaImage entity + selection tests
 ├── integration/                # screen-level: real bloc + real widgets + mocked repo
 │   ├── home_content_test.dart
@@ -191,11 +208,12 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Trailers** — tapping a video opens an in-app YouTube player (`youtube_player_flutter`) with a custom control bar: red scrubber, tap to play/pause, **double-tap left/right to seek ±10 s**, and a fullscreen toggle that rotates to landscape. Owner-disabled / region- or age-restricted videos fall back to a "Watch on YouTube" action.
 - **Photos** — a backdrop gallery on movie & TV detail opens a full-screen viewer: swipe between images, pinch-zoom, **double-tap to zoom** (centred on the tap), and **save to the device gallery** (`saver_gallery`, with photo-library permission handling on iOS & Android).
 - **Reviews** — author, score, and expandable review text on movie & TV detail.
-- **TV shows** on their own tab (Popular / Top Rated / On The Air / Airing Today) with the same search, infinite scroll, and detail layout — season & episode counts replace runtime. Browse + detail only (no favouriting in v1). Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
+- **TV shows** on their own tab (Popular / Top Rated / On The Air / Airing Today) with the same search, infinite scroll, and detail layout — season & episode counts replace runtime. TV detail pages are saveable to the watchlist (favouriting stays movies-only). Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
 - **People / cast** — tap any cast member to open a person page with their profile photo, known-for department, birthday / age / birthplace, an expandable biography, and a combined movie + TV **filmography** (sorted by popularity) whose posters route back into the matching movie or TV detail. Reuses the same poster kernel as the browse grids.
-- **Favourites** persisted locally via Hive; reactive — toggling on the detail screen updates the home grid heart and the Favourites tab in real time.
-- **Shared-element transition** — tapping a favourites card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
+- **Favourites** (movies) persisted locally via Hive; reactive — toggling on the detail screen updates the home grid heart and the Library tab in real time.
+- **Watchlist** — a separate "watch later" list spanning **both movies and TV shows**, persisted locally via Hive and reactive like favourites. A bookmark toggle on movie & TV detail saves/removes; each saved card carries a MOVIE/TV chip and routes back to the matching detail screen.
+- **Shared-element transition** — tapping a favourites or watchlist card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0). Push only; pop uses the standard route transition (suppressed via `PopScope` so the detail screen exits as a single unit).
 - **Profile tab** showing favourites count plus a destructive "Clear favourites" flow with confirm dialog.
-- **Five-tab shell** — Home · Discover · TV · Favourites · Profile, lazily built and kept alive via `IndexedStack`.
+- **Five-tab shell** — Home · Discover · TV · Library · Profile, lazily built and kept alive via `IndexedStack`. The **Library** tab combines Favourites and Watchlist under one app bar with two segments.
 - **Responsive grid** — 3 columns on mobile, scaling 4–7 on tablet (clamped on `width / 180`); aspect ratio shifts slightly between tiers.
 - **Light & dark mode** — `MaterialApp` is wired with `themeMode: ThemeMode.system`. Theme-dependent surfaces/text live on `AppColors` instances (`AppColors.light` / `AppColors.dark`) and resolve at the call site via `context.colors`; brand and semantic colors stay as static constants.

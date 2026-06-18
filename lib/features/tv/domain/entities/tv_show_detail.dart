@@ -135,6 +135,20 @@ class TvShowDetail extends Equatable {
   String? get firstAirYear => firstAirDate.year;
   String get formattedRating => voteCount == 0 ? 'NR' : voteAverage.rating;
 
+  /// Projects the detail down to a list-level [TvShow]. Mirrors
+  /// `MovieDetail.toMovie()`; used to seed the watchlist toggle.
+  TvShow toTvShow() => TvShow(
+    id: id,
+    name: name,
+    overview: overview,
+    posterPath: posterPath,
+    backdropPath: backdropPath,
+    firstAirDate: firstAirDate,
+    voteAverage: voteAverage,
+    voteCount: voteCount,
+    genreIds: genres.map((g) => g.id).toList(),
+  );
+
   /// e.g. `"3 Seasons"` / `"1 Season"`; `""` when unknown.
   String get seasonsLabel => numberOfSeasons <= 0
       ? ''

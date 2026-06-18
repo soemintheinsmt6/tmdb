@@ -8,6 +8,8 @@ import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_event.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_state.dart';
 import 'package:tmdb/features/tv/presentation/widgets/tv_detail_cards.dart';
+import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
+import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_toggle_button.dart';
 import 'package:tmdb/shared/domain/video.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
@@ -86,6 +88,17 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
             fontWeight: FontWeight.w600,
           ),
           title: Text(_isScrolled ? (widget.fallbackTitle ?? '') : ''),
+          actions: [
+            BlocBuilder<TvDetailBloc, TvDetailState>(
+              builder: (context, state) {
+                if (state is! TvDetailLoaded) return const SizedBox.shrink();
+                return WatchlistToggleButton(
+                  item: WatchlistItem.fromTvShow(state.detail.toTvShow()),
+                  color: foreground,
+                );
+              },
+            ),
+          ],
         ),
         body: BlocBuilder<TvDetailBloc, TvDetailState>(
           builder: (context, state) {
