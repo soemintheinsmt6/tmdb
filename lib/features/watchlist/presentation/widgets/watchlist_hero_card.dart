@@ -5,11 +5,9 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/core/utils/navigation.dart';
-import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
-import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
 import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
 import 'package:tmdb/features/watchlist/presentation/cubit/watchlist_cubit.dart';
+import 'package:tmdb/features/watchlist/presentation/watchlist_navigation.dart';
 import 'package:tmdb/shared/widgets/rating_badge.dart';
 
 /// Full-width 16:9 card with the backdrop as a hero image, a bookmark in the
@@ -20,31 +18,6 @@ class WatchlistHeroCard extends StatelessWidget {
   const WatchlistHeroCard({super.key, required this.item});
 
   final WatchlistItem item;
-
-  Future<void> _openDetail(BuildContext context, Object? heroTag) async {
-    switch (item.mediaType) {
-      case MediaType.movie:
-        await pushView(
-          context,
-          MovieDetailScreen(
-            movieId: item.id,
-            title: item.title,
-            backdropPath: item.backdropPath,
-            heroTag: heroTag,
-          ),
-        );
-      case MediaType.tv:
-        await pushView(
-          context,
-          TvDetailScreen(
-            tvShowId: item.id,
-            title: item.title,
-            backdropPath: item.backdropPath,
-            heroTag: heroTag,
-          ),
-        );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +33,9 @@ class WatchlistHeroCard extends StatelessWidget {
           Positioned.fill(
             child: Material(
               color: Colors.transparent,
-              child: InkWell(onTap: () => _openDetail(context, heroTag)),
+              child: InkWell(
+                onTap: () => openWatchlistDetail(context, item, heroTag: heroTag),
+              ),
             ),
           ),
           Positioned(top: 10, left: 12, child: _TypeChip(type: item.mediaType)),
