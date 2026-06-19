@@ -114,11 +114,20 @@ class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
         builder: (context, state) {
           final loaded = state is TvDetailLoaded ? state.detail : null;
           final backdropPath = loaded?.backdropPath ?? widget.seedBackdropPath;
+          // During loading we only have a real header when a backdrop or hero
+          // was seeded from the previous screen; otherwise the skeleton draws
+          // its own shimmer backdrop instead of a flat, inert block.
+          final showHeader =
+              loaded != null ||
+              state is TvDetailError ||
+              (backdropPath != null && backdropPath.isNotEmpty) ||
+              heroTag != null;
           return ListView(
             controller: _scrollController,
             padding: EdgeInsets.zero,
             children: [
-              DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
+              if (showHeader)
+                DetailHeader(backdropPath: backdropPath, heroTag: heroTag),
               if (loaded != null) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -164,7 +173,7 @@ class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
                   ),
                 ),
               ] else
-                const DetailSkeleton(),
+                DetailSkeleton(includeBackdrop: !showHeader),
             ],
           );
         },

@@ -43,45 +43,26 @@ class MovieCategoryScreen extends StatelessWidget {
   }
 }
 
-class _MovieCategoryGrid extends StatefulWidget {
+class _MovieCategoryGrid extends StatelessWidget {
   const _MovieCategoryGrid({required this.category});
 
   final MovieCategory category;
 
-  @override
-  State<_MovieCategoryGrid> createState() => _MovieCategoryGridState();
-}
+  void _open(BuildContext context, PosterItem item) => unawaited(
+    pushView(context, MovieDetailScreen(movieId: item.id, title: item.title)),
+  );
 
-class _MovieCategoryGridState extends State<_MovieCategoryGrid> {
-  final _controller = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _controller
-      ..removeListener(_onScroll)
-      ..dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (!_controller.hasClients) return;
-    final position = _controller.position;
-    if (position.pixels < position.maxScrollExtent - 320) return;
+  /// Loads the next page as the grid nears its end. Returns false so the
+  /// notification keeps bubbling.
+  bool _maybeLoadMore(BuildContext context, ScrollNotification notification) {
+    final metrics = notification.metrics;
+    if (metrics.pixels < metrics.maxScrollExtent - 320) return false;
     final state = context.read<MovieListBloc>().state;
     if (state is MovieListLoaded && state.hasMore && !state.isLoadingMore) {
       context.read<MovieListBloc>().add(const MovieListLoadMore());
     }
+    return false;
   }
-
-  void _open(PosterItem item) => unawaited(
-    pushView(context, MovieDetailScreen(movieId: item.id, title: item.title)),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +75,7 @@ class _MovieCategoryGridState extends State<_MovieCategoryGrid> {
           return AppErrorView(
             message: state.message,
             onRetry: () => context.read<MovieListBloc>().add(
-              MovieListCategoryChanged(widget.category),
+              MovieListCategoryChanged(category),
             ),
           );
         }
@@ -102,22 +83,28 @@ class _MovieCategoryGridState extends State<_MovieCategoryGrid> {
           if (state.movies.isEmpty) {
             return const AppEmptyView(message: 'Nothing to show');
           }
-          return PosterGrid(
-            scrollController: _controller,
-            items: state.movies,
-            onTap: _open,
-            footer: state.isLoadingMore
-                ? const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: AppColors.cyan,
+          // No explicit scroll controller: this keeps the grid the route's
+          // primary scroll view, so an iOS status-bar tap scrolls it to top.
+          // Pagination is driven by scroll notifications instead.
+          return NotificationListener<ScrollNotification>(
+            onNotification: (notification) =>
+                _maybeLoadMore(context, notification),
+            child: PosterGrid(
+              items: state.movies,
+              onTap: (item) => _open(context, item),
+              footer: state.isLoadingMore
+                  ? const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: AppColors.cyan,
+                        ),
                       ),
-                    ),
-                  )
-                : null,
+                    )
+                  : null,
+            ),
           );
         }
         return const SizedBox.shrink();

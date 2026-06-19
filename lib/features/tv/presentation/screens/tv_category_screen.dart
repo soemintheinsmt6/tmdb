@@ -31,10 +31,8 @@ class TvCategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => TvListBloc(
-        repository: sl<TvRepository>(),
-        initialCategory: category,
-      ),
+      create: (_) =>
+          TvListBloc(repository: sl<TvRepository>(), initialCategory: category),
       child: Scaffold(
         appBar: AppBar(titleSpacing: 0, title: Text(title)),
         body: SafeArea(child: _TvCategoryGrid(category: category)),
@@ -43,45 +41,26 @@ class TvCategoryScreen extends StatelessWidget {
   }
 }
 
-class _TvCategoryGrid extends StatefulWidget {
+class _TvCategoryGrid extends StatelessWidget {
   const _TvCategoryGrid({required this.category});
 
   final TvCategory category;
 
-  @override
-  State<_TvCategoryGrid> createState() => _TvCategoryGridState();
-}
+  void _open(BuildContext context, PosterItem item) => unawaited(
+    pushView(context, TvDetailScreen(tvShowId: item.id, title: item.title)),
+  );
 
-class _TvCategoryGridState extends State<_TvCategoryGrid> {
-  final _controller = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _controller
-      ..removeListener(_onScroll)
-      ..dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (!_controller.hasClients) return;
-    final position = _controller.position;
-    if (position.pixels < position.maxScrollExtent - 320) return;
+  /// Loads the next page as the grid nears its end. Returns false so the
+  /// notification keeps bubbling.
+  bool _maybeLoadMore(BuildContext context, ScrollNotification notification) {
+    final metrics = notification.metrics;
+    if (metrics.pixels < metrics.maxScrollExtent - 320) return false;
     final state = context.read<TvListBloc>().state;
     if (state is TvListLoaded && state.hasMore && !state.isLoadingMore) {
       context.read<TvListBloc>().add(const TvListLoadMore());
     }
+    return false;
   }
-
-  void _open(PosterItem item) => unawaited(
-    pushView(context, TvDetailScreen(tvShowId: item.id, title: item.title)),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -93,31 +72,36 @@ class _TvCategoryGridState extends State<_TvCategoryGrid> {
         if (state is TvListError) {
           return AppErrorView(
             message: state.message,
-            onRetry: () => context.read<TvListBloc>().add(
-              TvListCategoryChanged(widget.category),
-            ),
+            onRetry: () =>
+                context.read<TvListBloc>().add(TvListCategoryChanged(category)),
           );
         }
         if (state is TvListLoaded) {
           if (state.shows.isEmpty) {
             return const AppEmptyView(message: 'Nothing to show');
           }
-          return PosterGrid(
-            scrollController: _controller,
-            items: state.shows,
-            onTap: _open,
-            footer: state.isLoadingMore
-                ? const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: AppColors.cyan,
+          // No explicit scroll controller: this keeps the grid the route's
+          // primary scroll view, so an iOS status-bar tap scrolls it to top.
+          // Pagination is driven by scroll notifications instead.
+          return NotificationListener<ScrollNotification>(
+            onNotification: (notification) =>
+                _maybeLoadMore(context, notification),
+            child: PosterGrid(
+              items: state.shows,
+              onTap: (item) => _open(context, item),
+              footer: state.isLoadingMore
+                  ? const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: AppColors.cyan,
+                        ),
                       ),
-                    ),
-                  )
-                : null,
+                    )
+                  : null,
+            ),
           );
         }
         return const SizedBox.shrink();

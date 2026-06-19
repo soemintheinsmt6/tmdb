@@ -2,14 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 
-/// Shimmer placeholder for a detail screen's body — everything below the
-/// backdrop header: the poster + title summary, overview lines, and a rail.
-/// Mirrors the loaded layout's structure (including the summary's upward
-/// overlap into the header) so content arrives with no layout shift.
+/// Shimmer placeholder for a detail screen's body: the poster + title summary,
+/// overview lines, and a rail. Mirrors the loaded layout's structure (including
+/// the summary's upward overlap into the header) so content arrives with no
+/// layout shift.
+///
+/// When [includeBackdrop] is true the skeleton also draws a backdrop placeholder
+/// at the top, in the same shimmer pass as the body. Screens enable this when
+/// they have no real backdrop (or hero) to show during loading, so the top of
+/// the screen shimmers as one piece instead of leaving an inert, flat header
+/// block above the summary.
 class DetailSkeleton extends StatelessWidget {
-  const DetailSkeleton({super.key, this.horizontalPadding = 16});
+  const DetailSkeleton({
+    super.key,
+    this.horizontalPadding = 16,
+    this.includeBackdrop = false,
+  });
 
   final double horizontalPadding;
+  final bool includeBackdrop;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +41,14 @@ class DetailSkeleton extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Full-bleed backdrop placeholder, matching DetailHeader's 16:9. The
+          // summary below overlaps its bottom edge (Transform.translate), so the
+          // two shimmer as one continuous surface.
+          if (includeBackdrop)
+            const AspectRatio(
+              aspectRatio: 16 / 9,
+              child: ColoredBox(color: Colors.transparent),
+            ),
           Padding(
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
@@ -90,24 +109,6 @@ class DetailSkeleton extends StatelessWidget {
                 const SizedBox(height: 8),
                 box(200, 12, 6), // last, shorter line
               ],
-            ),
-          ),
-          const SizedBox(height: 28),
-          // A rail (heading + a row of poster cards).
-          Padding(
-            padding: EdgeInsets.only(left: horizontalPadding),
-            child: box(150, 18, 6),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 195,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              itemCount: 4,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (_, __) => box(130, 195, 12),
             ),
           ),
         ],
