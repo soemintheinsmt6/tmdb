@@ -4,11 +4,11 @@ import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
 import 'package:tmdb/features/tv/domain/entities/season_detail.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
-import 'package:tmdb/shared/domain/cast_member.dart';
-import 'package:tmdb/shared/domain/media_image.dart';
-import 'package:tmdb/shared/domain/review.dart';
-import 'package:tmdb/shared/domain/video.dart';
-import 'package:tmdb/shared/domain/watch_providers.dart';
+import 'package:tmdb/shared/domain/media/cast_member.dart';
+import 'package:tmdb/shared/domain/media/media_image.dart';
+import 'package:tmdb/shared/domain/media/review.dart';
+import 'package:tmdb/shared/domain/media/video.dart';
+import 'package:tmdb/shared/domain/media/watch_providers.dart';
 
 /// Network-only client for the TV feature. Throws the exceptions defined in
 /// `core/error/exceptions.dart`; the repository converts them to `Failure`s.

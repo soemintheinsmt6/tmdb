@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:tmdb/shared/domain/watch_provider.dart';
+import 'package:tmdb/shared/domain/media/watch_provider.dart';
 
 /// Parses a `/watch/providers` response, preferring [region] and falling back
 /// to [fallbackRegion] when TMDB has no data for the user's country (many

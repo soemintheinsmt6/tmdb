@@ -1,6 +1,6 @@
 import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/recommendations/domain/entities/recommendation_seed.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 /// Builds a personalised feed from the titles the user has saved.
 abstract class RecommendationsRepository {

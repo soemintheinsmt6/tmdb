@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tmdb/shared/domain/media_image.dart';
+import 'package:tmdb/shared/domain/media/media_image.dart';
 
 void main() {
   group('MediaImage.fromJson', () {

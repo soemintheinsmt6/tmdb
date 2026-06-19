@@ -3,7 +3,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/shared/domain/library_sort.dart';
+import 'package:tmdb/shared/domain/library/library_sort.dart';
 
 /// Shows the library sort sheet and resolves to the chosen [LibrarySort], or
 /// `null` if dismissed without a selection.

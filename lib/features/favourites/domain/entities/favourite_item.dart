@@ -4,11 +4,11 @@ import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
-import 'package:tmdb/shared/domain/media_type.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/domain/sortable_saved_item.dart';
+import 'package:tmdb/shared/domain/library/sortable_saved_item.dart';
+import 'package:tmdb/shared/domain/media/media_type.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
-export 'package:tmdb/shared/domain/media_type.dart';
+export 'package:tmdb/shared/domain/media/media_type.dart';
 
 /// A favourited title — a movie or a TV show. Carries a [mediaType]
 /// discriminator (favourites span both verticals) and implements [PosterItem]

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/poster_card.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/poster/poster_card.dart';
 
 /// Grid of [PosterCard]s with an optional trailing footer (load-more spinner).
 /// Generic over [PosterItem] so movies and TV shows share one grid.

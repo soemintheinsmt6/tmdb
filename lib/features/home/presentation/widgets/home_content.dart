@@ -14,11 +14,11 @@ import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_category_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
-import 'package:tmdb/shared/widgets/detail_cards.dart';
-import 'package:tmdb/shared/widgets/featured_carousel.dart';
-import 'package:tmdb/shared/widgets/rail_feed_skeleton.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
+import 'package:tmdb/shared/widgets/feed/featured_carousel.dart';
+import 'package:tmdb/shared/widgets/skeletons/rail_feed_skeleton.dart';
 
 /// The editorial home body: a hero over a vertical stack of horizontal rails.
 /// Mixed movie + TV items route to the right detail screen by runtime type.

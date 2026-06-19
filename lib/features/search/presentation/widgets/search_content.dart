@@ -16,9 +16,9 @@ import 'package:tmdb/features/search/presentation/bloc/search_bloc/search_state.
 import 'package:tmdb/features/search/presentation/widgets/search_result_tile.dart';
 import 'package:tmdb/features/search/presentation/widgets/search_results_skeleton.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
-import 'package:tmdb/shared/widgets/app_empty_view.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
-import 'package:tmdb/shared/widgets/app_search_field.dart';
+import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/common/app_search_field.dart';
 
 /// The body of the search screen. Handles query debouncing, infinite scroll,
 /// and routing each mixed result to its matching detail screen.

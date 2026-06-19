@@ -9,8 +9,8 @@ import 'package:tmdb/features/favourites/domain/repositories/favourites_reposito
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourite_hero_card.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourites_list_view.dart';
-import 'package:tmdb/shared/domain/library_view.dart';
-import 'package:tmdb/shared/widgets/poster_card.dart';
+import 'package:tmdb/shared/domain/library/library_view.dart';
+import 'package:tmdb/shared/widgets/poster/poster_card.dart';
 
 import '../../../../helpers/movie_fixtures.dart';
 import '../../../../helpers/tv_fixtures.dart';

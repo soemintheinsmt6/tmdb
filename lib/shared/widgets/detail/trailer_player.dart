@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/core/utils/navigation.dart';
-import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/domain/media/video.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 

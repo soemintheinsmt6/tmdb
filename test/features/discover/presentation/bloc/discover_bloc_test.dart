@@ -8,7 +8,7 @@ import 'package:tmdb/features/discover/domain/repositories/discover_repository.d
 import 'package:tmdb/features/discover/presentation/bloc/discover_bloc.dart';
 import 'package:tmdb/features/discover/presentation/bloc/discover_event.dart';
 import 'package:tmdb/features/discover/presentation/bloc/discover_state.dart';
-import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
 
 import '../../../../helpers/movie_fixtures.dart';
 import '../../../../helpers/tv_fixtures.dart'

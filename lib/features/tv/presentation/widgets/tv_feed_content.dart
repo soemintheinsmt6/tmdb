@@ -10,11 +10,11 @@ import 'package:tmdb/features/tv/presentation/bloc/tv_feed_bloc/tv_feed_event.da
 import 'package:tmdb/features/tv/presentation/bloc/tv_feed_bloc/tv_feed_state.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_category_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
-import 'package:tmdb/shared/widgets/detail_cards.dart';
-import 'package:tmdb/shared/widgets/featured_carousel.dart';
-import 'package:tmdb/shared/widgets/rail_feed_skeleton.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
+import 'package:tmdb/shared/widgets/feed/featured_carousel.dart';
+import 'package:tmdb/shared/widgets/skeletons/rail_feed_skeleton.dart';
 
 /// The editorial series body: a trending hero over a vertical stack of TV
 /// category rails. Mirrors the home layout for the TV vertical.

@@ -9,9 +9,9 @@ import 'package:tmdb/features/movies/presentation/bloc/collection_bloc/collectio
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
 import 'package:tmdb/features/movies/presentation/widgets/collection_skeleton.dart';
 import 'package:tmdb/injection_container.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
-import 'package:tmdb/shared/widgets/detail_cards.dart';
-import 'package:tmdb/shared/widgets/poster_card.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
+import 'package:tmdb/shared/widgets/poster/poster_card.dart';
 
 /// All films in a movie franchise, from `/collection/{id}`. Reached by tapping
 /// the "Part of …" banner on a movie detail screen; each film routes back into

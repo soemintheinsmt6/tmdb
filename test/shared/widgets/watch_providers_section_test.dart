@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tmdb/shared/domain/watch_providers.dart';
-import 'package:tmdb/shared/widgets/watch_providers_section.dart';
+import 'package:tmdb/shared/domain/media/watch_providers.dart';
+import 'package:tmdb/shared/widgets/detail/watch_providers_section.dart';
 
 import '../../helpers/watch_provider_fixtures.dart';
 

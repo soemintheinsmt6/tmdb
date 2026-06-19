@@ -3,7 +3,7 @@ import 'package:tmdb/core/network/api_client.dart';
 import 'package:tmdb/features/discover/domain/entities/discover_filter.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
-import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
 
 /// Network-only client for the discover feature. Throws the exceptions defined
 /// in `core/error/exceptions.dart`; the repository converts them to `Failure`s.

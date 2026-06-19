@@ -10,11 +10,11 @@ import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_event.da
 import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_state.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
 import 'package:tmdb/injection_container.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/app_empty_view.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
-import 'package:tmdb/shared/widgets/poster_grid.dart';
-import 'package:tmdb/shared/widgets/poster_grid_skeleton.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/poster/poster_grid.dart';
+import 'package:tmdb/shared/widgets/skeletons/poster_grid_skeleton.dart';
 
 /// Full, paginated grid for a single TV category — reached from a rail's
 /// "See all". Reuses [TvListBloc]'s infinite-scroll loading.

@@ -8,7 +8,7 @@ import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
 import 'package:tmdb/features/watchlist/presentation/cubit/watchlist_cubit.dart';
 import 'package:tmdb/features/watchlist/presentation/watchlist_navigation.dart';
-import 'package:tmdb/shared/widgets/rating_badge.dart';
+import 'package:tmdb/shared/widgets/common/rating_badge.dart';
 
 /// Full-width 16:9 card with the backdrop as a hero image, a bookmark in the
 /// top-right, a media-type chip in the top-left, and title / rating / year

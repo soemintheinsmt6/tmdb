@@ -2,8 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/rating_badge.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/rating_badge.dart';
 
 /// A single featured backdrop slide. Fills its parent — the carousel supplies
 /// the 16:10 box — with a bottom fade into the page background and an overlaid

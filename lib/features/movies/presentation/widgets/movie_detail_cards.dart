@@ -4,8 +4,8 @@ import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
-import 'package:tmdb/shared/widgets/detail_cards.dart';
-import 'package:tmdb/shared/widgets/imdb_chip.dart';
+import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
+import 'package:tmdb/shared/widgets/detail/imdb_chip.dart';
 
 /// Movie-specific summary: composes the shared [DetailSummary] with a meta row
 /// of release year + runtime.

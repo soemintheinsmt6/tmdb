@@ -3,7 +3,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/features/search/domain/entities/search_result.dart';
-import 'package:tmdb/shared/widgets/poster_image.dart';
+import 'package:tmdb/shared/widgets/poster/poster_image.dart';
 
 /// A single multi-search row: thumbnail, title, a media-type chip and a
 /// type-specific subtitle (year • rating for titles, known-for dept for

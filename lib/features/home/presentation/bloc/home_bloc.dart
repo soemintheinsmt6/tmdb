@@ -12,7 +12,7 @@ import 'package:tmdb/features/recommendations/domain/entities/recommendation_see
 import 'package:tmdb/features/recommendations/domain/repositories/recommendations_repository.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/features/watchlist/domain/repositories/watchlist_repository.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 import 'home_event.dart';
 import 'home_state.dart';

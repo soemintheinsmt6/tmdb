@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tmdb/features/favourites/domain/entities/favourite_item.dart';
 import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
-import 'package:tmdb/shared/domain/library_sort.dart';
+import 'package:tmdb/shared/domain/library/library_sort.dart';
 
 FavouriteItem _fav({
   int id = 1,

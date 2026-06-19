@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tmdb/features/tv/presentation/widgets/episode_tile.dart';
-import 'package:tmdb/shared/widgets/rating_badge.dart';
+import 'package:tmdb/shared/widgets/common/rating_badge.dart';
 
 import '../../../../helpers/tv_fixtures.dart';
 

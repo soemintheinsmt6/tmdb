@@ -2,8 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/discover/domain/entities/discover_filter.dart';
 import 'package:tmdb/features/discover/domain/repositories/discover_repository.dart';
-import 'package:tmdb/shared/domain/genre.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 import 'discover_event.dart';
 import 'discover_state.dart';

@@ -1,5 +1,5 @@
-import 'package:tmdb/shared/domain/watch_provider.dart';
-import 'package:tmdb/shared/domain/watch_providers.dart';
+import 'package:tmdb/shared/domain/media/watch_provider.dart';
+import 'package:tmdb/shared/domain/media/watch_providers.dart';
 
 WatchProvider buildWatchProvider({
   int providerId = 8,

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 enum HomeStatus { initial, loading, loaded, error }
 

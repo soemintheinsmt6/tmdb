@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 void main() {
   group('TvShow.fromJson', () {

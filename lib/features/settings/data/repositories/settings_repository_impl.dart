@@ -2,8 +2,8 @@ import 'package:flutter/material.dart' show ThemeMode;
 
 import 'package:tmdb/core/storage/hive_storage.dart';
 import 'package:tmdb/features/settings/domain/repositories/settings_repository.dart';
-import 'package:tmdb/shared/domain/library_sort.dart';
-import 'package:tmdb/shared/domain/library_view.dart';
+import 'package:tmdb/shared/domain/library/library_sort.dart';
+import 'package:tmdb/shared/domain/library/library_view.dart';
 
 /// [SettingsRepository] backed by the Hive `settings` box. Enum preferences are
 /// stored as their `index` (a primitive — no TypeAdapter) keyed by name.

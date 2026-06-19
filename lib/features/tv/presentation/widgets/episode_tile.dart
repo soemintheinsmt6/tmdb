@@ -6,7 +6,7 @@ import 'package:tmdb/core/extensions/string_date.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/features/tv/domain/entities/episode.dart';
-import 'package:tmdb/shared/widgets/rating_badge.dart';
+import 'package:tmdb/shared/widgets/common/rating_badge.dart';
 
 /// A single episode row in the season screen: a still on the left that fills the
 /// card's height, then the numbered title, air date / runtime, and a clamped

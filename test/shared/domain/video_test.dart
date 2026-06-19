@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/domain/media/video.dart';
 
 void main() {
   group('Video.fromJson', () {

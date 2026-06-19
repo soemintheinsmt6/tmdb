@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' show ThemeMode;
 
-import 'package:tmdb/shared/domain/library_sort.dart';
-import 'package:tmdb/shared/domain/library_view.dart';
+import 'package:tmdb/shared/domain/library/library_sort.dart';
+import 'package:tmdb/shared/domain/library/library_view.dart';
 
 /// Persists user-level app preferences (theme, library sort/view, …) — the seam
 /// where future settings (region, language, …) would live.

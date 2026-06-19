@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 /// A TV show list item. Implements [PosterItem] so it renders through the
 /// shared poster widgets exactly like a `Movie`.

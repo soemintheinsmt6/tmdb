@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tmdb/shared/domain/watch_providers.dart';
+import 'package:tmdb/shared/domain/media/watch_providers.dart';
 
 void main() {
   group('WatchProviders.fromJson', () {

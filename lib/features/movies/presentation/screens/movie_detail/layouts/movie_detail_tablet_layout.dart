@@ -13,14 +13,14 @@ import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dar
 import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
 import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
 import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_toggle_button.dart';
-import 'package:tmdb/shared/domain/shareable_media.dart';
-import 'package:tmdb/shared/domain/video.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
-import 'package:tmdb/shared/widgets/detail_cards.dart';
-import 'package:tmdb/shared/widgets/detail_skeleton.dart';
-import 'package:tmdb/shared/widgets/share_button.dart';
-import 'package:tmdb/shared/widgets/trailer_player.dart';
-import 'package:tmdb/shared/widgets/watch_providers_section.dart';
+import 'package:tmdb/shared/domain/media/shareable_media.dart';
+import 'package:tmdb/shared/domain/media/video.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
+import 'package:tmdb/shared/widgets/detail/share_button.dart';
+import 'package:tmdb/shared/widgets/detail/trailer_player.dart';
+import 'package:tmdb/shared/widgets/detail/watch_providers_section.dart';
+import 'package:tmdb/shared/widgets/skeletons/detail_skeleton.dart';
 
 class MovieDetailTabletLayout extends StatefulWidget {
   const MovieDetailTabletLayout({

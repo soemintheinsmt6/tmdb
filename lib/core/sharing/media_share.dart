@@ -4,8 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:tmdb/shared/domain/media_type.dart';
-import 'package:tmdb/shared/domain/shareable_media.dart';
+import 'package:tmdb/shared/domain/media/media_type.dart';
+import 'package:tmdb/shared/domain/media/shareable_media.dart';
 
 /// Canonical public TMDB URL for a title.
 String tmdbUrl(MediaType type, int id) {

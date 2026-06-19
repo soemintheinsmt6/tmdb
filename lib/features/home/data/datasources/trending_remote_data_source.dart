@@ -2,7 +2,7 @@ import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/network/api_client.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 /// Network-only client for trending content. Throws the exceptions defined in
 /// `core/error/exceptions.dart`; the repository converts them to `Failure`s.

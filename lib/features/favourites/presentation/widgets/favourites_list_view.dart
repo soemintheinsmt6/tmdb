@@ -7,10 +7,10 @@ import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dar
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_state.dart';
 import 'package:tmdb/features/favourites/presentation/favourite_navigation.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourite_hero_card.dart';
-import 'package:tmdb/shared/domain/library_sort.dart';
-import 'package:tmdb/shared/domain/library_view.dart';
-import 'package:tmdb/shared/widgets/app_empty_view.dart';
-import 'package:tmdb/shared/widgets/sectioned_poster_grid.dart';
+import 'package:tmdb/shared/domain/library/library_sort.dart';
+import 'package:tmdb/shared/domain/library/library_view.dart';
+import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
+import 'package:tmdb/shared/widgets/poster/sectioned_poster_grid.dart';
 
 /// Reactive list body for the favourites segment of the Library tab (also used
 /// standalone by [FavouriteScreen]). Items are ordered by [sort] and rendered

@@ -5,7 +5,7 @@ import 'package:tmdb/features/people/presentation/bloc/person_detail_bloc/person
 import 'package:tmdb/features/people/presentation/bloc/person_detail_bloc/person_detail_state.dart';
 import 'package:tmdb/features/people/presentation/widgets/person_detail_cards.dart';
 import 'package:tmdb/features/people/presentation/widgets/person_detail_skeleton.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
 
 /// Single layout for the person detail screen — unlike the movie/TV screens it
 /// has no backdrop hero, so one width-adaptive layout (via [horizontalPadding])

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:tmdb/shared/domain/media_type.dart';
+import 'package:tmdb/shared/domain/media/media_type.dart';
 
-export 'package:tmdb/shared/domain/media_type.dart';
+export 'package:tmdb/shared/domain/media/media_type.dart';
 
 /// Sort options exposed by the discover screen. Each maps to a different TMDB
 /// `sort_by` value per media type, since movies and TV use different date/title

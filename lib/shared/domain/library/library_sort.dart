@@ -1,4 +1,4 @@
-import 'package:tmdb/shared/domain/sortable_saved_item.dart';
+import 'package:tmdb/shared/domain/library/sortable_saved_item.dart';
 
 /// Sort orders offered for the Library lists (favourites + watchlist).
 enum LibrarySort {

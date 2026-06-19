@@ -4,11 +4,11 @@ import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
-import 'package:tmdb/shared/domain/media_type.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/domain/sortable_saved_item.dart';
+import 'package:tmdb/shared/domain/library/sortable_saved_item.dart';
+import 'package:tmdb/shared/domain/media/media_type.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
-export 'package:tmdb/shared/domain/media_type.dart';
+export 'package:tmdb/shared/domain/media/media_type.dart';
 
 /// A saved entry in the watchlist. Unlike favourites (movies only), the
 /// watchlist holds both movies and TV shows, so every entry carries a

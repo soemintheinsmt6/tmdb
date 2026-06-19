@@ -3,7 +3,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/features/discover/domain/entities/discover_filter.dart';
-import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
 
 /// Shows the discover filter sheet and resolves to the edited [DiscoverFilter],
 /// or `null` if the user dismisses it without applying.

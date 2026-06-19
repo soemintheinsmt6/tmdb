@@ -10,11 +10,11 @@ import 'package:tmdb/features/movies/presentation/bloc/movie_list_bloc/movie_lis
 import 'package:tmdb/features/movies/presentation/bloc/movie_list_bloc/movie_list_state.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
 import 'package:tmdb/injection_container.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/app_empty_view.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
-import 'package:tmdb/shared/widgets/poster_grid.dart';
-import 'package:tmdb/shared/widgets/poster_grid_skeleton.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/poster/poster_grid.dart';
+import 'package:tmdb/shared/widgets/skeletons/poster_grid_skeleton.dart';
 
 /// Full, paginated grid for a single movie category — reached from a home rail's
 /// "See all". Reuses [MovieListBloc]'s infinite-scroll loading.

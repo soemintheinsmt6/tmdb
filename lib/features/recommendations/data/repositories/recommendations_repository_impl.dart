@@ -10,7 +10,7 @@ import 'package:tmdb/features/recommendations/domain/entities/recommendation_see
 import 'package:tmdb/features/recommendations/domain/repositories/recommendations_repository.dart';
 import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 class RecommendationsRepositoryImpl implements RecommendationsRepository {
   const RecommendationsRepositoryImpl(

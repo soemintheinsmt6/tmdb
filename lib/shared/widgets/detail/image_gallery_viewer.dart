@@ -7,7 +7,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/core/utils/navigation.dart';
-import 'package:tmdb/shared/domain/media_image.dart';
+import 'package:tmdb/shared/domain/media/media_image.dart';
 
 /// Opens the full-screen image gallery at [initialIndex].
 Future<void> openImageGallery(

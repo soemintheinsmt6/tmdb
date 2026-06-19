@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 /// The kind of title a [PersonCredit] points to. `combined_credits` also
 /// reports `person` entries (e.g. self appearances); those are dropped in the

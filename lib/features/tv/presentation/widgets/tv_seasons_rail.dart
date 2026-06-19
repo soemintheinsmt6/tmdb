@@ -5,7 +5,7 @@ import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/tv/domain/entities/season.dart';
 import 'package:tmdb/features/tv/presentation/screens/season/season_screen.dart';
-import 'package:tmdb/shared/widgets/poster_image.dart';
+import 'package:tmdb/shared/widgets/poster/poster_image.dart';
 
 /// Horizontal rail of a show's seasons. Tapping a season opens its episode list
 /// in a [SeasonScreen]. Seasons with no released episodes are hidden, and the

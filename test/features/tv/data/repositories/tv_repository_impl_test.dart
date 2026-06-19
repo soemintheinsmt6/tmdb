@@ -9,9 +9,9 @@ import 'package:tmdb/features/tv/data/repositories/tv_repository_impl.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
-import 'package:tmdb/shared/domain/media_image.dart';
-import 'package:tmdb/shared/domain/review.dart';
-import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/domain/media/media_image.dart';
+import 'package:tmdb/shared/domain/media/review.dart';
+import 'package:tmdb/shared/domain/media/video.dart';
 
 import '../../../../helpers/tv_fixtures.dart';
 import '../../../../helpers/watch_provider_fixtures.dart';

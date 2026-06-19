@@ -7,7 +7,7 @@ import 'package:tmdb/features/movies/data/datasources/movie_remote_data_source.d
 import 'package:tmdb/features/recommendations/data/repositories/recommendations_repository_impl.dart';
 import 'package:tmdb/features/recommendations/domain/entities/recommendation_seed.dart';
 import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 import '../../../../helpers/movie_fixtures.dart'
     show buildMovie, buildPaginated;

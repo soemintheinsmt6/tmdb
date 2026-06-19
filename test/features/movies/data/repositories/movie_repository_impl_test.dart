@@ -10,9 +10,9 @@ import 'package:tmdb/features/movies/domain/entities/movie_collection.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
-import 'package:tmdb/shared/domain/media_image.dart';
-import 'package:tmdb/shared/domain/review.dart';
-import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/domain/media/media_image.dart';
+import 'package:tmdb/shared/domain/media/review.dart';
+import 'package:tmdb/shared/domain/media/video.dart';
 
 import '../../../../helpers/movie_fixtures.dart';
 import '../../../../helpers/watch_provider_fixtures.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tmdb/core/sharing/media_share.dart';
-import 'package:tmdb/shared/domain/media_type.dart';
-import 'package:tmdb/shared/domain/shareable_media.dart';
+import 'package:tmdb/shared/domain/media/media_type.dart';
+import 'package:tmdb/shared/domain/media/shareable_media.dart';
 
 void main() {
   group('tmdbUrl', () {

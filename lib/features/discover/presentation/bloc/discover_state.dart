@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:tmdb/features/discover/domain/entities/discover_filter.dart';
-import 'package:tmdb/shared/domain/genre.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 enum DiscoverStatus { initial, loading, loaded, error }
 

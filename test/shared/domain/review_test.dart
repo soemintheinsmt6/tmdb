@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tmdb/shared/domain/review.dart';
+import 'package:tmdb/shared/domain/media/review.dart';
 
 void main() {
   group('Review.fromJson', () {

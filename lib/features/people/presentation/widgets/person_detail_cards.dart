@@ -11,7 +11,7 @@ import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_det
 import 'package:tmdb/features/people/domain/entities/person.dart';
 import 'package:tmdb/features/people/domain/entities/person_credit.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
-import 'package:tmdb/shared/widgets/detail_cards.dart';
+import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
 
 /// Profile photo + name + known-for department + vital-stat chips. The person
 /// screen has no backdrop, so this header stands in for the movie/TV summary.

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/shared/domain/watch_provider.dart';
-import 'package:tmdb/shared/domain/watch_providers.dart';
+import 'package:tmdb/shared/domain/media/watch_provider.dart';
+import 'package:tmdb/shared/domain/media/watch_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// "Where to Watch" block for the movie/TV detail screens: stream / rent / buy

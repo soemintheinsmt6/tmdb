@@ -4,8 +4,8 @@ import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
-import 'package:tmdb/shared/widgets/detail_cards.dart';
-import 'package:tmdb/shared/widgets/imdb_chip.dart';
+import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
+import 'package:tmdb/shared/widgets/detail/imdb_chip.dart';
 
 /// TV-specific summary: composes the shared [DetailSummary] with a meta row of
 /// first-air year + season count + episode count.

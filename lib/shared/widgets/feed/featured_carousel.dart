@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/featured_hero.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/feed/featured_hero.dart';
 
 /// Auto-advancing hero carousel for the trending titles at the top of the home
 /// and series screens. Loops seamlessly (an unbounded [PageView] centred far

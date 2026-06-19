@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tmdb/shared/widgets/imdb_chip.dart';
+import 'package:tmdb/shared/widgets/detail/imdb_chip.dart';
 
 void main() {
   testWidgets('renders the IMDb label', (tester) async {

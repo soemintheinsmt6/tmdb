@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:tmdb/shared/domain/media_type.dart';
+import 'package:tmdb/shared/domain/media/media_type.dart';
 
-export 'package:tmdb/shared/domain/media_type.dart';
+export 'package:tmdb/shared/domain/media/media_type.dart';
 
 /// A title the user has engaged with (favourited or watchlisted) used as a
 /// seed for personalised "For You" recommendations.

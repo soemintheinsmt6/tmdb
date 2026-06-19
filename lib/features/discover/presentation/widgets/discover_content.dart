@@ -10,11 +10,11 @@ import 'package:tmdb/features/discover/presentation/bloc/discover_state.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/app_empty_view.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
-import 'package:tmdb/shared/widgets/poster_grid.dart';
-import 'package:tmdb/shared/widgets/poster_grid_skeleton.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/poster/poster_grid.dart';
+import 'package:tmdb/shared/widgets/skeletons/poster_grid_skeleton.dart';
 
 /// Body of the discover screen: an infinite-scroll poster grid driven by the
 /// active filter. Shared across form factors (the grid is responsive).

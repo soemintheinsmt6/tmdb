@@ -11,8 +11,8 @@ import 'package:tmdb/features/tv/presentation/bloc/season_detail_bloc/season_det
 import 'package:tmdb/features/tv/presentation/widgets/episode_tile.dart';
 import 'package:tmdb/features/tv/presentation/widgets/season_detail_skeleton.dart';
 import 'package:tmdb/injection_container.dart';
-import 'package:tmdb/shared/widgets/app_empty_view.dart';
-import 'package:tmdb/shared/widgets/app_error_view.dart';
+import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
+import 'package:tmdb/shared/widgets/common/app_error_view.dart';
 
 /// Episode list for a single season of a TV show. Loads `/tv/{id}/season/{n}`
 /// via its own [SeasonDetailBloc]; reached by tapping a season on TV detail.

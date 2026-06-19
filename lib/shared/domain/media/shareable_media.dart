@@ -1,4 +1,4 @@
-import 'package:tmdb/shared/domain/media_type.dart';
+import 'package:tmdb/shared/domain/media/media_type.dart';
 
 /// The minimal data needed to share a title to the system share sheet.
 class ShareableMedia {

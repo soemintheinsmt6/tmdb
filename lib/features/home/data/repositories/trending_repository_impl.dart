@@ -7,7 +7,7 @@ import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/home/data/datasources/trending_remote_data_source.dart';
 import 'package:tmdb/features/home/domain/repositories/trending_repository.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 class TrendingRepositoryImpl implements TrendingRepository {
   const TrendingRepositoryImpl(this._remote, {AppLogger? logger})

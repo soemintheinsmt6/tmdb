@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/poster_image.dart';
-import 'package:tmdb/shared/widgets/rating_badge.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/rating_badge.dart';
+import 'package:tmdb/shared/widgets/poster/poster_image.dart';
 
 /// Vertical poster card used in grids — poster on top, title + year below.
 /// Works for any [PosterItem] (movie or TV show).

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/widgets/poster_card.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/poster/poster_card.dart';
 
 /// Poster grid split into "Movies" and "TV Shows" sections, each under a
 /// labelled header with a count. Used by the Library grid layout (favourites &

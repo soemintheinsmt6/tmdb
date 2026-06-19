@@ -7,8 +7,8 @@ import 'package:tmdb/features/library/presentation/widgets/library_sort_sheet.da
 import 'package:tmdb/features/settings/domain/repositories/settings_repository.dart';
 import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_list_view.dart';
 import 'package:tmdb/injection_container.dart';
-import 'package:tmdb/shared/domain/library_sort.dart';
-import 'package:tmdb/shared/domain/library_view.dart';
+import 'package:tmdb/shared/domain/library/library_sort.dart';
+import 'package:tmdb/shared/domain/library/library_view.dart';
 
 /// Combined "Library" tab hosting the user's saved titles under one app bar:
 /// Favourites (movies + TV) and the Watchlist (movies + TV) as two segments.

@@ -4,11 +4,11 @@ import 'package:tmdb/features/tv/domain/entities/season.dart';
 import 'package:tmdb/features/tv/domain/entities/season_detail.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
-import 'package:tmdb/shared/domain/cast_member.dart';
-import 'package:tmdb/shared/domain/genre.dart';
-import 'package:tmdb/shared/domain/media_image.dart';
-import 'package:tmdb/shared/domain/review.dart';
-import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/domain/media/cast_member.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
+import 'package:tmdb/shared/domain/media/media_image.dart';
+import 'package:tmdb/shared/domain/media/review.dart';
+import 'package:tmdb/shared/domain/media/video.dart';
 
 /// Reusable builders. Every parameter has a sensible default so tests only
 /// override the fields that matter to the assertion.

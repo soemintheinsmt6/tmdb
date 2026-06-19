@@ -9,7 +9,7 @@ import 'package:tmdb/features/discover/data/repositories/discover_repository_imp
 import 'package:tmdb/features/discover/domain/entities/discover_filter.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
-import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
 
 import '../../../../helpers/movie_fixtures.dart';
 import '../../../../helpers/tv_fixtures.dart' show buildPaginatedTv;

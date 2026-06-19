@@ -4,16 +4,16 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
-import 'package:tmdb/shared/domain/cast_member.dart';
-import 'package:tmdb/shared/domain/genre.dart';
-import 'package:tmdb/shared/domain/media_image.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
-import 'package:tmdb/shared/domain/review.dart';
-import 'package:tmdb/shared/domain/video.dart';
-import 'package:tmdb/shared/widgets/image_gallery_viewer.dart';
-import 'package:tmdb/shared/widgets/poster_image.dart';
-import 'package:tmdb/shared/widgets/rating_badge.dart';
-import 'package:tmdb/shared/widgets/rating_stars.dart';
+import 'package:tmdb/shared/domain/media/cast_member.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
+import 'package:tmdb/shared/domain/media/media_image.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/domain/media/review.dart';
+import 'package:tmdb/shared/domain/media/video.dart';
+import 'package:tmdb/shared/widgets/common/rating_badge.dart';
+import 'package:tmdb/shared/widgets/common/rating_stars.dart';
+import 'package:tmdb/shared/widgets/detail/image_gallery_viewer.dart';
+import 'package:tmdb/shared/widgets/poster/poster_image.dart';
 
 /// Backdrop hero with a bottom fade, shared by the movie and TV detail screens.
 class DetailHeader extends StatelessWidget {

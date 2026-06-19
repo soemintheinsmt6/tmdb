@@ -9,7 +9,7 @@ import 'package:tmdb/features/favourites/domain/repositories/favourites_reposito
 import 'package:tmdb/features/favourites/presentation/cubit/favourites_cubit.dart';
 import 'package:tmdb/features/favourites/presentation/screens/favourite_screen.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourite_hero_card.dart';
-import 'package:tmdb/shared/widgets/app_empty_view.dart';
+import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
 
 import '../helpers/movie_fixtures.dart';
 import '../helpers/tv_fixtures.dart';

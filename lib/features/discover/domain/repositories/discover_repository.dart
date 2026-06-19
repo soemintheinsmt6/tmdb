@@ -2,7 +2,7 @@ import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/discover/domain/entities/discover_filter.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
-import 'package:tmdb/shared/domain/genre.dart';
+import 'package:tmdb/shared/domain/media/genre.dart';
 
 /// Repository abstraction for the discover/browse feature.
 abstract class DiscoverRepository {

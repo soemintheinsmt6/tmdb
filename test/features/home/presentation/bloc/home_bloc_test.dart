@@ -13,7 +13,7 @@ import 'package:tmdb/features/recommendations/domain/repositories/recommendation
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/features/watchlist/domain/repositories/watchlist_repository.dart';
-import 'package:tmdb/shared/domain/poster_item.dart';
+import 'package:tmdb/shared/domain/media/poster_item.dart';
 
 import '../../../../helpers/movie_fixtures.dart'
     show buildMovie, buildPaginated;

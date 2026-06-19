@@ -7,10 +7,10 @@ import 'package:tmdb/features/watchlist/presentation/cubit/watchlist_cubit.dart'
 import 'package:tmdb/features/watchlist/presentation/cubit/watchlist_state.dart';
 import 'package:tmdb/features/watchlist/presentation/watchlist_navigation.dart';
 import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_hero_card.dart';
-import 'package:tmdb/shared/domain/library_sort.dart';
-import 'package:tmdb/shared/domain/library_view.dart';
-import 'package:tmdb/shared/widgets/app_empty_view.dart';
-import 'package:tmdb/shared/widgets/sectioned_poster_grid.dart';
+import 'package:tmdb/shared/domain/library/library_sort.dart';
+import 'package:tmdb/shared/domain/library/library_view.dart';
+import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
+import 'package:tmdb/shared/widgets/poster/sectioned_poster_grid.dart';
 
 /// Reactive list body for the watchlist segment of the Library tab. Items are
 /// ordered by [sort] and rendered as hero cards or a poster grid per [view].
