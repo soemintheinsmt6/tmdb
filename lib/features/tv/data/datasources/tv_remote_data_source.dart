@@ -1,6 +1,7 @@
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/network/api_client.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
+import 'package:tmdb/features/tv/domain/entities/season_detail.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
@@ -57,6 +58,14 @@ class TvRemoteDataSource {
       query: {'language': 'en-US'},
     );
     return TvShowDetail.fromJson(response as Map<String, dynamic>);
+  }
+
+  Future<SeasonDetail> getSeasonDetail(int tvId, int seasonNumber) async {
+    final response = await _apiClient.get(
+      ApiConstants.tvSeasonDetail(tvId, seasonNumber),
+      query: {'language': 'en-US'},
+    );
+    return SeasonDetail.fromJson(response as Map<String, dynamic>);
   }
 
   Future<List<CastMember>> getTvCredits(int id) async {

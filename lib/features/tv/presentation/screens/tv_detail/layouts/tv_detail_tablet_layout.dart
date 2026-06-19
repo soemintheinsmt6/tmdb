@@ -10,6 +10,7 @@ import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_event.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_state.dart';
 import 'package:tmdb/features/tv/presentation/widgets/tv_detail_cards.dart';
+import 'package:tmdb/features/tv/presentation/widgets/tv_seasons_rail.dart';
 import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
 import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_toggle_button.dart';
 import 'package:tmdb/shared/domain/shareable_media.dart';
@@ -143,6 +144,12 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
                       DetailOverview(overview: loaded.overview),
                     ],
                   ),
+                ),
+                const SizedBox(height: 32),
+                TvSeasonsRail(
+                  tvShowId: widget.tvShowId,
+                  seasons: loaded.seasons,
+                  horizontalPadding: padding,
                 ),
                 const SizedBox(height: 32),
                 DetailVideoRail(

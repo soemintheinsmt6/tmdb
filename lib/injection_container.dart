@@ -30,9 +30,13 @@ import 'package:tmdb/features/search/data/datasources/search_remote_data_source.
 import 'package:tmdb/features/search/data/repositories/search_repository_impl.dart';
 import 'package:tmdb/features/search/domain/repositories/search_repository.dart';
 import 'package:tmdb/features/search/presentation/bloc/search_bloc/search_bloc.dart';
+import 'package:tmdb/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:tmdb/features/settings/domain/repositories/settings_repository.dart';
+import 'package:tmdb/features/settings/presentation/cubit/theme_cubit.dart';
 import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
 import 'package:tmdb/features/tv/data/repositories/tv_repository_impl.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
+import 'package:tmdb/features/tv/presentation/bloc/season_detail_bloc/season_detail_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_detail_bloc/tv_detail_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_feed_bloc/tv_feed_bloc.dart';
 import 'package:tmdb/features/tv/presentation/bloc/tv_list_bloc/tv_list_bloc.dart';
@@ -71,6 +75,7 @@ Future<void> init() async {
   sl.registerFactory(() => TvListBloc(repository: sl()));
   sl.registerFactory(() => TvSearchBloc(repository: sl()));
   sl.registerFactory(() => TvDetailBloc(repository: sl()));
+  sl.registerFactory(() => SeasonDetailBloc(repository: sl()));
   sl.registerFactory(
     () => TvFeedBloc(tvRepository: sl(), trendingRepository: sl()),
   );
@@ -133,4 +138,10 @@ Future<void> init() async {
     () => WatchlistRepositoryImpl(sl<HiveStorage>()),
   );
   sl.registerLazySingleton<WatchlistCubit>(() => WatchlistCubit(sl()));
+
+  // ── Settings feature ───────────────────────────────────
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(sl<HiveStorage>()),
+  );
+  sl.registerLazySingleton<ThemeCubit>(() => ThemeCubit(sl()));
 }

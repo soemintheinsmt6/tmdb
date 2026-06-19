@@ -6,6 +6,7 @@ import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
+import 'package:tmdb/features/tv/domain/entities/season_detail.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
@@ -65,6 +66,11 @@ class TvRepositoryImpl implements TvRepository {
         images: images.take(16).toList(),
       );
     });
+  }
+
+  @override
+  ResultFuture<SeasonDetail> getSeasonDetail(int tvId, int seasonNumber) {
+    return _guard(() => _remote.getSeasonDetail(tvId, seasonNumber));
   }
 
   /// Runs [body] and converts the layered exceptions into typed failures so

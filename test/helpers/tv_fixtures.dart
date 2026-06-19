@@ -1,4 +1,7 @@
+import 'package:tmdb/features/tv/domain/entities/episode.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
+import 'package:tmdb/features/tv/domain/entities/season.dart';
+import 'package:tmdb/features/tv/domain/entities/season_detail.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
@@ -77,6 +80,7 @@ TvShowDetail buildTvShowDetail({
   int numberOfSeasons = 8,
   int numberOfEpisodes = 73,
   List<int> episodeRunTime = const [60],
+  List<Season>? seasons,
   List<Genre>? genres,
   String status = 'Ended',
   List<CastMember> cast = const [],
@@ -99,6 +103,7 @@ TvShowDetail buildTvShowDetail({
     numberOfSeasons: numberOfSeasons,
     numberOfEpisodes: numberOfEpisodes,
     episodeRunTime: episodeRunTime,
+    seasons: seasons ?? const [],
     genres: genres ?? const [Genre(id: 18, name: 'Drama')],
     status: status,
     cast: cast,
@@ -106,6 +111,74 @@ TvShowDetail buildTvShowDetail({
     videos: videos,
     reviews: reviews,
     images: images,
+  );
+}
+
+Season buildSeason({
+  int id = 3624,
+  int seasonNumber = 1,
+  String name = 'Season 1',
+  String overview = 'The first season.',
+  String? posterPath = '/season1.jpg',
+  String airDate = '2011-04-17',
+  int episodeCount = 10,
+  double voteAverage = 8.3,
+}) {
+  return Season(
+    id: id,
+    seasonNumber: seasonNumber,
+    name: name,
+    overview: overview,
+    posterPath: posterPath,
+    airDate: airDate,
+    episodeCount: episodeCount,
+    voteAverage: voteAverage,
+  );
+}
+
+Episode buildEpisode({
+  int id = 63056,
+  int episodeNumber = 1,
+  int seasonNumber = 1,
+  String name = 'Winter Is Coming',
+  String overview = 'Lord Stark is troubled by disturbing reports.',
+  String? stillPath = '/still.jpg',
+  String airDate = '2011-04-17',
+  double voteAverage = 8.0,
+  int voteCount = 350,
+  int? runtime = 62,
+}) {
+  return Episode(
+    id: id,
+    episodeNumber: episodeNumber,
+    seasonNumber: seasonNumber,
+    name: name,
+    overview: overview,
+    stillPath: stillPath,
+    airDate: airDate,
+    voteAverage: voteAverage,
+    voteCount: voteCount,
+    runtime: runtime,
+  );
+}
+
+SeasonDetail buildSeasonDetail({
+  int id = 3624,
+  int seasonNumber = 1,
+  String name = 'Season 1',
+  String overview = 'The first season.',
+  String? posterPath = '/season1.jpg',
+  String airDate = '2011-04-17',
+  List<Episode>? episodes,
+}) {
+  return SeasonDetail(
+    id: id,
+    seasonNumber: seasonNumber,
+    name: name,
+    overview: overview,
+    posterPath: posterPath,
+    airDate: airDate,
+    episodes: episodes ?? [buildEpisode()],
   );
 }
 

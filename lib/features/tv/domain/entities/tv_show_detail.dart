@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
+import 'package:tmdb/features/tv/domain/entities/season.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
@@ -26,6 +27,7 @@ class TvShowDetail extends Equatable {
     required this.numberOfSeasons,
     required this.numberOfEpisodes,
     required this.episodeRunTime,
+    required this.seasons,
     required this.genres,
     required this.status,
     required this.cast,
@@ -62,6 +64,9 @@ class TvShowDetail extends Equatable {
       episodeRunTime: ((json['episode_run_time'] as List?) ?? const [])
           .map((e) => e as int)
           .toList(),
+      seasons: ((json['seasons'] as List?) ?? const [])
+          .map((e) => Season.fromJson(e as Map<String, dynamic>))
+          .toList(),
       genres: ((json['genres'] as List?) ?? const [])
           .map((e) => Genre.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -95,6 +100,7 @@ class TvShowDetail extends Equatable {
       numberOfSeasons: numberOfSeasons,
       numberOfEpisodes: numberOfEpisodes,
       episodeRunTime: episodeRunTime,
+      seasons: seasons,
       genres: genres,
       status: status,
       cast: cast ?? this.cast,
@@ -118,6 +124,7 @@ class TvShowDetail extends Equatable {
   final int numberOfSeasons;
   final int numberOfEpisodes;
   final List<int> episodeRunTime;
+  final List<Season> seasons;
   final List<Genre> genres;
   final String status;
   final List<CastMember> cast;
@@ -174,6 +181,7 @@ class TvShowDetail extends Equatable {
     numberOfSeasons,
     numberOfEpisodes,
     episodeRunTime,
+    seasons,
     genres,
     status,
     cast,

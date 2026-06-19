@@ -35,6 +35,8 @@ class ApiConstants {
   static const String onTheAirTv = '/tv/on_the_air';
   static const String airingTodayTv = '/tv/airing_today';
   static String tvDetail(int id) => '/tv/$id';
+  static String tvSeasonDetail(int id, int seasonNumber) =>
+      '/tv/$id/season/$seasonNumber';
   static String tvCredits(int id) => '/tv/$id/credits';
   static String tvRecommendations(int id) => '/tv/$id/recommendations';
   static String tvVideos(int id) => '/tv/$id/videos';

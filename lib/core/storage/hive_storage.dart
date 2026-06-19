@@ -9,15 +9,24 @@ import 'package:tmdb/features/watchlist/data/models/watchlist_entry.dart';
 /// Open once at startup via [HiveStorage.create] and pass the instance into
 /// the dependency-injection container.
 class HiveStorage {
-  HiveStorage._(this.favouriteBox, this.favouriteTvBox, this.watchlistBox);
+  HiveStorage._(
+    this.favouriteBox,
+    this.favouriteTvBox,
+    this.watchlistBox,
+    this.settingsBox,
+  );
 
   final Box<FavouriteMovie> favouriteBox;
   final Box<FavouriteTvShow> favouriteTvBox;
   final Box<WatchlistEntry> watchlistBox;
 
+  /// Untyped key/value box for primitive user preferences (e.g. theme mode).
+  final Box<dynamic> settingsBox;
+
   static const String favouriteBoxName = 'favourites';
   static const String favouriteTvBoxName = 'favourite_tv';
   static const String watchlistBoxName = 'watchlist';
+  static const String settingsBoxName = 'settings';
 
   static Future<HiveStorage> create() async {
     await Hive.initFlutter();
@@ -35,6 +44,12 @@ class HiveStorage {
       favouriteTvBoxName,
     );
     final watchlistBox = await Hive.openBox<WatchlistEntry>(watchlistBoxName);
-    return HiveStorage._(favouriteBox, favouriteTvBox, watchlistBox);
+    final settingsBox = await Hive.openBox<dynamic>(settingsBoxName);
+    return HiveStorage._(
+      favouriteBox,
+      favouriteTvBox,
+      watchlistBox,
+      settingsBox,
+    );
   }
 }

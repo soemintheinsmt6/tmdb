@@ -1,5 +1,6 @@
 import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
+import 'package:tmdb/features/tv/domain/entities/season_detail.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show_detail.dart';
 
 /// The TMDB TV list endpoints exposed in the TV screen tabs.
@@ -19,4 +20,6 @@ abstract class TvRepository {
   });
 
   ResultFuture<TvShowDetail> getTvShowDetail(int id);
+
+  ResultFuture<SeasonDetail> getSeasonDetail(int tvId, int seasonNumber);
 }
