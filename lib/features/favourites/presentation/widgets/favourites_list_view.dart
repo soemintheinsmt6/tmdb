@@ -42,7 +42,8 @@ class FavouritesListView extends StatelessWidget {
           return PosterGrid(
             items: items,
             padding: _padding,
-            onTap: (item) => openFavouriteDetail(context, item as FavouriteItem),
+            onTap: (item) =>
+                openFavouriteDetail(context, item as FavouriteItem),
           );
         }
         return ListView.separated(

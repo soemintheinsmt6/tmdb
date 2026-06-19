@@ -27,9 +27,9 @@ void main() {
   });
 
   test('seeds initial state from repository.getAll()', () {
-    when(() => repository.getAll()).thenReturn([
-      FavouriteItem.fromMovie(buildMovie(id: 1)),
-    ]);
+    when(
+      () => repository.getAll(),
+    ).thenReturn([FavouriteItem.fromMovie(buildMovie(id: 1))]);
 
     final cubit = FavouritesCubit(repository);
     addTearDown(cubit.close);

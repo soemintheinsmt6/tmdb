@@ -41,7 +41,8 @@ class WatchlistListView extends StatelessWidget {
           return PosterGrid(
             items: items,
             padding: _padding,
-            onTap: (item) => openWatchlistDetail(context, item as WatchlistItem),
+            onTap: (item) =>
+                openWatchlistDetail(context, item as WatchlistItem),
           );
         }
         return ListView.separated(

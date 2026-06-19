@@ -113,9 +113,9 @@ class _MediaToggle extends StatelessWidget {
               ButtonSegment(value: MediaType.tv, label: Text('TV Shows')),
             ],
             selected: {state.filter.mediaType},
-            onSelectionChanged: (selection) => context
-                .read<DiscoverBloc>()
-                .add(DiscoverMediaTypeChanged(selection.first)),
+            onSelectionChanged: (selection) => context.read<DiscoverBloc>().add(
+              DiscoverMediaTypeChanged(selection.first),
+            ),
           );
         },
       ),
@@ -226,7 +226,11 @@ class _RemovableChip extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              Icon(IconsaxPlusLinear.close_circle, size: 16, color: colors.textMuted),
+              Icon(
+                IconsaxPlusLinear.close_circle,
+                size: 16,
+                color: colors.textMuted,
+              ),
             ],
           ),
         ),

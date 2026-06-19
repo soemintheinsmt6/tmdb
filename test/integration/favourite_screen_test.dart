@@ -65,10 +65,20 @@ void main() {
   ) async {
     when(() => repo.getAll()).thenReturn([
       FavouriteItem.fromMovie(
-        buildMovie(id: 1, title: 'Inception', posterPath: null, backdropPath: null),
+        buildMovie(
+          id: 1,
+          title: 'Inception',
+          posterPath: null,
+          backdropPath: null,
+        ),
       ),
       FavouriteItem.fromTvShow(
-        buildTvShow(id: 2, name: 'The Wire', posterPath: null, backdropPath: null),
+        buildTvShow(
+          id: 2,
+          name: 'The Wire',
+          posterPath: null,
+          backdropPath: null,
+        ),
       ),
     ]);
 
@@ -111,7 +121,12 @@ void main() {
   ) async {
     when(() => repo.getAll()).thenReturn([
       FavouriteItem.fromMovie(
-        buildMovie(id: 42, title: 'To Remove', posterPath: null, backdropPath: null),
+        buildMovie(
+          id: 42,
+          title: 'To Remove',
+          posterPath: null,
+          backdropPath: null,
+        ),
       ),
     ]);
     when(() => repo.remove(any(), any())).thenAnswer((_) async {});

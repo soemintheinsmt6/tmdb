@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Auto-format staged Dart files before every commit so CI's
+# `dart format --output=none --set-exit-if-changed .` can never trip on
+# formatting again. Files reformatted here are re-staged, so the commit
+# you make is already CI-clean.
+#
+# Enabled per-clone via `git config core.hooksPath .githooks` (see README).
+
+set -e
+
+# Staged Dart files that still exist (Added/Copied/Modified — skip deletes).
+files=$(git diff --cached --name-only --diff-filter=ACM -- '*.dart')
+
+[ -z "$files" ] && exit 0
+
+# Format in place, then re-stage anything the formatter touched.
+echo "$files" | xargs dart format
+echo "$files" | xargs git add
+
+exit 0

@@ -165,6 +165,16 @@ lib/
    flutter run -d <device-id>          # specific device — use `flutter devices`
    ```
 
+4. Enable the git hooks so staged Dart files are auto-formatted
+   before each commit — this keeps the CI formatting gate from ever failing:
+
+   ```bash
+   git config core.hooksPath .githooks
+   ```
+
+   The hook lives in [`.githooks/pre-commit`](.githooks/pre-commit) and runs
+   `dart format` on staged `*.dart` files, re-staging anything it touches.
+
 ## Tests
 
 The project has three test layers; together they're 325 host-side tests + one device E2E.

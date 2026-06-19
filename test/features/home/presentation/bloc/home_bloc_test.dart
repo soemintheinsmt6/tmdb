@@ -15,7 +15,8 @@ import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/features/watchlist/domain/repositories/watchlist_repository.dart';
 import 'package:tmdb/shared/domain/poster_item.dart';
 
-import '../../../../helpers/movie_fixtures.dart' show buildMovie, buildPaginated;
+import '../../../../helpers/movie_fixtures.dart'
+    show buildMovie, buildPaginated;
 import '../../../../helpers/tv_fixtures.dart'
     show buildTvShow, buildPaginatedTv;
 
@@ -96,11 +97,9 @@ void main() {
           .having((s) => s.nowPlaying.map((e) => e.id), 'nowPlaying', [10])
           .having((s) => s.topRated.map((e) => e.id), 'topRated', [11])
           .having((s) => s.upcoming.map((e) => e.id), 'upcoming', [12])
-          .having(
-            (s) => s.popularSeries.map((e) => e.id),
-            'popularSeries',
-            [20],
-          )
+          .having((s) => s.popularSeries.map((e) => e.id), 'popularSeries', [
+            20,
+          ])
           .having((s) => s.forYou, 'forYou', isEmpty),
     ],
   );
@@ -125,17 +124,17 @@ void main() {
     'goes to error only when every core rail fails',
     setUp: () {
       const failure = NetworkFailure(message: 'offline');
-      when(() => trending.getTrending()).thenAnswer(
-        (_) async => const Left<Failure, List<PosterItem>>(failure),
-      );
+      when(
+        () => trending.getTrending(),
+      ).thenAnswer((_) async => const Left<Failure, List<PosterItem>>(failure));
       for (final c in MovieCategory.values) {
         when(() => movies.getMovies(category: c)).thenAnswer(
           (_) async => const Left<Failure, PaginatedMovies>(failure),
         );
       }
-      when(() => tv.getTvShows(category: TvCategory.popular)).thenAnswer(
-        (_) async => const Left<Failure, PaginatedTvShows>(failure),
-      );
+      when(
+        () => tv.getTvShows(category: TvCategory.popular),
+      ).thenAnswer((_) async => const Left<Failure, PaginatedTvShows>(failure));
     },
     build: build,
     wait: const Duration(milliseconds: 50),

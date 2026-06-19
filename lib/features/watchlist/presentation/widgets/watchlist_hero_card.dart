@@ -23,7 +23,9 @@ class WatchlistHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasBackdrop =
         item.backdropPath != null && item.backdropPath!.isNotEmpty;
-    final heroTag = hasBackdrop ? 'watchlist-backdrop-${item.storageKey}' : null;
+    final heroTag = hasBackdrop
+        ? 'watchlist-backdrop-${item.storageKey}'
+        : null;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Stack(
@@ -34,7 +36,8 @@ class WatchlistHeroCard extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => openWatchlistDetail(context, item, heroTag: heroTag),
+                onTap: () =>
+                    openWatchlistDetail(context, item, heroTag: heroTag),
               ),
             ),
           ),

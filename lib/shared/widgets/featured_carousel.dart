@@ -112,7 +112,9 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
                 label: widget.label,
                 // Tag only the centred slide so cached neighbours don't share a
                 // tag with it during a hero flight.
-                heroTag: realIndex == _index ? widget.heroTag?.call(item) : null,
+                heroTag: realIndex == _index
+                    ? widget.heroTag?.call(item)
+                    : null,
               );
             },
           ),

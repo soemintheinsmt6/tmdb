@@ -30,9 +30,9 @@ class DiscoverBloc extends Bloc<DiscoverEvent, DiscoverState> {
   ) async {
     emit(state.copyWith(status: DiscoverStatus.loading));
     // Genres are best-effort: a failure here just leaves the genre filter empty.
-    final genres = (await _genres(state.filter.mediaType)).getOrElse(
-      () => state.genres,
-    );
+    final genres = (await _genres(
+      state.filter.mediaType,
+    )).getOrElse(() => state.genres);
     await _loadFirstPage(emit, state.filter, genres: genres);
   }
 

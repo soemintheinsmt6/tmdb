@@ -29,9 +29,10 @@ void main() {
     trending = _MockTrending();
 
     when(() => trending.getTrendingTv()).thenAnswer(
-      (_) async => Right<Failure, List<TvShow>>(
-        [buildTvShow(id: 1), buildTvShow(id: 2)],
-      ),
+      (_) async => Right<Failure, List<TvShow>>([
+        buildTvShow(id: 1),
+        buildTvShow(id: 2),
+      ]),
     );
     when(
       () => tv.getTvShows(category: TvCategory.popular),
@@ -55,7 +56,11 @@ void main() {
     build: build,
     wait: const Duration(milliseconds: 50),
     expect: () => [
-      isA<TvFeedState>().having((s) => s.status, 'status', TvFeedStatus.loading),
+      isA<TvFeedState>().having(
+        (s) => s.status,
+        'status',
+        TvFeedStatus.loading,
+      ),
       isA<TvFeedState>()
           .having((s) => s.status, 'status', TvFeedStatus.loaded)
           .having((s) => s.trending.map((e) => e.id), 'trending', [1, 2])
@@ -70,9 +75,9 @@ void main() {
     'goes to error only when every rail fails',
     setUp: () {
       const failure = NetworkFailure(message: 'offline');
-      when(() => trending.getTrendingTv()).thenAnswer(
-        (_) async => const Left<Failure, List<TvShow>>(failure),
-      );
+      when(
+        () => trending.getTrendingTv(),
+      ).thenAnswer((_) async => const Left<Failure, List<TvShow>>(failure));
       for (final c in TvCategory.values) {
         when(() => tv.getTvShows(category: c)).thenAnswer(
           (_) async => const Left<Failure, PaginatedTvShows>(failure),
@@ -82,7 +87,11 @@ void main() {
     build: build,
     wait: const Duration(milliseconds: 50),
     expect: () => [
-      isA<TvFeedState>().having((s) => s.status, 'status', TvFeedStatus.loading),
+      isA<TvFeedState>().having(
+        (s) => s.status,
+        'status',
+        TvFeedStatus.loading,
+      ),
       isA<TvFeedState>()
           .having((s) => s.status, 'status', TvFeedStatus.error)
           .having((s) => s.message, 'message', 'offline'),

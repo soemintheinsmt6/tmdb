@@ -23,7 +23,9 @@ class FavouriteHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasBackdrop =
         item.backdropPath != null && item.backdropPath!.isNotEmpty;
-    final heroTag = hasBackdrop ? 'favourite-backdrop-${item.storageKey}' : null;
+    final heroTag = hasBackdrop
+        ? 'favourite-backdrop-${item.storageKey}'
+        : null;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Stack(
@@ -34,7 +36,8 @@ class FavouriteHeroCard extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => openFavouriteDetail(context, item, heroTag: heroTag),
+                onTap: () =>
+                    openFavouriteDetail(context, item, heroTag: heroTag),
               ),
             ),
           ),

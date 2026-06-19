@@ -71,7 +71,11 @@ class TvFeedContent extends StatelessWidget {
 
   Widget _buildLoaded(BuildContext context, TvFeedState state) {
     final rails = <Widget>[];
-    void addRail(String title, List<PosterItem> items, {VoidCallback? onSeeAll}) {
+    void addRail(
+      String title,
+      List<PosterItem> items, {
+      VoidCallback? onSeeAll,
+    }) {
       if (items.isEmpty) return;
       rails
         ..add(const SizedBox(height: 24))

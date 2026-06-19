@@ -6,7 +6,10 @@ import 'package:tmdb/shared/domain/shareable_media.dart';
 void main() {
   group('tmdbUrl', () {
     test('builds the canonical movie URL', () {
-      expect(tmdbUrl(MediaType.movie, 550), 'https://www.themoviedb.org/movie/550');
+      expect(
+        tmdbUrl(MediaType.movie, 550),
+        'https://www.themoviedb.org/movie/550',
+      );
     });
 
     test('builds the canonical tv URL', () {

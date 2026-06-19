@@ -86,7 +86,11 @@ class HomeContent extends StatelessWidget {
 
   Widget _buildLoaded(BuildContext context, HomeState state) {
     final rails = <Widget>[];
-    void addRail(String title, List<PosterItem> items, {VoidCallback? onSeeAll}) {
+    void addRail(
+      String title,
+      List<PosterItem> items, {
+      VoidCallback? onSeeAll,
+    }) {
       if (items.isEmpty) return;
       rails
         ..add(const SizedBox(height: 24))
@@ -104,12 +108,14 @@ class HomeContent extends StatelessWidget {
     addRail(
       'Now Playing',
       state.nowPlaying,
-      onSeeAll: () => _seeAllMovie(context, MovieCategory.nowPlaying, 'Now Playing'),
+      onSeeAll: () =>
+          _seeAllMovie(context, MovieCategory.nowPlaying, 'Now Playing'),
     );
     addRail(
       'Top Rated',
       state.topRated,
-      onSeeAll: () => _seeAllMovie(context, MovieCategory.topRated, 'Top Rated'),
+      onSeeAll: () =>
+          _seeAllMovie(context, MovieCategory.topRated, 'Top Rated'),
     );
     addRail(
       'Upcoming',
@@ -140,7 +146,11 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  void _seeAllMovie(BuildContext context, MovieCategory category, String title) {
+  void _seeAllMovie(
+    BuildContext context,
+    MovieCategory category,
+    String title,
+  ) {
     unawaited(
       pushView(context, MovieCategoryScreen(category: category, title: title)),
     );

@@ -64,7 +64,8 @@ class RatingStars extends StatelessWidget {
                       ),
                       TextSpan(text: ' /10', style: muted),
                       TextSpan(
-                        text: '  ·  ${_votesFormat.format(voteCount)} '
+                        text:
+                            '  ·  ${_votesFormat.format(voteCount)} '
                             '${voteCount == 1 ? 'vote' : 'votes'}',
                         style: muted,
                       ),
