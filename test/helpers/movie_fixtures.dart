@@ -1,4 +1,5 @@
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/movie_collection.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
@@ -140,6 +141,7 @@ MovieDetail buildMovieDetail({
   List<Review> reviews = const [],
   List<MediaImage> images = const [],
   String? imdbId = 'tt0137523',
+  MovieCollectionRef? collection,
 }) {
   return MovieDetail(
     id: id,
@@ -160,5 +162,38 @@ MovieDetail buildMovieDetail({
     reviews: reviews,
     images: images,
     imdbId: imdbId,
+    collection: collection,
+  );
+}
+
+MovieCollectionRef buildMovieCollectionRef({
+  int id = 2344,
+  String name = 'The Matrix Collection',
+  String? posterPath = '/collection_poster.jpg',
+  String? backdropPath = '/collection_backdrop.jpg',
+}) {
+  return MovieCollectionRef(
+    id: id,
+    name: name,
+    posterPath: posterPath,
+    backdropPath: backdropPath,
+  );
+}
+
+MovieCollection buildMovieCollection({
+  int id = 2344,
+  String name = 'The Matrix Collection',
+  String overview = 'A series about a simulated reality.',
+  String? posterPath = '/collection_poster.jpg',
+  String? backdropPath = '/collection_backdrop.jpg',
+  List<Movie>? parts,
+}) {
+  return MovieCollection(
+    id: id,
+    name: name,
+    overview: overview,
+    posterPath: posterPath,
+    backdropPath: backdropPath,
+    parts: parts ?? [buildMovie(id: 603), buildMovie(id: 604)],
   );
 }

@@ -70,6 +70,12 @@ void main() {
         ],
         'status': 'Released',
         'imdb_id': 'tt0137523',
+        'belongs_to_collection': {
+          'id': 2344,
+          'name': 'The Matrix Collection',
+          'poster_path': '/c.jpg',
+          'backdrop_path': '/cb.jpg',
+        },
       };
 
       final detail = MovieDetail.fromJson(json);
@@ -78,6 +84,8 @@ void main() {
       expect(detail.tagline, 'Mischief. Mayhem. Soap.');
       expect(detail.runtime, 139);
       expect(detail.imdbId, 'tt0137523');
+      expect(detail.collection?.id, 2344);
+      expect(detail.collection?.name, 'The Matrix Collection');
       expect(detail.genres, [
         const Genre(id: 18, name: 'Drama'),
         const Genre(id: 53, name: 'Thriller'),

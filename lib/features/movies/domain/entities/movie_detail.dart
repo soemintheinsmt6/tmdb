@@ -4,6 +4,7 @@ import 'package:tmdb/core/extensions/double_rating.dart';
 import 'package:tmdb/core/extensions/int_runtime.dart';
 import 'package:tmdb/core/extensions/string_year.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
+import 'package:tmdb/features/movies/domain/entities/movie_collection.dart';
 import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/genre.dart';
 import 'package:tmdb/shared/domain/media_image.dart';
@@ -34,6 +35,7 @@ class MovieDetail extends Equatable {
     required this.images,
     this.watchProviders,
     this.imdbId,
+    this.collection,
   });
 
   /// Parses the `/movie/{id}` payload. Cast, recommendations, videos, reviews,
@@ -63,6 +65,9 @@ class MovieDetail extends Equatable {
           .toList(),
       status: json['status'] as String? ?? '',
       imdbId: json['imdb_id'] as String?,
+      collection: MovieCollectionRef.tryFromJson(
+        json['belongs_to_collection'] as Map<String, dynamic>?,
+      ),
       cast: cast,
       recommendations: recommendations,
       videos: videos,
@@ -99,6 +104,7 @@ class MovieDetail extends Equatable {
       images: images ?? this.images,
       watchProviders: watchProviders ?? this.watchProviders,
       imdbId: imdbId,
+      collection: collection,
     );
   }
 
@@ -127,6 +133,10 @@ class MovieDetail extends Equatable {
   /// IMDb id (e.g. `"tt0137523"`), straight from the `/movie/{id}` payload;
   /// `null` when TMDB has none. Used to deep-link to the IMDb page.
   final String? imdbId;
+
+  /// The franchise this movie belongs to (from `belongs_to_collection`), or
+  /// `null` when it's standalone. The full film list loads lazily on tap.
+  final MovieCollectionRef? collection;
 
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
@@ -171,5 +181,6 @@ class MovieDetail extends Equatable {
     images,
     watchProviders,
     imdbId,
+    collection,
   ];
 }

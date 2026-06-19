@@ -46,21 +46,24 @@ lib/
 │   │   │   ├── datasources/    # MovieRemoteDataSource (concrete, wraps ApiClient)
 │   │   │   └── repositories/   # MovieRepositoryImpl (composition + Failure mapping)
 │   │   ├── domain/
-│   │   │   ├── entities/       # Movie (implements PosterItem), MovieDetail, PaginatedMovies
-│   │   │   │                   # — entities own their fromJson; no separate Model class
+│   │   │   ├── entities/       # Movie (implements PosterItem), MovieDetail (+ MovieCollection /
+│   │   │   │                   # MovieCollectionRef), PaginatedMovies — entities own their
+│   │   │   │                   # fromJson; no separate Model class
 │   │   │   └── repositories/   # MovieRepository (abstract — test seam)
 │   │   └── presentation/
 │   │       ├── bloc/
 │   │       │   ├── movie_list_bloc/    # Popular / Now Playing / Top Rated / Upcoming
 │   │       │   │                       #   — powers the "See all" category grids
 │   │       │   ├── movie_search_bloc/  # per-vertical debounced search (superseded by global)
-│   │       │   └── movie_detail_bloc/  # /movie/{id} (+ imdb_id) + credits + recs + videos +
-│   │       │                           #   reviews + images + watch providers (one parallel
-│   │       │                           #   fetch, merged via copyWith)
+│   │       │   ├── movie_detail_bloc/  # /movie/{id} (+ imdb_id, belongs_to_collection) +
+│   │       │   │                       #   credits + recs + videos + reviews + images + watch
+│   │       │   │                       #   providers (one parallel fetch, merged via copyWith)
+│   │       │   └── collection_bloc/    # /collection/{id} — franchise parts, lazy on banner tap
 │   │       ├── screens/
 │   │       │   ├── movie_category_screen.dart  # full grid for one category ("See all")
-│   │       │   └── movie_detail/{movie_detail_screen.dart, layouts/}
-│   │       └── widgets/        # movie_detail_cards (compose the shared kernel)
+│   │       │   ├── movie_detail/{movie_detail_screen.dart, layouts/}
+│   │       │   └── collection/collection_screen.dart  # franchise films (hero from banner)
+│   │       └── widgets/        # movie_detail_cards, CollectionBanner, CollectionSkeleton
 │   ├── tv/                     # Series vertical, mirrors movies: TvShow (implements
 │   │                           # PosterItem), TvShowDetail (+ Season / Episode / SeasonDetail),
 │   │                           # TvRepository, remote data source. TvFeedBloc drives the
@@ -188,7 +191,7 @@ lib/
 
 ## Tests
 
-The project has three test layers; together they're 353 host-side tests + one device E2E.
+The project has three test layers; together they're 362 host-side tests + one device E2E.
 
 ```bash
 dart format --set-exit-if-changed .   # formatting gate
@@ -210,9 +213,9 @@ test/
 ├── features/
 │   ├── home/                   # HomeBloc (rail aggregation, best-effort, live For You)
 │   ├── movies/
-│   │   ├── data/               # repository impl, remote data source
-│   │   ├── domain/entities/    # fromJson, copyWith, computed props
-│   │   └── presentation/bloc/  # MovieList, MovieSearch, MovieDetail blocs
+│   │   ├── data/               # repository impl (+ getCollection), remote data source
+│   │   ├── domain/entities/    # fromJson, copyWith, computed props (+ MovieCollection)
+│   │   └── presentation/bloc/  # MovieList, MovieSearch, MovieDetail, Collection blocs
 │   ├── tv/                     # mirrors movies: entities (+ SeasonDetail), data,
 │   │                           # TvList/TvSearch/TvDetail/SeasonDetail/TvFeed blocs, EpisodeTile
 │   ├── discover/               # DiscoverFilter (movie+TV), remote data source, repo impl, DiscoverBloc
@@ -262,11 +265,12 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Share** — a share action on movie & TV detail opens the native share sheet (`share_plus`) with the title, year, and canonical TMDB link, best-effort attaching the backdrop image (fetched with a timeout; falls back to text + link).
 - **Where to watch** — movie & TV detail show **stream / rent / buy** provider logos (TMDB's JustWatch data) for your device region, sourced via `/watch/providers` in the same parallel detail fetch. JustWatch attribution links to the full TMDB watch page; when your region isn't covered the section falls back to **US** and labels which region is shown (hidden entirely when there's no data anywhere).
 - **IMDb** — when a title has an IMDb id (movies carry it directly; TV resolves it via `/external_ids`), a gold **IMDb** button in the detail meta row deep-links to its IMDb page.
+- **Collections / franchises** — when a movie is part of a franchise (`belongs_to_collection`, already in the detail payload), a "Part of the … Collection" banner sits under the overview. Tapping it flies the backdrop into a collection screen (shared-element hero, seeded so the target is on-screen while it loads) that lazily fetches `/collection/{id}` and lists every film in release order behind a dedicated shimmer — each routing back to movie detail.
 - **TV shows** on their own **Series** tab — a trending-TV **hero carousel** over Popular / Top Rated / On The Air / Airing Today rails (each with See all), sharing the detail layout where season & episode counts replace runtime. A **Seasons** rail on TV detail opens each season's **episode list** (`/tv/{id}/season/{n}` — stills, air dates, ratings, overviews) behind a shimmer skeleton. TV detail pages are saveable to favourites and the watchlist. Movies and TV share one **poster kernel** (`PosterItem` view contract + `PosterGrid`/`PosterCard`/`FeaturedCarousel`/detail cards in `shared/`), so the second vertical reuses the first's UI rather than duplicating it.
 - **People / cast** — tap any cast member to open a person page with their profile photo, known-for department, birthday / age / birthplace, an expandable biography, and a combined movie + TV **filmography** (sorted by popularity) whose posters route back into the matching movie or TV detail. Reuses the same poster kernel as the browse grids.
 - **Favourites** spanning **both movies and TV shows**, persisted locally via Hive; reactive — toggling the heart on any movie or TV detail screen updates the Library tab in real time.
 - **Watchlist** — a separate "watch later" list spanning **both movies and TV shows**, persisted locally via Hive and reactive like favourites. A bookmark toggle on movie & TV detail saves/removes; each saved card carries a MOVIE/TV chip and routes back to the matching detail screen.
-- **Shared-element transition** — tapping a trending hero slide or a favourites/watchlist card flies its backdrop into the detail header with a corner-radius interpolation (16 → 0), on **both push and pop**. The detail route pops normally, so the iOS edge-swipe-back gesture works alongside the hero flight.
+- **Shared-element transition** — tapping a trending hero slide, a favourites/watchlist card, or a movie's collection banner flies its backdrop into the destination header with a corner-radius interpolation (16 → 0), on **both push and pop**. The detail route pops normally, so the iOS edge-swipe-back gesture works alongside the hero flight.
 - **Profile tab** showing favourites count, an **Appearance** picker (System / Light / Dark), and destructive "Clear favourites" / "Clear watchlist" flows with confirm dialogs.
 - **Five-tab shell** — Home · Discover · TV · Library · Profile, lazily built and kept alive via `IndexedStack`. The **Library** tab combines Favourites and Watchlist under one app bar with two segments, plus shared **sort** (recently added · title A–Z · top rated · release date) and **list/grid view** controls that reorder and re-lay-out both segments — in grid view each segment is split into **Movies** and **TV Shows** sections (`SectionedPosterGrid`). Both the sort and the view are **persisted** across launches.
 - **Skeleton loading** — Home, Series, Discover, Library, Search, and the movie/TV detail pages load behind shimmer skeletons that mirror their real layouts (no spinners, no layout shift).

@@ -1,4 +1,5 @@
 import 'package:tmdb/core/utils/typedef.dart';
+import 'package:tmdb/features/movies/domain/entities/movie_collection.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 
@@ -19,4 +20,6 @@ abstract class MovieRepository {
   });
 
   ResultFuture<MovieDetail> getMovieDetail(int id);
+
+  ResultFuture<MovieCollection> getCollection(int id);
 }

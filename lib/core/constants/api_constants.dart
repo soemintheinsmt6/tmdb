@@ -30,6 +30,9 @@ class ApiConstants {
   static String movieImages(int id) => '/movie/$id/images';
   static String movieWatchProviders(int id) => '/movie/$id/watch/providers';
 
+  // ── Collections ───────────────────────────────────────
+  static String collection(int id) => '/collection/$id';
+
   // ── TV shows ──────────────────────────────────────────
   static const String popularTv = '/tv/popular';
   static const String topRatedTv = '/tv/top_rated';

@@ -1,5 +1,6 @@
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/network/api_client.dart';
+import 'package:tmdb/features/movies/domain/entities/movie_collection.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
@@ -128,5 +129,14 @@ class MovieRemoteDataSource {
       response as Map<String, dynamic>,
       region: region,
     );
+  }
+
+  /// Full franchise (metadata + film parts) from `/collection/{id}`.
+  Future<MovieCollection> getCollection(int id) async {
+    final response = await _apiClient.get(
+      ApiConstants.collection(id),
+      query: {'language': 'en-US'},
+    );
+    return MovieCollection.fromJson(response as Map<String, dynamic>);
   }
 }

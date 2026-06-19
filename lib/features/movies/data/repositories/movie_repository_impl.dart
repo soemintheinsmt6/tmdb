@@ -6,6 +6,7 @@ import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/core/utils/region.dart';
 import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/movies/data/datasources/movie_remote_data_source.dart';
+import 'package:tmdb/features/movies/domain/entities/movie_collection.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
@@ -71,6 +72,11 @@ class MovieRepositoryImpl implements MovieRepository {
         watchProviders: watchProviders,
       );
     });
+  }
+
+  @override
+  ResultFuture<MovieCollection> getCollection(int id) {
+    return _guard(() => _remote.getCollection(id));
   }
 
   /// Runs [body] and converts the layered exceptions into typed failures so

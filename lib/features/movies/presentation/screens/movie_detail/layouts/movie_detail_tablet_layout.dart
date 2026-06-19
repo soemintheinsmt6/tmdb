@@ -8,6 +8,7 @@ import 'package:tmdb/features/favourites/presentation/widgets/favourite_toggle_b
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_bloc.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_event.dart';
 import 'package:tmdb/features/movies/presentation/bloc/movie_detail_bloc/movie_detail_state.dart';
+import 'package:tmdb/features/movies/presentation/widgets/collection_banner.dart';
 import 'package:tmdb/features/movies/presentation/widgets/movie_detail_cards.dart';
 import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
 import 'package:tmdb/features/watchlist/domain/entities/watchlist_item.dart';
@@ -146,6 +147,13 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
                     ],
                   ),
                 ),
+                if (loaded.collection != null) ...[
+                  const SizedBox(height: 24),
+                  CollectionBanner(
+                    collection: loaded.collection!,
+                    horizontalPadding: padding,
+                  ),
+                ],
                 const SizedBox(height: 32),
                 DetailVideoRail(
                   videos: loaded.videos.youTubeVideos,

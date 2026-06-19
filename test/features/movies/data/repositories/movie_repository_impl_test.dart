@@ -6,6 +6,7 @@ import 'package:tmdb/core/error/failures.dart';
 import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/features/movies/data/datasources/movie_remote_data_source.dart';
 import 'package:tmdb/features/movies/data/repositories/movie_repository_impl.dart';
+import 'package:tmdb/features/movies/domain/entities/movie_collection.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/domain/entities/paginated_movies.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
@@ -178,6 +179,35 @@ void main() {
         expect(composed.cast, hasLength(8));
       },
     );
+  });
+
+  group('getCollection', () {
+    test('returns Right and forwards the id on success', () async {
+      final collection = buildMovieCollection();
+      when(
+        () => remote.getCollection(2344),
+      ).thenAnswer((_) async => collection);
+
+      final result = await repository.getCollection(2344);
+
+      expect(result, Right<Failure, MovieCollection>(collection));
+      verify(() => remote.getCollection(2344)).called(1);
+    });
+
+    test('maps a thrown exception to a Failure', () async {
+      when(
+        () => remote.getCollection(1),
+      ).thenThrow(const ServerException(message: 'boom', statusCode: 500));
+
+      final result = await repository.getCollection(1);
+
+      expect(
+        result,
+        const Left<Failure, MovieCollection>(
+          ServerFailure(message: 'boom', statusCode: 500),
+        ),
+      );
+    });
   });
 
   group('exception → Failure mapping', () {
