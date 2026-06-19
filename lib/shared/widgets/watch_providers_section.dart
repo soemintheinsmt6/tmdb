@@ -187,7 +187,7 @@ class _JustWatchLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton.icon(
+    return TextButton(
       onPressed: onTap,
       style: TextButton.styleFrom(
         foregroundColor: AppColors.cyan,
@@ -196,8 +196,14 @@ class _JustWatchLink extends StatelessWidget {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         visualDensity: VisualDensity.compact,
       ),
-      icon: const Icon(IconsaxPlusLinear.export_3, size: 14),
-      label: const Text('JustWatch', style: AppTypography.smallText),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('JustWatch', style: AppTypography.smallText),
+          SizedBox(width: 4),
+          Icon(IconsaxPlusLinear.export_3, size: 14),
+        ],
+      ),
     );
   }
 }

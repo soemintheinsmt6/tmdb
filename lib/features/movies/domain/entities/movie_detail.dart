@@ -33,6 +33,7 @@ class MovieDetail extends Equatable {
     required this.reviews,
     required this.images,
     this.watchProviders,
+    this.imdbId,
   });
 
   /// Parses the `/movie/{id}` payload. Cast, recommendations, videos, reviews,
@@ -61,6 +62,7 @@ class MovieDetail extends Equatable {
           .map((e) => Genre.fromJson(e as Map<String, dynamic>))
           .toList(),
       status: json['status'] as String? ?? '',
+      imdbId: json['imdb_id'] as String?,
       cast: cast,
       recommendations: recommendations,
       videos: videos,
@@ -96,6 +98,7 @@ class MovieDetail extends Equatable {
       reviews: reviews ?? this.reviews,
       images: images ?? this.images,
       watchProviders: watchProviders ?? this.watchProviders,
+      imdbId: imdbId,
     );
   }
 
@@ -120,6 +123,10 @@ class MovieDetail extends Equatable {
   /// Where-to-watch options for the device region; `null` until injected by the
   /// repository (or when TMDB has none for that region).
   final WatchProviders? watchProviders;
+
+  /// IMDb id (e.g. `"tt0137523"`), straight from the `/movie/{id}` payload;
+  /// `null` when TMDB has none. Used to deep-link to the IMDb page.
+  final String? imdbId;
 
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
@@ -163,5 +170,6 @@ class MovieDetail extends Equatable {
     reviews,
     images,
     watchProviders,
+    imdbId,
   ];
 }

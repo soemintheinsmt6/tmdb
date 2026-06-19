@@ -143,6 +143,8 @@ void main() {
         expect(composed.images.first.filePath, '/img0.jpg');
         // Watch providers injected for the resolved region.
         expect(composed.watchProviders, watchProviders);
+        // imdb_id (parsed from the base payload) survives copyWith.
+        expect(composed.imdbId, detailBase.imdbId);
         // Base detail fields preserved via copyWith.
         expect(composed.id, detailBase.id);
         expect(composed.title, detailBase.title);

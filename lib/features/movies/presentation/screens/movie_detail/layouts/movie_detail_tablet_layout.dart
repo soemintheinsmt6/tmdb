@@ -147,11 +147,6 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                WatchProvidersSection(
-                  providers: loaded.watchProviders,
-                  horizontalPadding: padding,
-                ),
-                const SizedBox(height: 32),
                 DetailVideoRail(
                   videos: loaded.videos.youTubeVideos,
                   horizontalPadding: padding,
@@ -171,7 +166,14 @@ class _MovieDetailTabletLayoutState extends State<MovieDetailTabletLayout> {
                     PersonDetailScreen(personId: member.id, name: member.name),
                   ),
                 ),
-                const SizedBox(height: 16),
+                if (loaded.watchProviders?.isNotEmpty ?? false) ...[
+                  const SizedBox(height: 32),
+                  WatchProvidersSection(
+                    providers: loaded.watchProviders,
+                    horizontalPadding: padding,
+                  ),
+                ],
+                const SizedBox(height: 32),
                 MovieRecommendations(
                   movies: loaded.recommendations,
                   horizontalPadding: padding,

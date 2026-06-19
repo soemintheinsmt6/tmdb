@@ -53,6 +53,7 @@ class TvRepositoryImpl implements TvRepository {
         _remote.getTvReviews(id),
         _remote.getTvImages(id),
         _remote.getTvWatchProviders(id, region: deviceRegionCode()),
+        _remote.getTvExternalIds(id),
       ]);
       final detail = results[0] as TvShowDetail;
       final cast = results[1] as List<CastMember>;
@@ -61,6 +62,7 @@ class TvRepositoryImpl implements TvRepository {
       final reviews = results[4] as List<Review>;
       final images = results[5] as List<MediaImage>;
       final watchProviders = results[6] as WatchProviders?;
+      final imdbId = results[7] as String?;
 
       return detail.copyWith(
         cast: cast.take(20).toList(),
@@ -69,6 +71,7 @@ class TvRepositoryImpl implements TvRepository {
         reviews: reviews.take(10).toList(),
         images: images.take(16).toList(),
         watchProviders: watchProviders,
+        imdbId: imdbId,
       );
     });
   }

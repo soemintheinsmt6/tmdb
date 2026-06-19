@@ -139,6 +139,7 @@ MovieDetail buildMovieDetail({
   List<Video> videos = const [],
   List<Review> reviews = const [],
   List<MediaImage> images = const [],
+  String? imdbId = 'tt0137523',
 }) {
   return MovieDetail(
     id: id,
@@ -158,5 +159,6 @@ MovieDetail buildMovieDetail({
     videos: videos,
     reviews: reviews,
     images: images,
+    imdbId: imdbId,
   );
 }

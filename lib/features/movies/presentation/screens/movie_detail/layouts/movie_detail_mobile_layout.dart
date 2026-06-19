@@ -145,8 +145,6 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                WatchProvidersSection(providers: loaded.watchProviders),
-                const SizedBox(height: 24),
                 DetailVideoRail(
                   videos: loaded.videos.youTubeVideos,
                   onTap: (video) => playTrailer(context, video),
@@ -161,7 +159,11 @@ class _MovieDetailMobileLayoutState extends State<MovieDetailMobileLayout> {
                     PersonDetailScreen(personId: member.id, name: member.name),
                   ),
                 ),
-                const SizedBox(height: 12),
+                if (loaded.watchProviders?.isNotEmpty ?? false) ...[
+                  const SizedBox(height: 24),
+                  WatchProvidersSection(providers: loaded.watchProviders),
+                ],
+                const SizedBox(height: 24),
                 MovieRecommendations(movies: loaded.recommendations),
                 const SizedBox(height: 24),
                 DetailReviewsSection(reviews: loaded.reviews),

@@ -44,6 +44,7 @@ class ApiConstants {
   static String tvReviews(int id) => '/tv/$id/reviews';
   static String tvImages(int id) => '/tv/$id/images';
   static String tvWatchProviders(int id) => '/tv/$id/watch/providers';
+  static String tvExternalIds(int id) => '/tv/$id/external_ids';
 
   // ── Trending ──────────────────────────────────────────
   /// Mixed movie + TV (+ people, which the app filters out) trending titles.

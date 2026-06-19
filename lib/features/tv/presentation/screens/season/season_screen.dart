@@ -9,6 +9,7 @@ import 'package:tmdb/features/tv/presentation/bloc/season_detail_bloc/season_det
 import 'package:tmdb/features/tv/presentation/bloc/season_detail_bloc/season_detail_event.dart';
 import 'package:tmdb/features/tv/presentation/bloc/season_detail_bloc/season_detail_state.dart';
 import 'package:tmdb/features/tv/presentation/widgets/episode_tile.dart';
+import 'package:tmdb/features/tv/presentation/widgets/season_detail_skeleton.dart';
 import 'package:tmdb/injection_container.dart';
 import 'package:tmdb/shared/widgets/app_empty_view.dart';
 import 'package:tmdb/shared/widgets/app_error_view.dart';
@@ -52,9 +53,7 @@ class SeasonScreen extends StatelessWidget {
                 ),
               );
             }
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.cyan),
-            );
+            return const SeasonDetailSkeleton();
           },
         ),
       ),

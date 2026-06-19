@@ -58,6 +58,7 @@ void main() {
     when(
       () => remote.getTvWatchProviders(any(), region: any(named: 'region')),
     ).thenAnswer((_) async => null);
+    when(() => remote.getTvExternalIds(any())).thenAnswer((_) async => null);
   });
 
   group('getTvShows', () {
@@ -126,6 +127,9 @@ void main() {
         when(
           () => remote.getTvWatchProviders(1399, region: any(named: 'region')),
         ).thenAnswer((_) async => watchProviders);
+        when(
+          () => remote.getTvExternalIds(1399),
+        ).thenAnswer((_) async => 'tt0108778');
 
         final result = await repository.getTvShowDetail(1399);
 
@@ -141,8 +145,9 @@ void main() {
         expect(composed.reviews.first.id, 'r0');
         expect(composed.images, hasLength(16));
         expect(composed.images.first.filePath, '/img0.jpg');
-        // Watch providers injected for the resolved region.
+        // Watch providers + IMDb id injected from their side endpoints.
         expect(composed.watchProviders, watchProviders);
+        expect(composed.imdbId, 'tt0108778');
         // Base detail fields preserved via copyWith.
         expect(composed.id, detailBase.id);
         expect(composed.name, detailBase.name);

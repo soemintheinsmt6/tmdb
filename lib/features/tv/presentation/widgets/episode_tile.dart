@@ -19,6 +19,7 @@ class EpisodeTile extends StatelessWidget {
 
   static const double _stillWidth = 116;
   static const double _minHeight = 96;
+  static const double _radius = 16;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,7 @@ class EpisodeTile extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_radius),
         border: Border.all(color: colors.border),
       ),
       clipBehavior: Clip.antiAlias,
@@ -51,19 +52,26 @@ class EpisodeTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Fills the row height (driven by the text column) — no dead space.
-            SizedBox(
-              width: _stillWidth,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: _minHeight),
-                child: still.isEmpty
-                    ? fallback()
-                    : CachedNetworkImage(
-                        imageUrl: still,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) =>
-                            Container(color: colors.surfaceMuted),
-                        errorWidget: (_, __, ___) => fallback(),
-                      ),
+            // Clip its own left corners so they follow the card radius even
+            // though it paints edge-to-edge under the card's border.
+            ClipRRect(
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(_radius),
+              ),
+              child: SizedBox(
+                width: _stillWidth,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: _minHeight),
+                  child: still.isEmpty
+                      ? fallback()
+                      : CachedNetworkImage(
+                          imageUrl: still,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) =>
+                              Container(color: colors.surfaceMuted),
+                          errorWidget: (_, __, ___) => fallback(),
+                        ),
+                ),
               ),
             ),
             Expanded(

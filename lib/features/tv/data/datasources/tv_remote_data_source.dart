@@ -134,4 +134,12 @@ class TvRemoteDataSource {
       region: region,
     );
   }
+
+  /// IMDb id for the show, or `null` when TMDB has none. The TV detail payload
+  /// omits it, so it lives on `/tv/{id}/external_ids`.
+  Future<String?> getTvExternalIds(int id) async {
+    final response = await _apiClient.get(ApiConstants.tvExternalIds(id));
+    final json = response as Map<String, dynamic>;
+    return json['imdb_id'] as String?;
+  }
 }

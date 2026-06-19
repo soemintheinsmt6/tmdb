@@ -5,6 +5,7 @@ import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/movies/domain/entities/movie_detail.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
 import 'package:tmdb/shared/widgets/detail_cards.dart';
+import 'package:tmdb/shared/widgets/imdb_chip.dart';
 
 /// Movie-specific summary: composes the shared [DetailSummary] with a meta row
 /// of release year + runtime.
@@ -31,6 +32,8 @@ class MovieDetailSummary extends StatelessWidget {
           icon: IconsaxPlusLinear.clock_1,
           label: detail.formattedRuntime,
         ),
+        if (detail.imdbId != null && detail.imdbId!.isNotEmpty)
+          ImdbChip(imdbId: detail.imdbId!),
       ],
     );
   }

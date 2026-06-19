@@ -145,8 +145,6 @@ class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                WatchProvidersSection(providers: loaded.watchProviders),
-                const SizedBox(height: 24),
                 TvSeasonsRail(
                   tvShowId: widget.tvShowId,
                   seasons: loaded.seasons,
@@ -166,7 +164,11 @@ class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
                     PersonDetailScreen(personId: member.id, name: member.name),
                   ),
                 ),
-                const SizedBox(height: 12),
+                if (loaded.watchProviders?.isNotEmpty ?? false) ...[
+                  const SizedBox(height: 24),
+                  WatchProvidersSection(providers: loaded.watchProviders),
+                ],
+                const SizedBox(height: 24),
                 TvRecommendations(shows: loaded.recommendations),
                 const SizedBox(height: 24),
                 DetailReviewsSection(reviews: loaded.reviews),

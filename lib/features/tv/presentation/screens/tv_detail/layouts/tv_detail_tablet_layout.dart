@@ -147,11 +147,6 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                WatchProvidersSection(
-                  providers: loaded.watchProviders,
-                  horizontalPadding: padding,
-                ),
-                const SizedBox(height: 32),
                 TvSeasonsRail(
                   tvShowId: widget.tvShowId,
                   seasons: loaded.seasons,
@@ -177,7 +172,14 @@ class _TvDetailTabletLayoutState extends State<TvDetailTabletLayout> {
                     PersonDetailScreen(personId: member.id, name: member.name),
                   ),
                 ),
-                const SizedBox(height: 16),
+                if (loaded.watchProviders?.isNotEmpty ?? false) ...[
+                  const SizedBox(height: 32),
+                  WatchProvidersSection(
+                    providers: loaded.watchProviders,
+                    horizontalPadding: padding,
+                  ),
+                ],
+                const SizedBox(height: 32),
                 TvRecommendations(
                   shows: loaded.recommendations,
                   horizontalPadding: padding,

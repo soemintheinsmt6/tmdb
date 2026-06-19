@@ -4,7 +4,9 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/features/favourites/presentation/widgets/favourites_list_view.dart';
 import 'package:tmdb/features/library/presentation/widgets/library_sort_sheet.dart';
+import 'package:tmdb/features/settings/domain/repositories/settings_repository.dart';
 import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_list_view.dart';
+import 'package:tmdb/injection_container.dart';
 import 'package:tmdb/shared/domain/library_sort.dart';
 import 'package:tmdb/shared/domain/library_view.dart';
 
@@ -19,27 +21,38 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-  LibrarySort _sort = LibrarySort.recentlyAdded;
-  LibraryView _view = LibraryView.list;
+  final SettingsRepository _settings = sl<SettingsRepository>();
+  late LibrarySort _sort;
+  late LibraryView _view;
+
+  @override
+  void initState() {
+    super.initState();
+    // Restore the last-used sort and layout so they persist across launches.
+    _sort = _settings.getLibrarySort();
+    _view = _settings.getLibraryView();
+  }
 
   Future<void> _pickSort() async {
     final picked = await showLibrarySortSheet(context, selected: _sort);
     if (picked != null && picked != _sort && mounted) {
       setState(() => _sort = picked);
+      await _settings.setLibrarySort(picked);
     }
   }
 
-  void _toggleView() {
-    setState(
-      () => _view = _view == LibraryView.list
-          ? LibraryView.grid
-          : LibraryView.list,
-    );
+  Future<void> _toggleView() async {
+    final next = _view == LibraryView.list
+        ? LibraryView.grid
+        : LibraryView.list;
+    setState(() => _view = next);
+    await _settings.setLibraryView(next);
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final isList = _view == LibraryView.list;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -48,14 +61,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
           title: const Text('Library'),
           actions: [
             IconButton(
-              tooltip: _view == LibraryView.list ? 'Grid view' : 'List view',
+              tooltip: isList ? 'Grid view' : 'List view',
               icon: Icon(
-                _view == LibraryView.list
-                    ? IconsaxPlusLinear.grid_2
-                    : IconsaxPlusLinear.row_vertical,
+                isList ? IconsaxPlusLinear.grid_2 : IconsaxPlusLinear.menu,
                 // Optical balance: the grid/list glyphs fill their box more
                 // densely than the sort icon, so nudge them down a touch.
-                size: 22,
+                size: isList ? 22 : null,
               ),
               onPressed: _toggleView,
             ),

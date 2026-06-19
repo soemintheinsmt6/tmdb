@@ -69,6 +69,7 @@ void main() {
           {'id': 53, 'name': 'Thriller'},
         ],
         'status': 'Released',
+        'imdb_id': 'tt0137523',
       };
 
       final detail = MovieDetail.fromJson(json);
@@ -76,6 +77,7 @@ void main() {
       expect(detail.id, 550);
       expect(detail.tagline, 'Mischief. Mayhem. Soap.');
       expect(detail.runtime, 139);
+      expect(detail.imdbId, 'tt0137523');
       expect(detail.genres, [
         const Genre(id: 18, name: 'Drama'),
         const Genre(id: 53, name: 'Thriller'),

@@ -37,6 +37,7 @@ class TvShowDetail extends Equatable {
     required this.reviews,
     required this.images,
     this.watchProviders,
+    this.imdbId,
   });
 
   /// Parses the `/tv/{id}` payload. Cast, recommendations, videos, reviews, and
@@ -88,6 +89,7 @@ class TvShowDetail extends Equatable {
     List<Review>? reviews,
     List<MediaImage>? images,
     WatchProviders? watchProviders,
+    String? imdbId,
   }) {
     return TvShowDetail(
       id: id,
@@ -112,6 +114,7 @@ class TvShowDetail extends Equatable {
       reviews: reviews ?? this.reviews,
       images: images ?? this.images,
       watchProviders: watchProviders ?? this.watchProviders,
+      imdbId: imdbId ?? this.imdbId,
     );
   }
 
@@ -140,6 +143,10 @@ class TvShowDetail extends Equatable {
   /// Where-to-watch options for the device region; `null` until injected by the
   /// repository (or when TMDB has none for that region).
   final WatchProviders? watchProviders;
+
+  /// IMDb id (e.g. `"tt0108778"`); injected from `/tv/{id}/external_ids` since
+  /// the TV detail payload omits it. `null` when unavailable.
+  final String? imdbId;
 
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
@@ -198,5 +205,6 @@ class TvShowDetail extends Equatable {
     reviews,
     images,
     watchProviders,
+    imdbId,
   ];
 }

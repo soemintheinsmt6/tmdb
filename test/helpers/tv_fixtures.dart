@@ -88,6 +88,7 @@ TvShowDetail buildTvShowDetail({
   List<Video> videos = const [],
   List<Review> reviews = const [],
   List<MediaImage> images = const [],
+  String? imdbId,
 }) {
   return TvShowDetail(
     id: id,
@@ -111,6 +112,7 @@ TvShowDetail buildTvShowDetail({
     videos: videos,
     reviews: reviews,
     images: images,
+    imdbId: imdbId,
   );
 }
 
