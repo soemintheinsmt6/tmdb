@@ -14,6 +14,7 @@ import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
 
 import '../../../../helpers/movie_fixtures.dart';
+import '../../../../helpers/watch_provider_fixtures.dart';
 
 class _MockRemote extends Mock implements MovieRemoteDataSource {}
 
@@ -43,8 +44,8 @@ void main() {
   setUp(() {
     remote = _MockRemote();
     repository = MovieRepositoryImpl(remote);
-    // Videos and reviews joined the parallel detail fetch; default every
-    // composition test to empty lists so tests only stub what they assert on.
+    // Videos, reviews, images and watch providers joined the parallel detail
+    // fetch; default every composition test so tests only stub what they assert.
     when(
       () => remote.getMovieVideos(any()),
     ).thenAnswer((_) async => const <Video>[]);
@@ -54,6 +55,9 @@ void main() {
     when(
       () => remote.getMovieImages(any()),
     ).thenAnswer((_) async => const <MediaImage>[]);
+    when(
+      () => remote.getMovieWatchProviders(any(), region: any(named: 'region')),
+    ).thenAnswer((_) async => null);
   });
 
   group('getMovies', () {
@@ -117,6 +121,11 @@ void main() {
           () => remote.getMovieReviews(550),
         ).thenAnswer((_) async => reviews);
         when(() => remote.getMovieImages(550)).thenAnswer((_) async => images);
+        final watchProviders = buildWatchProviders();
+        when(
+          () =>
+              remote.getMovieWatchProviders(550, region: any(named: 'region')),
+        ).thenAnswer((_) async => watchProviders);
 
         final result = await repository.getMovieDetail(550);
 
@@ -132,6 +141,8 @@ void main() {
         expect(composed.reviews.first.id, 'r0');
         expect(composed.images, hasLength(16));
         expect(composed.images.first.filePath, '/img0.jpg');
+        // Watch providers injected for the resolved region.
+        expect(composed.watchProviders, watchProviders);
         // Base detail fields preserved via copyWith.
         expect(composed.id, detailBase.id);
         expect(composed.title, detailBase.title);

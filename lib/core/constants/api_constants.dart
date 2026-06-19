@@ -28,6 +28,7 @@ class ApiConstants {
   static String movieVideos(int id) => '/movie/$id/videos';
   static String movieReviews(int id) => '/movie/$id/reviews';
   static String movieImages(int id) => '/movie/$id/images';
+  static String movieWatchProviders(int id) => '/movie/$id/watch/providers';
 
   // ── TV shows ──────────────────────────────────────────
   static const String popularTv = '/tv/popular';
@@ -42,6 +43,7 @@ class ApiConstants {
   static String tvVideos(int id) => '/tv/$id/videos';
   static String tvReviews(int id) => '/tv/$id/reviews';
   static String tvImages(int id) => '/tv/$id/images';
+  static String tvWatchProviders(int id) => '/tv/$id/watch/providers';
 
   // ── Trending ──────────────────────────────────────────
   /// Mixed movie + TV (+ people, which the app filters out) trending titles.

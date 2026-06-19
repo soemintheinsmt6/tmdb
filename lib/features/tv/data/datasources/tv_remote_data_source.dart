@@ -8,6 +8,7 @@ import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/domain/watch_providers.dart';
 
 /// Network-only client for the TV feature. Throws the exceptions defined in
 /// `core/error/exceptions.dart`; the repository converts them to `Failure`s.
@@ -118,5 +119,19 @@ class TvRemoteDataSource {
     return ((json['backdrops'] as List?) ?? const [])
         .map((e) => MediaImage.fromJson(e as Map<String, dynamic>))
         .toList();
+  }
+
+  /// Watch options for the user's [region], falling back to `US` when TMDB has
+  /// no data for that country, or `null` when neither is available. The
+  /// endpoint returns a per-country `results` map.
+  Future<WatchProviders?> getTvWatchProviders(
+    int id, {
+    required String region,
+  }) async {
+    final response = await _apiClient.get(ApiConstants.tvWatchProviders(id));
+    return parseWatchProviders(
+      response as Map<String, dynamic>,
+      region: region,
+    );
   }
 }

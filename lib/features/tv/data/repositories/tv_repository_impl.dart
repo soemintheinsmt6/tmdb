@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:tmdb/core/error/exceptions.dart';
 import 'package:tmdb/core/error/failures.dart';
 import 'package:tmdb/core/logging/app_logger.dart';
+import 'package:tmdb/core/utils/region.dart';
 import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/tv/data/datasources/tv_remote_data_source.dart';
 import 'package:tmdb/features/tv/domain/entities/paginated_tv_shows.dart';
@@ -13,6 +14,7 @@ import 'package:tmdb/shared/domain/cast_member.dart';
 import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/domain/watch_providers.dart';
 
 class TvRepositoryImpl implements TvRepository {
   const TvRepositoryImpl(this._remote, {AppLogger? logger}) : _logger = logger;
@@ -50,6 +52,7 @@ class TvRepositoryImpl implements TvRepository {
         _remote.getTvVideos(id),
         _remote.getTvReviews(id),
         _remote.getTvImages(id),
+        _remote.getTvWatchProviders(id, region: deviceRegionCode()),
       ]);
       final detail = results[0] as TvShowDetail;
       final cast = results[1] as List<CastMember>;
@@ -57,6 +60,7 @@ class TvRepositoryImpl implements TvRepository {
       final videos = results[3] as List<Video>;
       final reviews = results[4] as List<Review>;
       final images = results[5] as List<MediaImage>;
+      final watchProviders = results[6] as WatchProviders?;
 
       return detail.copyWith(
         cast: cast.take(20).toList(),
@@ -64,6 +68,7 @@ class TvRepositoryImpl implements TvRepository {
         videos: videos,
         reviews: reviews.take(10).toList(),
         images: images.take(16).toList(),
+        watchProviders: watchProviders,
       );
     });
   }

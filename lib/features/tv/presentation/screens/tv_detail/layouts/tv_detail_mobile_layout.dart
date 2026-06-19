@@ -19,6 +19,7 @@ import 'package:tmdb/shared/widgets/detail_cards.dart';
 import 'package:tmdb/shared/widgets/detail_skeleton.dart';
 import 'package:tmdb/shared/widgets/share_button.dart';
 import 'package:tmdb/shared/widgets/trailer_player.dart';
+import 'package:tmdb/shared/widgets/watch_providers_section.dart';
 
 class TvDetailMobileLayout extends StatefulWidget {
   const TvDetailMobileLayout({
@@ -143,6 +144,8 @@ class _TvDetailMobileLayoutState extends State<TvDetailMobileLayout> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 24),
+                WatchProvidersSection(providers: loaded.watchProviders),
                 const SizedBox(height: 24),
                 TvSeasonsRail(
                   tvShowId: widget.tvShowId,

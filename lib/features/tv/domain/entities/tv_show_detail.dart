@@ -9,6 +9,7 @@ import 'package:tmdb/shared/domain/genre.dart';
 import 'package:tmdb/shared/domain/media_image.dart';
 import 'package:tmdb/shared/domain/review.dart';
 import 'package:tmdb/shared/domain/video.dart';
+import 'package:tmdb/shared/domain/watch_providers.dart';
 
 /// Full TV show detail — combines `/tv/{id}` with credits and recommendations
 /// into a single domain object. Mirrors `MovieDetail`.
@@ -35,6 +36,7 @@ class TvShowDetail extends Equatable {
     required this.videos,
     required this.reviews,
     required this.images,
+    this.watchProviders,
   });
 
   /// Parses the `/tv/{id}` payload. Cast, recommendations, videos, reviews, and
@@ -85,6 +87,7 @@ class TvShowDetail extends Equatable {
     List<Video>? videos,
     List<Review>? reviews,
     List<MediaImage>? images,
+    WatchProviders? watchProviders,
   }) {
     return TvShowDetail(
       id: id,
@@ -108,6 +111,7 @@ class TvShowDetail extends Equatable {
       videos: videos ?? this.videos,
       reviews: reviews ?? this.reviews,
       images: images ?? this.images,
+      watchProviders: watchProviders ?? this.watchProviders,
     );
   }
 
@@ -132,6 +136,10 @@ class TvShowDetail extends Equatable {
   final List<Video> videos;
   final List<Review> reviews;
   final List<MediaImage> images;
+
+  /// Where-to-watch options for the device region; `null` until injected by the
+  /// repository (or when TMDB has none for that region).
+  final WatchProviders? watchProviders;
 
   String posterUrl({String size = 'w500'}) =>
       ApiConstants.posterUrl(posterPath, size: size);
@@ -189,5 +197,6 @@ class TvShowDetail extends Equatable {
     videos,
     reviews,
     images,
+    watchProviders,
   ];
 }
