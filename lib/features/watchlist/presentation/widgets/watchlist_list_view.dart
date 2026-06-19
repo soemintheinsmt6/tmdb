@@ -10,7 +10,7 @@ import 'package:tmdb/features/watchlist/presentation/widgets/watchlist_hero_card
 import 'package:tmdb/shared/domain/library_sort.dart';
 import 'package:tmdb/shared/domain/library_view.dart';
 import 'package:tmdb/shared/widgets/app_empty_view.dart';
-import 'package:tmdb/shared/widgets/poster_grid.dart';
+import 'package:tmdb/shared/widgets/sectioned_poster_grid.dart';
 
 /// Reactive list body for the watchlist segment of the Library tab. Items are
 /// ordered by [sort] and rendered as hero cards or a poster grid per [view].
@@ -38,11 +38,20 @@ class WatchlistListView extends StatelessWidget {
         }
         final items = [...state.items]..sort(sort.comparator);
         if (view == LibraryView.grid) {
-          return PosterGrid(
-            items: items,
+          // Grid layout separates movies and TV into their own sections;
+          // `items` is already sorted, so each section stays in sort order.
+          return SectionedPosterGrid(
             padding: _padding,
             onTap: (item) =>
                 openWatchlistDetail(context, item as WatchlistItem),
+            movies: [
+              for (final item in items)
+                if (item.mediaType == MediaType.movie) item,
+            ],
+            tvShows: [
+              for (final item in items)
+                if (item.mediaType == MediaType.tv) item,
+            ],
           );
         }
         return ListView.separated(

@@ -61,4 +61,22 @@ void main() {
     expect(find.byType(PosterCard), findsNWidgets(2));
     expect(find.byType(FavouriteHeroCard), findsNothing);
   });
+
+  testWidgets('grid view groups items under Movies and TV Shows headers', (
+    tester,
+  ) async {
+    await pump(tester, LibraryView.grid);
+    await tester.pump();
+
+    expect(find.text('Movies'), findsOneWidget);
+    expect(find.text('TV Shows'), findsOneWidget);
+  });
+
+  testWidgets('list view does not show the section headers', (tester) async {
+    await pump(tester, LibraryView.list);
+    await tester.pump();
+
+    expect(find.text('Movies'), findsNothing);
+    expect(find.text('TV Shows'), findsNothing);
+  });
 }

@@ -11,6 +11,7 @@ class AppSearchField extends StatefulWidget {
     this.hint = 'Search…',
     this.focusNode,
     this.onClear,
+    this.autofocus = false,
   });
 
   final TextEditingController controller;
@@ -18,6 +19,9 @@ class AppSearchField extends StatefulWidget {
   final String hint;
   final FocusNode? focusNode;
   final VoidCallback? onClear;
+
+  /// Focuses the field (and raises the keyboard) as soon as it is first built.
+  final bool autofocus;
 
   @override
   State<AppSearchField> createState() => _AppSearchFieldState();
@@ -54,6 +58,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
         return TextField(
           controller: widget.controller,
           focusNode: _focusNode,
+          autofocus: widget.autofocus,
           onChanged: widget.onChanged,
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(

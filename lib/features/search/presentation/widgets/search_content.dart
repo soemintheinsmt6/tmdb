@@ -111,6 +111,7 @@ class _SearchContentState extends State<SearchContent> {
           child: AppSearchField(
             controller: _searchCtrl,
             focusNode: _searchFocus,
+            autofocus: true,
             hint: 'Search movies, TV shows & people…',
             onChanged: _onSearchChanged,
             onClear: () {
