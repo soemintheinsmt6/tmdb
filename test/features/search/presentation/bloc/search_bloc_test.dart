@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tmdb/core/error/failures.dart';
+import 'package:tmdb/features/search/domain/entities/search_filter.dart';
 import 'package:tmdb/features/search/domain/repositories/search_repository.dart';
 import 'package:tmdb/features/search/presentation/bloc/search_bloc/search_bloc.dart';
 import 'package:tmdb/features/search/presentation/bloc/search_bloc/search_event.dart';
@@ -14,6 +15,8 @@ class _MockSearchRepository extends Mock implements SearchRepository {}
 
 void main() {
   late _MockSearchRepository repository;
+
+  setUpAll(() => registerFallbackValue(SearchFilter.all));
 
   setUp(() {
     repository = _MockSearchRepository();
@@ -27,8 +30,9 @@ void main() {
       expect: () => const [SearchIdle()],
       verify: (_) {
         verifyNever(
-          () => repository.searchMulti(
+          () => repository.search(
             query: any(named: 'query'),
+            filter: any(named: 'filter'),
             page: any(named: 'page'),
           ),
         );
@@ -38,7 +42,13 @@ void main() {
     blocTest<SearchBloc, SearchState>(
       'emits Loading then Loaded when the query has results',
       setUp: () {
-        when(() => repository.searchMulti(query: 'matrix', page: 1)).thenAnswer(
+        when(
+          () => repository.search(
+            query: 'matrix',
+            filter: SearchFilter.all,
+            page: 1,
+          ),
+        ).thenAnswer(
           (_) async => Right(
             buildPaginatedSearch(
               page: 1,
@@ -62,7 +72,10 @@ void main() {
     blocTest<SearchBloc, SearchState>(
       'emits Loading then Error on a failed query',
       setUp: () {
-        when(() => repository.searchMulti(query: 'x', page: 1)).thenAnswer(
+        when(
+          () =>
+              repository.search(query: 'x', filter: SearchFilter.all, page: 1),
+        ).thenAnswer(
           (_) async => const Left(NetworkFailure(message: 'offline')),
         );
       },
@@ -76,7 +89,13 @@ void main() {
     blocTest<SearchBloc, SearchState>(
       'appends the next page',
       setUp: () {
-        when(() => repository.searchMulti(query: 'matrix', page: 1)).thenAnswer(
+        when(
+          () => repository.search(
+            query: 'matrix',
+            filter: SearchFilter.all,
+            page: 1,
+          ),
+        ).thenAnswer(
           (_) async => Right(
             buildPaginatedSearch(
               page: 1,
@@ -85,7 +104,13 @@ void main() {
             ),
           ),
         );
-        when(() => repository.searchMulti(query: 'matrix', page: 2)).thenAnswer(
+        when(
+          () => repository.search(
+            query: 'matrix',
+            filter: SearchFilter.all,
+            page: 2,
+          ),
+        ).thenAnswer(
           (_) async => Right(
             buildPaginatedSearch(
               page: 2,
@@ -126,8 +151,9 @@ void main() {
       expect: () => const <SearchState>[],
       verify: (_) {
         verifyNever(
-          () => repository.searchMulti(
+          () => repository.search(
             query: any(named: 'query'),
+            filter: any(named: 'filter'),
             page: any(named: 'page'),
           ),
         );
@@ -138,7 +164,9 @@ void main() {
   blocTest<SearchBloc, SearchState>(
     'SearchCleared resets to Idle',
     setUp: () {
-      when(() => repository.searchMulti(query: 'x', page: 1)).thenAnswer(
+      when(
+        () => repository.search(query: 'x', filter: SearchFilter.all, page: 1),
+      ).thenAnswer(
         (_) async =>
             Right(buildPaginatedSearch(results: [buildSearchResult()])),
       );
@@ -152,4 +180,55 @@ void main() {
     skip: 2,
     expect: () => const [SearchIdle()],
   );
+
+  group('SearchFilterChanged', () {
+    blocTest<SearchBloc, SearchState>(
+      're-runs the active query in the new filter scope',
+      setUp: () {
+        when(
+          () => repository.search(
+            query: 'matrix',
+            filter: any(named: 'filter'),
+            page: 1,
+          ),
+        ).thenAnswer(
+          (_) async =>
+              Right(buildPaginatedSearch(results: [buildSearchResult()])),
+        );
+      },
+      build: () => SearchBloc(repository: repository),
+      act: (bloc) async {
+        bloc.add(const SearchQueryChanged('matrix'));
+        await bloc.stream.firstWhere((s) => s is SearchLoaded);
+        bloc.add(const SearchFilterChanged(SearchFilter.movie));
+      },
+      skip: 2, // Loading + first Loaded
+      expect: () => [const SearchLoading(), isA<SearchLoaded>()],
+      verify: (_) {
+        verify(
+          () => repository.search(
+            query: 'matrix',
+            filter: SearchFilter.movie,
+            page: 1,
+          ),
+        ).called(1);
+      },
+    );
+
+    blocTest<SearchBloc, SearchState>(
+      'is a no-op when there is no active query',
+      build: () => SearchBloc(repository: repository),
+      act: (bloc) => bloc.add(const SearchFilterChanged(SearchFilter.tv)),
+      expect: () => const <SearchState>[],
+      verify: (_) {
+        verifyNever(
+          () => repository.search(
+            query: any(named: 'query'),
+            filter: any(named: 'filter'),
+            page: any(named: 'page'),
+          ),
+        );
+      },
+    );
+  });
 }

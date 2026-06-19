@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
+import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
 import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
+import 'package:tmdb/features/search/domain/entities/search_filter.dart';
 import 'package:tmdb/features/search/domain/entities/search_result.dart';
 import 'package:tmdb/features/search/presentation/bloc/search_bloc/search_bloc.dart';
 import 'package:tmdb/features/search/presentation/bloc/search_bloc/search_event.dart';
@@ -31,6 +33,7 @@ class _SearchContentState extends State<SearchContent> {
   final _searchCtrl = TextEditingController();
   final _searchFocus = FocusNode();
   Timer? _debounce;
+  SearchFilter _filter = SearchFilter.all;
 
   /// Drives the results list. We prefer the route's [PrimaryScrollController]
   /// so an iOS status-bar tap — which [Scaffold] dispatches to that exact
@@ -70,6 +73,12 @@ class _SearchContentState extends State<SearchContent> {
     _debounce = Timer(const Duration(milliseconds: 400), () {
       context.read<SearchBloc>().add(SearchQueryChanged(value));
     });
+  }
+
+  void _onFilterChanged(SearchFilter filter) {
+    if (filter == _filter) return;
+    setState(() => _filter = filter);
+    context.read<SearchBloc>().add(SearchFilterChanged(filter));
   }
 
   void _onScroll() {
@@ -118,6 +127,13 @@ class _SearchContentState extends State<SearchContent> {
               _debounce?.cancel();
               context.read<SearchBloc>().add(const SearchCleared());
             },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: _SearchFilterBar(
+            selected: _filter,
+            onChanged: _onFilterChanged,
           ),
         ),
         Expanded(child: _buildBody()),
@@ -180,6 +196,44 @@ class _SearchContentState extends State<SearchContent> {
         }
         return const SizedBox.shrink();
       },
+    );
+  }
+}
+
+/// Segmented media-type filter (All / Movies / TV / People) shown under the
+/// search field. Mirrors the Discover toggle's cyan-selected styling.
+class _SearchFilterBar extends StatelessWidget {
+  const _SearchFilterBar({required this.selected, required this.onChanged});
+
+  final SearchFilter selected;
+  final ValueChanged<SearchFilter> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return SizedBox(
+      width: double.infinity,
+      child: SegmentedButton<SearchFilter>(
+        showSelectedIcon: false,
+        style: SegmentedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: colors.textSecondary,
+          selectedBackgroundColor: AppColors.cyan,
+          selectedForegroundColor: isDark ? AppColors.navy : AppColors.white,
+          side: BorderSide(color: colors.border),
+          textStyle: AppTypography.smallText.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+        ),
+        segments: [
+          for (final filter in SearchFilter.values)
+            ButtonSegment(value: filter, label: Text(filter.label)),
+        ],
+        selected: {selected},
+        onSelectionChanged: (selection) => onChanged(selection.first),
+      ),
     );
   }
 }

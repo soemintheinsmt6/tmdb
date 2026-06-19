@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:tmdb/features/search/domain/entities/search_filter.dart';
 
 abstract class SearchEvent extends Equatable {
   const SearchEvent();
@@ -14,6 +15,15 @@ class SearchQueryChanged extends SearchEvent {
 
   @override
   List<Object?> get props => [query];
+}
+
+/// User picked a media-type filter; re-runs the active query in that scope.
+class SearchFilterChanged extends SearchEvent {
+  const SearchFilterChanged(this.filter);
+  final SearchFilter filter;
+
+  @override
+  List<Object?> get props => [filter];
 }
 
 /// Append the next page for the active query.

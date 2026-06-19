@@ -6,6 +6,7 @@ import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/search/data/datasources/search_remote_data_source.dart';
 import 'package:tmdb/features/search/domain/entities/paginated_search_results.dart';
+import 'package:tmdb/features/search/domain/entities/search_filter.dart';
 import 'package:tmdb/features/search/domain/repositories/search_repository.dart';
 
 class SearchRepositoryImpl implements SearchRepository {
@@ -16,11 +17,14 @@ class SearchRepositoryImpl implements SearchRepository {
   final AppLogger? _logger;
 
   @override
-  ResultFuture<PaginatedSearchResults> searchMulti({
+  ResultFuture<PaginatedSearchResults> search({
     required String query,
+    required SearchFilter filter,
     int page = 1,
   }) {
-    return _guard(() => _remote.searchMulti(query: query, page: page));
+    return _guard(
+      () => _remote.search(query: query, filter: filter, page: page),
+    );
   }
 
   /// Runs [body] and converts the layered exceptions into typed failures so

@@ -7,6 +7,7 @@ import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/features/search/data/datasources/search_remote_data_source.dart';
 import 'package:tmdb/features/search/data/repositories/search_repository_impl.dart';
 import 'package:tmdb/features/search/domain/entities/paginated_search_results.dart';
+import 'package:tmdb/features/search/domain/entities/search_filter.dart';
 
 import '../../../../helpers/search_fixtures.dart';
 
@@ -40,27 +41,36 @@ void main() {
     repository = SearchRepositoryImpl(remote);
   });
 
-  group('searchMulti', () {
+  group('search', () {
     test('returns Right and forwards query and page on success', () async {
       final paginated = buildPaginatedSearch();
       when(
-        () => remote.searchMulti(query: 'matrix', page: 2),
+        () => remote.search(query: 'matrix', filter: SearchFilter.all, page: 2),
       ).thenAnswer((_) async => paginated);
 
-      final result = await repository.searchMulti(query: 'matrix', page: 2);
+      final result = await repository.search(
+        query: 'matrix',
+        filter: SearchFilter.all,
+        page: 2,
+      );
 
       expect(result, Right<Failure, PaginatedSearchResults>(paginated));
-      verify(() => remote.searchMulti(query: 'matrix', page: 2)).called(1);
+      verify(
+        () => remote.search(query: 'matrix', filter: SearchFilter.all, page: 2),
+      ).called(1);
     });
   });
 
   group('exception → Failure mapping', () {
     test('UnauthorizedException → ServerFailure(401)', () async {
       when(
-        () => remote.searchMulti(query: 'x', page: 1),
+        () => remote.search(query: 'x', filter: SearchFilter.all, page: 1),
       ).thenThrow(const UnauthorizedException(message: 'bad token'));
 
-      final result = await repository.searchMulti(query: 'x');
+      final result = await repository.search(
+        query: 'x',
+        filter: SearchFilter.all,
+      );
 
       expect(
         result,
@@ -72,10 +82,13 @@ void main() {
 
     test('ServerException → ServerFailure with the original status', () async {
       when(
-        () => remote.searchMulti(query: 'x', page: 1),
+        () => remote.search(query: 'x', filter: SearchFilter.all, page: 1),
       ).thenThrow(const ServerException(message: 'boom', statusCode: 503));
 
-      final result = await repository.searchMulti(query: 'x');
+      final result = await repository.search(
+        query: 'x',
+        filter: SearchFilter.all,
+      );
 
       expect(
         result,
@@ -87,10 +100,13 @@ void main() {
 
     test('NetworkException → NetworkFailure', () async {
       when(
-        () => remote.searchMulti(query: 'x', page: 1),
+        () => remote.search(query: 'x', filter: SearchFilter.all, page: 1),
       ).thenThrow(const NetworkException(message: 'offline'));
 
-      final result = await repository.searchMulti(query: 'x');
+      final result = await repository.search(
+        query: 'x',
+        filter: SearchFilter.all,
+      );
 
       expect(
         result,
@@ -104,10 +120,10 @@ void main() {
       final logger = _RecordingLogger();
       final observed = SearchRepositoryImpl(remote, logger: logger);
       when(
-        () => remote.searchMulti(query: 'x', page: 1),
+        () => remote.search(query: 'x', filter: SearchFilter.all, page: 1),
       ).thenThrow(const ServerException(message: 'boom', statusCode: 503));
 
-      await observed.searchMulti(query: 'x');
+      await observed.search(query: 'x', filter: SearchFilter.all);
 
       expect(logger.warnings, hasLength(1));
       expect(logger.warnings.single, contains('503'));

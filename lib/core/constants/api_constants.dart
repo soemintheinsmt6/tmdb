@@ -58,6 +58,7 @@ class ApiConstants {
   // ── Search ────────────────────────────────────────────
   static const String searchMovies = '/search/movie';
   static const String searchTv = '/search/tv';
+  static const String searchPerson = '/search/person';
   static const String searchMulti = '/search/multi';
 
   // ── Genres ────────────────────────────────────────────

@@ -1,10 +1,14 @@
 import 'package:equatable/equatable.dart';
 import 'package:tmdb/features/search/domain/entities/search_result.dart';
 
-/// One page of `/search/multi` results. Mirrors `PaginatedMovies`, but the
-/// `fromJson` drops any entry that isn't a renderable media type (movie / TV /
-/// person) or lacks a usable id — TMDB also returns `collection` rows the app
-/// has no detail screen for.
+/// One page of search results. Mirrors `PaginatedMovies`, but the `fromJson`
+/// drops any entry that isn't a renderable media type (movie / TV / person) or
+/// lacks a usable id — TMDB also returns `collection` rows the app has no detail
+/// screen for.
+///
+/// [mediaType] is passed for the type-specific endpoints (`/search/movie` etc.),
+/// whose rows lack a `media_type`; `/search/multi` leaves it null so each row's
+/// own discriminator is used.
 class PaginatedSearchResults extends Equatable {
   const PaginatedSearchResults({
     required this.results,
@@ -13,10 +17,13 @@ class PaginatedSearchResults extends Equatable {
     required this.totalResults,
   });
 
-  factory PaginatedSearchResults.fromJson(Map<String, dynamic> json) {
+  factory PaginatedSearchResults.fromJson(
+    Map<String, dynamic> json, {
+    SearchMediaType? mediaType,
+  }) {
     final results = ((json['results'] as List?) ?? const [])
         .whereType<Map<String, dynamic>>()
-        .map(SearchResult.tryFromJson)
+        .map((e) => SearchResult.tryFromJson(e, mediaType: mediaType))
         .whereType<SearchResult>()
         .toList();
 

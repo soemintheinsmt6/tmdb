@@ -40,18 +40,26 @@ class SearchResult extends Equatable {
     required this.overview,
   });
 
-  /// Builds a [SearchResult] from one `/search/multi` entry, or `null` when the
-  /// entry is a media type the app does not render (e.g. `collection`) or lacks
-  /// a usable integer id. Parsing the page filters these out via
+  /// Builds a [SearchResult] from one search entry, or `null` when the entry is
+  /// a media type the app does not render (e.g. `collection`) or lacks a usable
+  /// integer id. Parsing the page filters these out via
   /// `PaginatedSearchResults.fromJson`.
-  static SearchResult? tryFromJson(Map<String, dynamic> json) {
+  ///
+  /// `/search/multi` rows carry their own `media_type`; the type-specific
+  /// endpoints (`/search/movie` etc.) do not, so callers pass [mediaType]
+  /// explicitly to tag those rows.
+  static SearchResult? tryFromJson(
+    Map<String, dynamic> json, {
+    SearchMediaType? mediaType,
+  }) {
     final id = json['id'];
-    final mediaType = searchMediaTypeFromString(json['media_type'] as String?);
-    if (id is! int || mediaType == null) return null;
+    final type =
+        mediaType ?? searchMediaTypeFromString(json['media_type'] as String?);
+    if (id is! int || type == null) return null;
 
     return SearchResult(
       id: id,
-      mediaType: mediaType,
+      mediaType: type,
       // Movies expose `title`; TV shows and people expose `name`.
       title: (json['title'] ?? json['name']) as String? ?? '',
       // Movies / TV carry `poster_path`; people carry `profile_path`.
