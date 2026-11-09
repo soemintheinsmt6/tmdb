@@ -152,6 +152,7 @@ class _DiscoverFilterSheetState extends State<_DiscoverFilterSheet> {
               width: double.infinity,
               child: FilledButton(
                 style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52),
                   // White label on the cyan button in light mode; theme default
                   // (navy) in dark.
                   foregroundColor:
