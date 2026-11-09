@@ -11,6 +11,7 @@ import 'package:tmdb/features/discover/presentation/widgets/discover_content.dar
 import 'package:tmdb/features/discover/presentation/widgets/discover_filter_sheet.dart';
 import 'package:tmdb/features/search/presentation/screens/search_screen.dart';
 import 'package:tmdb/injection_container.dart';
+import 'package:tmdb/shared/widgets/common/app_segmented_control.dart';
 
 /// Browse movies or TV shows by genre, rating, year, and sort order via
 /// `/discover/{movie,tv}`. A media-type toggle switches verticals; active
@@ -91,30 +92,14 @@ class _MediaToggle extends StatelessWidget {
       child: BlocBuilder<DiscoverBloc, DiscoverState>(
         buildWhen: (a, b) => a.filter.mediaType != b.filter.mediaType,
         builder: (context, state) {
-          final colors = context.colors;
-          final isDark = Theme.of(context).brightness == Brightness.dark;
-          return SegmentedButton<MediaType>(
-            showSelectedIcon: false,
-            // The Material default selected tone (secondaryContainer) is nearly
-            // indistinguishable from the surface in this app's dark scheme, so
-            // give the selected segment an explicit cyan fill (matching the
-            // filter chips) for a clear active state in both themes.
-            style: SegmentedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              foregroundColor: colors.textSecondary,
-              selectedBackgroundColor: AppColors.cyan,
-              selectedForegroundColor: isDark
-                  ? AppColors.navy
-                  : AppColors.white,
-              side: BorderSide(color: colors.border),
-            ),
+          return AppSegmentedControl<MediaType>(
             segments: const [
-              ButtonSegment(value: MediaType.movie, label: Text('Movies')),
-              ButtonSegment(value: MediaType.tv, label: Text('TV Shows')),
+              AppSegment(value: MediaType.movie, label: 'Movies'),
+              AppSegment(value: MediaType.tv, label: 'TV Shows'),
             ],
-            selected: {state.filter.mediaType},
-            onSelectionChanged: (selection) => context.read<DiscoverBloc>().add(
-              DiscoverMediaTypeChanged(selection.first),
+            selected: state.filter.mediaType,
+            onChanged: (type) => context.read<DiscoverBloc>().add(
+              DiscoverMediaTypeChanged(type),
             ),
           );
         },

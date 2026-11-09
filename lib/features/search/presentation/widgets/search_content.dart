@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
-import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_detail/movie_detail_screen.dart';
 import 'package:tmdb/features/people/presentation/screens/person_detail/person_detail_screen.dart';
@@ -19,6 +18,7 @@ import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen
 import 'package:tmdb/shared/widgets/common/app_empty_view.dart';
 import 'package:tmdb/shared/widgets/common/app_error_view.dart';
 import 'package:tmdb/shared/widgets/common/app_search_field.dart';
+import 'package:tmdb/shared/widgets/common/app_segmented_control.dart';
 
 /// The body of the search screen. Handles query debouncing, infinite scroll,
 /// and routing each mixed result to its matching detail screen.
@@ -210,30 +210,13 @@ class _SearchFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return SizedBox(
-      width: double.infinity,
-      child: SegmentedButton<SearchFilter>(
-        showSelectedIcon: false,
-        style: SegmentedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          foregroundColor: colors.textSecondary,
-          selectedBackgroundColor: AppColors.cyan,
-          selectedForegroundColor: isDark ? AppColors.navy : AppColors.white,
-          side: BorderSide(color: colors.border),
-          textStyle: AppTypography.smallText.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-        ),
-        segments: [
-          for (final filter in SearchFilter.values)
-            ButtonSegment(value: filter, label: Text(filter.label)),
-        ],
-        selected: {selected},
-        onSelectionChanged: (selection) => onChanged(selection.first),
-      ),
+    return AppSegmentedControl<SearchFilter>(
+      segments: [
+        for (final filter in SearchFilter.values)
+          AppSegment(value: filter, label: filter.label),
+      ],
+      selected: selected,
+      onChanged: onChanged,
     );
   }
 }
