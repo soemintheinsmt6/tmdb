@@ -11,9 +11,17 @@ concurrency:
   group: build-apk-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Android toolchain the Gradle build installs on demand; cached so it isn't
+  # downloaded every run. Bump these if flutter.ndkVersion / CMake change.
+  NDK_VERSION: 27.0.12077973
+  CMAKE_VERSION: 3.22.1
+  ANDROID_SDK: /usr/local/lib/android/sdk
+
 jobs:
   # PRs can't read the branch-locked Production environment, so they only verify
-  # the APK compiles against a placeholder key and upload nothing.
+  # the APK compiles against a placeholder key and upload nothing. They restore
+  # caches written by deploy but never save their own.
   verify-build:
     name: Verify APK build (PR)
     if: github.event_name == 'pull_request'
@@ -25,7 +33,21 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+
+      - name: Enable Gradle build cache
+        run: mkdir -p ~/.gradle && echo "org.gradle.caching=true" >> ~/.gradle/gradle.properties
+
+      - name: Restore Android NDK & CMake
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ${{ env.ANDROID_SDK }}/ndk/${{ env.NDK_VERSION }}
+            ${{ env.ANDROID_SDK }}/cmake/${{ env.CMAKE_VERSION }}
+          key: android-ndk-${{ env.NDK_VERSION }}-cmake-${{ env.CMAKE_VERSION }}-${{ runner.os }}
 
       - uses: subosito/flutter-action@v2
         with:
@@ -58,7 +80,23 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
+
+      # Caches Gradle deps, wrapper and build cache. deploy isn't the default
+      # branch, so allow writes explicitly.
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Enable Gradle build cache
+        run: mkdir -p ~/.gradle && echo "org.gradle.caching=true" >> ~/.gradle/gradle.properties
+
+      - name: Cache Android NDK & CMake
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ANDROID_SDK }}/ndk/${{ env.NDK_VERSION }}
+            ${{ env.ANDROID_SDK }}/cmake/${{ env.CMAKE_VERSION }}
+          key: android-ndk-${{ env.NDK_VERSION }}-cmake-${{ env.CMAKE_VERSION }}-${{ runner.os }}
 
       - uses: subosito/flutter-action@v2
         with:
