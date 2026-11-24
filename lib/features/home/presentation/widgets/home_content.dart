@@ -16,6 +16,7 @@ import 'package:tmdb/features/tv/presentation/screens/tv_category_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
 import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/common/fade_slide_in.dart';
 import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
 import 'package:tmdb/shared/widgets/feed/featured_carousel.dart';
 import 'package:tmdb/shared/widgets/skeletons/rail_feed_skeleton.dart';
@@ -65,26 +66,48 @@ class HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The home app bar is transparent and the body is drawn behind it, so the
+    // Scaffold reports the bar + status bar height as top padding. The hero
+    // fills that space; every other state is pushed below it.
+    final topInset = MediaQuery.paddingOf(context).top;
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
-        switch (state.status) {
-          case HomeStatus.initial:
-          case HomeStatus.loading:
-            return const RailFeedSkeleton();
-          case HomeStatus.error:
-            return AppErrorView(
+        final Widget child = switch (state.status) {
+          HomeStatus.initial || HomeStatus.loading => Padding(
+            key: const ValueKey('home-loading'),
+            padding: EdgeInsets.only(top: topInset),
+            // Stop the skeleton's ListView re-applying the inset itself.
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: const RailFeedSkeleton(),
+            ),
+          ),
+          HomeStatus.error => Padding(
+            key: const ValueKey('home-error'),
+            padding: EdgeInsets.only(top: topInset),
+            child: AppErrorView(
               message: state.message,
               onRetry: () =>
                   context.read<HomeBloc>().add(const HomeRefreshed()),
-            );
-          case HomeStatus.loaded:
-            return _buildLoaded(context, state);
-        }
+            ),
+          ),
+          HomeStatus.loaded => KeyedSubtree(
+            key: const ValueKey('home-loaded'),
+            child: _buildLoaded(context, state, topInset),
+          ),
+        };
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: child,
+        );
       },
     );
   }
 
-  Widget _buildLoaded(BuildContext context, HomeState state) {
+  Widget _buildLoaded(BuildContext context, HomeState state, double topInset) {
     final rails = <Widget>[];
     void addRail(
       String title,
@@ -95,11 +118,14 @@ class HomeContent extends StatelessWidget {
       rails
         ..add(const SizedBox(height: 24))
         ..add(
-          DetailPosterRail(
-            title: title,
-            items: items,
-            onTap: (item) => _open(context, item),
-            onSeeAll: onSeeAll,
+          FadeSlideIn(
+            index: rails.length ~/ 2,
+            child: DetailPosterRail(
+              title: title,
+              items: items,
+              onTap: (item) => _open(context, item),
+              onSeeAll: onSeeAll,
+            ),
           ),
         );
     }
@@ -128,17 +154,22 @@ class HomeContent extends StatelessWidget {
       onSeeAll: () => _seeAllTv(context, TvCategory.popular, 'Popular Series'),
     );
 
+    final hasHero = state.trending.isNotEmpty;
     return RefreshIndicator(
+      edgeOffset: topInset,
       onRefresh: () async =>
           context.read<HomeBloc>().add(const HomeRefreshed()),
       child: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
+        // With a hero, it extends up under the app bar itself; without one,
+        // the rails start below the bar.
+        padding: EdgeInsets.only(top: hasHero ? 0 : topInset, bottom: 24),
         children: [
-          if (state.trending.isNotEmpty)
+          if (hasHero)
             FeaturedCarousel(
               items: state.trending.take(6).toList(),
               onTap: (item) => _openFeatured(context, item),
               heroTag: _heroTag,
+              topInset: topInset,
             ),
           ...rails,
         ],

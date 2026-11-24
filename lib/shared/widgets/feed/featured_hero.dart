@@ -15,7 +15,12 @@ class FeaturedHero extends StatelessWidget {
     required this.onTap,
     this.label = 'TRENDING',
     this.heroTag,
+    this.topScrim = false,
   });
+
+  /// Darkens the top of the backdrop so a transparent app bar and the status
+  /// bar drawn over it stay legible.
+  final bool topScrim;
 
   final PosterItem item;
   final VoidCallback onTap;
@@ -46,6 +51,19 @@ class FeaturedHero extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           image,
+          if (topScrim)
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.center,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.45),
+                    Colors.black.withValues(alpha: 0.0),
+                  ],
+                ),
+              ),
+            ),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -77,11 +95,14 @@ class FeaturedHero extends StatelessWidget {
                     color: AppColors.cyan,
                     borderRadius: BorderRadius.circular(999),
                   ),
+                  // Navy on cyan: white text on this cyan falls well short of
+                  // WCAG contrast; navy clears it comfortably.
                   child: Text(
                     label,
                     style: AppTypography.labelSmall.copyWith(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w700,
+                      color: AppColors.navy,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),

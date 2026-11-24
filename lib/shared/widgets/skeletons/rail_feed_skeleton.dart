@@ -49,6 +49,9 @@ class RailFeedSkeleton extends StatelessWidget {
       baseColor: colors.shimmerBase,
       highlightColor: colors.shimmerHighlight,
       child: ListView(
+        // A static placeholder: never claim the tab's primary scroll
+        // controller, which the real feed takes over as it fades in.
+        primary: false,
         physics: const NeverScrollableScrollPhysics(),
         children: [
           AspectRatio(aspectRatio: 16 / 10, child: box(double.infinity, 0, 0)),

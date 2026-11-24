@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/core/theme/app_typography.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/pressable.dart';
 import 'package:tmdb/shared/widgets/common/rating_badge.dart';
 import 'package:tmdb/shared/widgets/poster/poster_image.dart';
 
@@ -15,9 +16,8 @@ class PosterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return Pressable(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -27,7 +27,7 @@ class PosterCard extends StatelessWidget {
               Positioned(
                 top: 8,
                 right: 8,
-                child: RatingBadge(rating: item.formattedRating),
+                child: RatingBadge(rating: item.formattedRating, onImage: true),
               ),
             ],
           ),

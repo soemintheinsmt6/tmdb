@@ -5,10 +5,20 @@ import 'package:tmdb/core/theme/app_typography.dart';
 
 /// Pill-shaped rating badge styled after the TMDB user score chip.
 class RatingBadge extends StatelessWidget {
-  const RatingBadge({super.key, required this.rating, this.compact = false});
+  const RatingBadge({
+    super.key,
+    required this.rating,
+    this.compact = false,
+    this.onImage = false,
+  });
 
   final String rating;
   final bool compact;
+
+  /// Set when the badge is overlaid on artwork (posters, backdrops). Swaps the
+  /// translucent tint for a solid dark backing so the score stays legible on
+  /// any image, light or busy.
+  final bool onImage;
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +29,23 @@ class RatingBadge extends StatelessWidget {
         vertical: compact ? 3 : 4,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.18),
+        color: onImage
+            ? AppColors.navyDark.withValues(alpha: 0.82)
+            : color.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
+        border: Border.all(
+          color: color.withValues(alpha: onImage ? 0.7 : 0.5),
+          width: 1,
+        ),
+        boxShadow: onImage
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

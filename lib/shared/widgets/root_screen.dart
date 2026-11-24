@@ -75,8 +75,12 @@ class _RootScreenState extends State<RootScreen> {
         ),
         bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(
-            indicatorColor: Colors.transparent,
-            overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+            height: 68,
+            indicatorColor: AppColors.cyan.withValues(alpha: 0.16),
+            indicatorShape: const StadiumBorder(),
+            overlayColor: WidgetStatePropertyAll(
+              AppColors.cyan.withValues(alpha: 0.08),
+            ),
             labelTextStyle: WidgetStateProperty.resolveWith(
               (states) => TextStyle(
                 fontSize: 12,
@@ -91,6 +95,7 @@ class _RootScreenState extends State<RootScreen> {
             selectedIndex: _index,
             onDestinationSelected: (i) => setState(() => _index = i),
             backgroundColor: colors.surface,
+            animationDuration: const Duration(milliseconds: 350),
             destinations: [
               NavigationDestination(
                 icon: Icon(

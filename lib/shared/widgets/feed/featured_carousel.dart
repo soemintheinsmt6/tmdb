@@ -17,6 +17,7 @@ class FeaturedCarousel extends StatefulWidget {
     this.heroTag,
     this.label = 'TRENDING',
     this.interval = const Duration(seconds: 5),
+    this.topInset = 0,
   });
 
   final List<PosterItem> items;
@@ -28,6 +29,11 @@ class FeaturedCarousel extends StatefulWidget {
   final Object? Function(PosterItem item)? heroTag;
   final String label;
   final Duration interval;
+
+  /// Extra height added above the 16:10 slide, for when the carousel is drawn
+  /// behind a transparent app bar / status bar. The backdrop fills it, so the
+  /// visible image keeps its proportions below the bar.
+  final double topInset;
 
   @override
   State<FeaturedCarousel> createState() => _FeaturedCarouselState();
@@ -79,26 +85,36 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
     if (_looping) _scheduleNext();
   }
 
+  /// Sizes the carousel to a 16:10 slide plus [FeaturedCarousel.topInset].
+  Widget _frame(Widget child) {
+    return LayoutBuilder(
+      builder: (context, constraints) => SizedBox(
+        width: constraints.maxWidth,
+        height: constraints.maxWidth / _aspectRatio + widget.topInset,
+        child: child,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.items.isEmpty) return const SizedBox.shrink();
 
     if (!_looping) {
       final item = widget.items.first;
-      return AspectRatio(
-        aspectRatio: _aspectRatio,
-        child: FeaturedHero(
+      return _frame(
+        FeaturedHero(
           item: item,
           onTap: () => widget.onTap(item),
           label: widget.label,
+          topScrim: widget.topInset > 0,
           heroTag: widget.heroTag?.call(item),
         ),
       );
     }
 
-    return AspectRatio(
-      aspectRatio: _aspectRatio,
-      child: Stack(
+    return _frame(
+      Stack(
         children: [
           PageView.builder(
             controller: _controller,
@@ -110,6 +126,7 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
                 item: item,
                 onTap: () => widget.onTap(item),
                 label: widget.label,
+                topScrim: widget.topInset > 0,
                 // Tag only the centred slide so cached neighbours don't share a
                 // tag with it during a hero flight.
                 heroTag: realIndex == _index

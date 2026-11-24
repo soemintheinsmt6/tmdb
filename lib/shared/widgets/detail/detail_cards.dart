@@ -10,6 +10,7 @@ import 'package:tmdb/shared/domain/media/media_image.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
 import 'package:tmdb/shared/domain/media/review.dart';
 import 'package:tmdb/shared/domain/media/video.dart';
+import 'package:tmdb/shared/widgets/common/pressable.dart';
 import 'package:tmdb/shared/widgets/common/rating_badge.dart';
 import 'package:tmdb/shared/widgets/common/rating_stars.dart';
 import 'package:tmdb/shared/widgets/detail/image_gallery_viewer.dart';
@@ -412,7 +413,7 @@ class DetailPosterRail extends StatelessWidget {
               final item = items[index];
               return SizedBox(
                 width: 130,
-                child: GestureDetector(
+                child: Pressable(
                   onTap: () => onTap(item),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -423,7 +424,10 @@ class DetailPosterRail extends StatelessWidget {
                           Positioned(
                             top: 8,
                             right: 8,
-                            child: RatingBadge(rating: item.formattedRating),
+                            child: RatingBadge(
+                              rating: item.formattedRating,
+                              onImage: true,
+                            ),
                           ),
                         ],
                       ),

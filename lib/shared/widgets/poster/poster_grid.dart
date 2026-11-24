@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb/core/responsive/app_breakpoints.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
+import 'package:tmdb/shared/widgets/common/fade_slide_in.dart';
 import 'package:tmdb/shared/widgets/poster/poster_card.dart';
 
 /// Grid of [PosterCard]s with an optional trailing footer (load-more spinner).
@@ -43,7 +44,12 @@ class PosterGrid extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (_, index) {
               final item = items[index];
-              return PosterCard(item: item, onTap: () => onTap(item));
+              // Stagger only the first screenful; cells built later (scrolling,
+              // next page) fade in immediately so they never lag the finger.
+              return FadeSlideIn(
+                index: index < columns * 3 ? index : 0,
+                child: PosterCard(item: item, onTap: () => onTap(item)),
+              );
             },
           ),
         ),
