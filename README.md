@@ -21,6 +21,7 @@ A movie & TV browser built on top of [The Movie Database (TMDB) API](https://dev
 - **http** for networking (wrapped by `core/network/api_client.dart`)
 - **hive** for local persistence of favourites, watchlist & settings (theme + Library prefs)
 - **cached_network_image**, **shimmer**, **iconsax_plus**, **google_fonts** for UI
+- **native_glass_navbar** — native UIKit Liquid Glass tab bar on iOS 26+ (Cupertino / Material fallbacks elsewhere)
 - **youtube_player_flutter** (in-app trailers) · **url_launcher** ("Watch on YouTube" fallback · IMDb & JustWatch deep links) · **saver_gallery** (save backdrops to the device gallery) · **share_plus** (system share sheet)
 - **bloc_test**, **mocktail**, **integration_test** for tests
 - **GitHub Actions** CI (format + analyze + test + coverage), curated lints on top of **flutter_lints**, and ADRs in `docs/adr/`
@@ -147,16 +148,19 @@ lib/
 │   └── widgets/                # Poster kernel shared by movies + TV:
 │       ├── common/             # AppSearchField, AppSegmentedControl (sliding pill toggle —
 │       │                       # Discover Movies/TV + Search scope), RatingBadge, RatingStars,
-│       │                       # AppErrorView, AppEmptyView
+│       │                       # AppErrorView, AppEmptyView, Pressable (press-scale feedback),
+│       │                       # FadeSlideIn (staggered entrance motion)
 │       ├── poster/             # PosterGrid, PosterCard, PosterImage, SectionedPosterGrid
 │       │                       # (Library movie/TV split)
 │       ├── feed/               # FeaturedHero + FeaturedCarousel (auto-sliding trending hero),
-│       │                       # CategoryTabBar
+│       │                       # ImmersiveFeedScaffold (app bar over the hero, solid on
+│       │                       # scroll) + FeedStateSwitcher (skeleton/error/feed), CategoryTabBar
 │       ├── detail/             # detail_cards (DetailHeader/Summary/CastList/PosterRail/
 │       │                       # VideoRail/ReviewsSection/ImageGallery), WatchProvidersSection,
 │       │                       # ImdbChip, ShareButton, TrailerPlayerScreen, ImageGalleryViewer
 │       ├── skeletons/          # PosterGridSkeleton, RailFeedSkeleton, DetailSkeleton shimmers
-│       └── root_screen.dart    # RootScreen (5-tab shell)
+│       └── root_screen.dart    # RootScreen (5-tab shell; native glass / Cupertino /
+│                               # Material tab bar by platform)
 ├── injection_container.dart    # GetIt registrations
 ├── app.dart                    # MaterialApp + global providers
 └── main.dart                   # boot: Env.init → di.init → runApp
@@ -271,7 +275,7 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 
 ## Features
 
-- **Editorial home** — a trending **hero carousel** (auto-advancing, seamless loop, page-indicator dots) over curated rails: **For You**, Now Playing, Top Rated, Upcoming, and Popular Series. Each rail's **See all** opens a full, infinite-scroll category grid.
+- **Editorial home** — a trending **hero carousel** (auto-advancing, seamless loop, page-indicator dots) that extends under a **transparent app bar**, which fades to solid navy as you scroll (shared with the Series tab), over curated rails: **For You**, Now Playing, Top Rated, Upcoming, and Popular Series. Each rail's **See all** opens a full, infinite-scroll category grid.
 - **For You** — personalised recommendations seeded from your recent favourites & watchlist, ranked by how many of them recommend each title and de-duplicated against everything you've already saved; refreshes live as you save/unsave.
 - **Global search** (movies + TV + people) with 400 ms debounce and an **All / Movies / TV / People** filter — each scope routes to its own `/search/{multi,movie,tv,person}` endpoint so every type paginates in full. Reachable from the Home, Series & Discover app bars.
 - **Infinite scroll** + pull-to-refresh on the "See all" category and Discover grids.
@@ -290,7 +294,8 @@ To run E2E against the real TMDB API, comment out `_swapApiClient()` in `setUpAl
 - **Watchlist** — a separate "watch later" list spanning **both movies and TV shows**, persisted locally via Hive and reactive like favourites. A bookmark toggle on movie & TV detail saves/removes; each saved card carries a MOVIE/TV chip and routes back to the matching detail screen.
 - **Shared-element transition** — tapping a trending hero slide, a favourites/watchlist card, or a movie's collection banner flies its backdrop into the destination header with a corner-radius interpolation (16 → 0), on **both push and pop**. The detail route pops normally, so the iOS edge-swipe-back gesture works alongside the hero flight.
 - **Profile tab** showing favourites count, an **Appearance** picker (System / Light / Dark), and destructive "Clear favourites" / "Clear watchlist" flows with confirm dialogs.
-- **Five-tab shell** — Home · Discover · Series · Library · Profile, lazily built and kept alive via `IndexedStack`. The **Library** tab combines Favourites and Watchlist under one app bar with two segments, plus shared **sort** (recently added · title A–Z · top rated · release date) and **list/grid view** controls that reorder and re-lay-out both segments — in grid view each segment is split into **Movies** and **TV Shows** sections (`SectionedPosterGrid`). Both the sort and the view are **persisted** across launches.
+- **Five-tab shell** — Home · Discover · Series · Library · Profile, lazily built and kept alive via `IndexedStack`. The tab bar is platform-native: a UIKit **Liquid Glass** bar with SF Symbols on iOS 26+ (content scrolls beneath it), a `CupertinoTabBar` on older iOS, and a Material 3 `NavigationBar` on Android. The **Library** tab combines Favourites and Watchlist under one app bar with two segments, plus shared **sort** (recently added · title A–Z · top rated · release date) and **list/grid view** controls that reorder and re-lay-out both segments — in grid view each segment is split into **Movies** and **TV Shows** sections (`SectionedPosterGrid`). Both the sort and the view are **persisted** across launches.
 - **Skeleton loading** — Home, Series, Discover, Library, Search, and the movie/TV detail pages load behind shimmer skeletons that mirror their real layouts (no spinners, no layout shift).
+- **Motion & feedback** — feeds crossfade from skeleton to content with rails and grid cells fading in on a short stagger (skipped when the OS "reduce motion" setting is on); posters scale down slightly on press; rating badges over artwork sit on a solid dark backing so they stay legible on any poster.
 - **Responsive grid** — 3 columns on mobile, scaling 4–7 on tablet (clamped on `width / 180`); aspect ratio shifts slightly between tiers.
 - **Light & dark mode** — user-selectable **System / Light / Dark** via a `ThemeCubit` that drives `MaterialApp.themeMode` and **persists** the choice (Hive `settings` box), changed from the Profile tab's Appearance picker. Theme-dependent surfaces/text live on `AppColors` instances (`AppColors.light` / `AppColors.dark`) and resolve at the call site via `context.colors`; brand and semantic colors stay as static constants.
