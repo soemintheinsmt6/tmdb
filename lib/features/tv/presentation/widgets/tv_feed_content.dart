@@ -11,10 +11,10 @@ import 'package:tmdb/features/tv/presentation/bloc/tv_feed_bloc/tv_feed_state.da
 import 'package:tmdb/features/tv/presentation/screens/tv_category_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
-import 'package:tmdb/shared/widgets/common/app_error_view.dart';
+import 'package:tmdb/shared/widgets/common/fade_slide_in.dart';
 import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
 import 'package:tmdb/shared/widgets/feed/featured_carousel.dart';
-import 'package:tmdb/shared/widgets/skeletons/rail_feed_skeleton.dart';
+import 'package:tmdb/shared/widgets/feed/feed_state_switcher.dart';
 
 /// The editorial series body: a trending hero over a vertical stack of TV
 /// category rails. Mirrors the home layout for the TV vertical.
@@ -51,25 +51,23 @@ class TvFeedContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TvFeedBloc, TvFeedState>(
-      builder: (context, state) {
-        switch (state.status) {
-          case TvFeedStatus.initial:
-          case TvFeedStatus.loading:
-            return const RailFeedSkeleton();
-          case TvFeedStatus.error:
-            return AppErrorView(
-              message: state.message,
-              onRetry: () =>
-                  context.read<TvFeedBloc>().add(const TvFeedRefreshed()),
-            );
-          case TvFeedStatus.loaded:
-            return _buildLoaded(context, state);
-        }
-      },
+      builder: (context, state) => FeedStateSwitcher(
+        isLoading:
+            state.status == TvFeedStatus.initial ||
+            state.status == TvFeedStatus.loading,
+        errorMessage: state.status == TvFeedStatus.error ? state.message : null,
+        onRetry: () => context.read<TvFeedBloc>().add(const TvFeedRefreshed()),
+        loadedBuilder: (context, topInset) =>
+            _buildLoaded(context, state, topInset),
+      ),
     );
   }
 
-  Widget _buildLoaded(BuildContext context, TvFeedState state) {
+  Widget _buildLoaded(
+    BuildContext context,
+    TvFeedState state,
+    double topInset,
+  ) {
     final rails = <Widget>[];
     void addRail(
       String title,
@@ -80,11 +78,14 @@ class TvFeedContent extends StatelessWidget {
       rails
         ..add(const SizedBox(height: 24))
         ..add(
-          DetailPosterRail(
-            title: title,
-            items: items,
-            onTap: (item) => _open(context, item),
-            onSeeAll: onSeeAll,
+          FadeSlideIn(
+            index: rails.length ~/ 2,
+            child: DetailPosterRail(
+              title: title,
+              items: items,
+              onTap: (item) => _open(context, item),
+              onSeeAll: onSeeAll,
+            ),
           ),
         );
     }
@@ -110,17 +111,22 @@ class TvFeedContent extends StatelessWidget {
       onSeeAll: () => _seeAll(context, TvCategory.airingToday, 'Airing Today'),
     );
 
+    final hasHero = state.trending.isNotEmpty;
     return RefreshIndicator(
+      edgeOffset: topInset,
       onRefresh: () async =>
           context.read<TvFeedBloc>().add(const TvFeedRefreshed()),
       child: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
+        // With a hero, it extends up under the app bar itself; without one,
+        // the rails start below the bar.
+        padding: EdgeInsets.only(top: hasHero ? 0 : topInset, bottom: 24),
         children: [
-          if (state.trending.isNotEmpty)
+          if (hasHero)
             FeaturedCarousel(
               items: state.trending.take(6).toList(),
               onTap: (item) => _openFeatured(context, item),
               heroTag: _heroTag,
+              topInset: topInset,
             ),
           ...rails,
         ],

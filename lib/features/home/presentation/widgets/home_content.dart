@@ -15,11 +15,10 @@ import 'package:tmdb/features/tv/domain/repositories/tv_repository.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_category_screen.dart';
 import 'package:tmdb/features/tv/presentation/screens/tv_detail/tv_detail_screen.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
-import 'package:tmdb/shared/widgets/common/app_error_view.dart';
 import 'package:tmdb/shared/widgets/common/fade_slide_in.dart';
 import 'package:tmdb/shared/widgets/detail/detail_cards.dart';
 import 'package:tmdb/shared/widgets/feed/featured_carousel.dart';
-import 'package:tmdb/shared/widgets/skeletons/rail_feed_skeleton.dart';
+import 'package:tmdb/shared/widgets/feed/feed_state_switcher.dart';
 
 /// The editorial home body: a hero over a vertical stack of horizontal rails.
 /// Mixed movie + TV items route to the right detail screen by runtime type.
@@ -66,44 +65,16 @@ class HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The home app bar is transparent and the body is drawn behind it, so the
-    // Scaffold reports the bar + status bar height as top padding. The hero
-    // fills that space; every other state is pushed below it.
-    final topInset = MediaQuery.paddingOf(context).top;
     return BlocBuilder<HomeBloc, HomeState>(
-      builder: (context, state) {
-        final Widget child = switch (state.status) {
-          HomeStatus.initial || HomeStatus.loading => Padding(
-            key: const ValueKey('home-loading'),
-            padding: EdgeInsets.only(top: topInset),
-            // Stop the skeleton's ListView re-applying the inset itself.
-            child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: const RailFeedSkeleton(),
-            ),
-          ),
-          HomeStatus.error => Padding(
-            key: const ValueKey('home-error'),
-            padding: EdgeInsets.only(top: topInset),
-            child: AppErrorView(
-              message: state.message,
-              onRetry: () =>
-                  context.read<HomeBloc>().add(const HomeRefreshed()),
-            ),
-          ),
-          HomeStatus.loaded => KeyedSubtree(
-            key: const ValueKey('home-loaded'),
-            child: _buildLoaded(context, state, topInset),
-          ),
-        };
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          switchInCurve: Curves.easeOut,
-          switchOutCurve: Curves.easeIn,
-          child: child,
-        );
-      },
+      builder: (context, state) => FeedStateSwitcher(
+        isLoading:
+            state.status == HomeStatus.initial ||
+            state.status == HomeStatus.loading,
+        errorMessage: state.status == HomeStatus.error ? state.message : null,
+        onRetry: () => context.read<HomeBloc>().add(const HomeRefreshed()),
+        loadedBuilder: (context, topInset) =>
+            _buildLoaded(context, state, topInset),
+      ),
     );
   }
 
