@@ -64,24 +64,26 @@ class FeaturedHero extends StatelessWidget {
                 ),
               ),
             ),
+          // Dark scrim under the copy (white text reads in both themes without
+          // washing the image out), then a short fade into the page.
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  colors.background.withValues(alpha: 0.0),
-                  colors.background.withValues(alpha: 0.75),
+                  Colors.black.withValues(alpha: 0.0),
+                  Colors.black.withValues(alpha: 0.6),
                   colors.background,
                 ],
-                stops: const [0.3, 0.82, 1.0],
+                stops: const [0.35, 0.92, 1.0],
               ),
             ),
           ),
           Positioned(
             left: 16,
             right: 16,
-            bottom: 12,
+            bottom: 28,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,19 +114,19 @@ class FeaturedHero extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.pageTitle.copyWith(
-                    color: colors.textPrimary,
+                    color: AppColors.white,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    RatingBadge(rating: item.formattedRating),
+                    RatingBadge(rating: item.formattedRating, onImage: true),
                     if (item.year != null) ...[
                       const SizedBox(width: 10),
                       Text(
                         item.year!,
                         style: AppTypography.bodyText.copyWith(
-                          color: colors.textSecondary,
+                          color: AppColors.white.withValues(alpha: 0.8),
                         ),
                       ),
                     ],

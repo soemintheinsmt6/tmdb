@@ -6,6 +6,9 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  # Vendored third-party packages keep their upstream style.
+  exclude:
+    - packages/**
   language:
     strict-casts: true
     strict-raw-types: true

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
+import 'package:tmdb/shared/widgets/feed/featured_carousel.dart';
 
 /// Loading placeholder for an editorial rail feed (home / series): a hero block
 /// followed by a few rail rows, matching the loaded layout's rhythm.
@@ -54,7 +55,13 @@ class RailFeedSkeleton extends StatelessWidget {
         primary: false,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          AspectRatio(aspectRatio: 16 / 10, child: box(double.infinity, 0, 0)),
+          LayoutBuilder(
+            builder: (context, constraints) => box(
+              double.infinity,
+              FeaturedCarousel.slideHeight(context, constraints.maxWidth),
+              0,
+            ),
+          ),
           rail(),
           rail(),
         ],

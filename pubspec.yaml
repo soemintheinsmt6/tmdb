@@ -41,7 +41,9 @@ dependencies:
   # Saving images to the device gallery
   saver_gallery: ^4.1.2
   share_plus: ^12.0.2
-  native_glass_navbar: ^1.2.0
+  # Vendored + patched for iPad (see packages/native_glass_navbar/CHANGELOG.md).
+  native_glass_navbar:
+    path: packages/native_glass_navbar
 
 dev_dependencies:
   flutter_test:

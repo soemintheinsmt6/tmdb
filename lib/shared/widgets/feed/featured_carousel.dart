@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:tmdb/core/responsive/app_breakpoints.dart';
 import 'package:tmdb/core/theme/app_colors.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
 import 'package:tmdb/shared/widgets/feed/featured_hero.dart';
@@ -35,13 +37,25 @@ class FeaturedCarousel extends StatefulWidget {
   /// visible image keeps its proportions below the bar.
   final double topInset;
 
+  static const double _aspectRatio = 16 / 10;
+  static const double _tabletAspectRatio = 21 / 9;
+
+  /// Height of one slide at [width] (excluding [topInset]): 16:10 on phones,
+  /// a wider 21:9 on tablets, and never more than 45% of the screen height
+  /// (landscape / large iPads) so the rails stay in view. Shared with the
+  /// loading skeleton so the hero doesn't jump when content lands.
+  static double slideHeight(BuildContext context, double width) {
+    final aspect = AppBreakpoints.isTablet(width)
+        ? _tabletAspectRatio
+        : _aspectRatio;
+    return math.min(width / aspect, MediaQuery.sizeOf(context).height * 0.45);
+  }
+
   @override
   State<FeaturedCarousel> createState() => _FeaturedCarouselState();
 }
 
 class _FeaturedCarouselState extends State<FeaturedCarousel> {
-  static const double _aspectRatio = 16 / 10;
-
   // Start far from 0 so the carousel scrolls "infinitely" forward while still
   // landing on a real index of 0.
   late final PageController _controller = PageController(
@@ -85,12 +99,14 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
     if (_looping) _scheduleNext();
   }
 
-  /// Sizes the carousel to a 16:10 slide plus [FeaturedCarousel.topInset].
+  /// Sizes the carousel to a slide plus [FeaturedCarousel.topInset].
   Widget _frame(Widget child) {
     return LayoutBuilder(
       builder: (context, constraints) => SizedBox(
         width: constraints.maxWidth,
-        height: constraints.maxWidth / _aspectRatio + widget.topInset,
+        height:
+            FeaturedCarousel.slideHeight(context, constraints.maxWidth) +
+            widget.topInset,
         child: child,
       ),
     );
@@ -137,7 +153,8 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
           ),
           Positioned(
             right: 16,
-            bottom: 16,
+            // Level with the hero's rating row.
+            bottom: 37,
             child: _Dots(count: widget.items.length, index: _index),
           ),
         ],

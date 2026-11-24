@@ -21,7 +21,7 @@ A movie & TV browser built on top of [The Movie Database (TMDB) API](https://dev
 - **http** for networking (wrapped by `core/network/api_client.dart`)
 - **hive** for local persistence of favourites, watchlist & settings (theme + Library prefs)
 - **cached_network_image**, **shimmer**, **iconsax_plus**, **google_fonts** for UI
-- **native_glass_navbar** — native UIKit Liquid Glass tab bar on iOS 26+ (Cupertino / Material fallbacks elsewhere)
+- **native_glass_navbar** — native UIKit Liquid Glass tab bar on iOS 26+ (Cupertino / Material fallbacks elsewhere). Vendored in `packages/native_glass_navbar` with a small patch so iPad gets the bottom bar with icons rather than the iPadOS floating text-only bar (see its CHANGELOG)
 - **youtube_player_flutter** (in-app trailers) · **url_launcher** ("Watch on YouTube" fallback · IMDb & JustWatch deep links) · **saver_gallery** (save backdrops to the device gallery) · **share_plus** (system share sheet)
 - **bloc_test**, **mocktail**, **integration_test** for tests
 - **GitHub Actions** CI (format + analyze + test + coverage), curated lints on top of **flutter_lints**, and ADRs in `docs/adr/`
