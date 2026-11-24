@@ -5,10 +5,10 @@ A movie & TV browser built on top of [The Movie Database (TMDB) API](https://dev
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/home.jpg" alt="Home" width="200" />
-  <img src="docs/screenshots/movie_detail.jpg" alt="Movie detail" width="200" />
-  <img src="docs/screenshots/movie_detail_media.jpg" alt="Trailers, gallery, cast and where to watch" width="200" />
-  <img src="docs/screenshots/discover_filters.jpg" alt="Discover filters" width="200" />
+  <img src="docs/screenshots/home_v2.jpg" alt="Home" width="200" />
+  <img src="docs/screenshots/movie_detail_v2.jpg" alt="Movie detail" width="200" />
+  <img src="docs/screenshots/movie_detail_media_v2.jpg" alt="Trailers, gallery, cast and where to watch" width="200" />
+  <img src="docs/screenshots/discover_filters_v2.jpg" alt="Discover filters" width="200" />
 </p>
 
 ## Tech stack
