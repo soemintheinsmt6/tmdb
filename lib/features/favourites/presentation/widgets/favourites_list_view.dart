@@ -56,7 +56,10 @@ class FavouritesListView extends StatelessWidget {
           );
         }
         return ListView.separated(
-          padding: _padding,
+          // Clear the tab bar the list scrolls beneath.
+          padding: _padding.copyWith(
+            bottom: _padding.bottom + MediaQuery.paddingOf(context).bottom,
+          ),
           itemCount: items.length,
           separatorBuilder: (_, __) => const SizedBox(height: 14),
           itemBuilder: (_, index) => FavouriteHeroCard(item: items[index]),

@@ -133,7 +133,10 @@ class HomeContent extends StatelessWidget {
       child: ListView(
         // With a hero, it extends up under the app bar itself; without one,
         // the rails start below the bar.
-        padding: EdgeInsets.only(top: hasHero ? 0 : topInset, bottom: 24),
+        padding: EdgeInsets.only(
+          top: hasHero ? 0 : topInset,
+          bottom: 24 + MediaQuery.paddingOf(context).bottom,
+        ),
         children: [
           if (hasHero)
             FeaturedCarousel(

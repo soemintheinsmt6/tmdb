@@ -134,6 +134,11 @@ class _RootScreenState extends State<RootScreen> {
       // active tab's controller here so the tap scrolls the visible list.
       controller: _scrollControllers[_index],
       child: Scaffold(
+        // Tab content scrolls beneath the (translucent) bar. The Scaffold then
+        // reports the bar's height as bottom padding, which each tab's
+        // scrollables add to their trailing inset so the last item can clear
+        // the bar.
+        extendBody: true,
         body: IndexedStack(
           index: _index,
           children: List.generate(_tabs.length, (i) {

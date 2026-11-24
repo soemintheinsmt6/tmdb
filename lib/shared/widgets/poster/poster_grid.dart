@@ -60,6 +60,10 @@ class PosterGrid extends StatelessWidget {
               child: footer,
             ),
           ),
+        // Clear an overlaid bottom bar / home indicator (0 inside a SafeArea).
+        SliverToBoxAdapter(
+          child: SizedBox(height: MediaQuery.paddingOf(context).bottom),
+        ),
       ],
     );
 

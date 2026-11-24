@@ -77,7 +77,14 @@ class SectionedPosterGrid extends StatelessWidget {
 
     addSection('Movies', movies);
     addSection('TV Shows', tvShows);
-    slivers.add(SliverToBoxAdapter(child: SizedBox(height: padding.bottom)));
+    // Also clear an overlaid bottom bar / home indicator (0 in a SafeArea).
+    slivers.add(
+      SliverToBoxAdapter(
+        child: SizedBox(
+          height: padding.bottom + MediaQuery.paddingOf(context).bottom,
+        ),
+      ),
+    );
 
     return CustomScrollView(slivers: slivers);
   }

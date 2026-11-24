@@ -68,7 +68,10 @@ class _DiscoverView extends StatelessWidget {
           ),
         ],
       ),
+      // No bottom inset: the grid scrolls beneath the tab bar and pads its own
+      // end (see PosterGrid).
       body: const SafeArea(
+        bottom: false,
         child: Column(
           children: [
             _MediaToggle(),
