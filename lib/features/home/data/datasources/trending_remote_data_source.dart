@@ -1,5 +1,6 @@
 import 'package:tmdb/core/constants/api_constants.dart';
 import 'package:tmdb/core/network/api_client.dart';
+import 'package:tmdb/features/home/domain/entities/paginated_trending.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
@@ -20,6 +21,24 @@ class TrendingRemoteDataSource {
     );
     final json = response as Map<String, dynamic>;
     return _parseMixed((json['results'] as List?) ?? const []);
+  }
+
+  /// One [page] of mixed movie + TV trending titles, for the paged
+  /// "See all" grid.
+  Future<PaginatedTrending> getTrendingPage({
+    int page = 1,
+    String window = 'day',
+  }) async {
+    final response = await _apiClient.get(
+      ApiConstants.trendingAll(window: window),
+      query: {'language': 'en-US', 'page': '$page'},
+    );
+    final json = response as Map<String, dynamic>;
+    return PaginatedTrending(
+      items: _parseMixed((json['results'] as List?) ?? const []),
+      page: (json['page'] as int?) ?? page,
+      totalPages: (json['total_pages'] as int?) ?? page,
+    );
   }
 
   /// Trending TV shows only, from `/trending/tv/{window}`.

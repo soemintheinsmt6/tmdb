@@ -6,6 +6,7 @@ import 'package:tmdb/core/utils/navigation.dart';
 import 'package:tmdb/features/home/presentation/bloc/home_bloc.dart';
 import 'package:tmdb/features/home/presentation/bloc/home_event.dart';
 import 'package:tmdb/features/home/presentation/bloc/home_state.dart';
+import 'package:tmdb/features/home/presentation/screens/trending_screen.dart';
 import 'package:tmdb/features/movies/domain/entities/movie.dart';
 import 'package:tmdb/features/movies/domain/repositories/movie_repository.dart';
 import 'package:tmdb/features/movies/presentation/screens/movie_category_screen.dart';
@@ -24,6 +25,9 @@ import 'package:tmdb/shared/widgets/feed/feed_state_switcher.dart';
 /// Mixed movie + TV items route to the right detail screen by runtime type.
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});
+
+  /// How many trending titles the hero carousel shows.
+  static const int _heroCount = 6;
 
   void _open(BuildContext context, PosterItem item) {
     final Widget screen = item is TvShow
@@ -101,7 +105,15 @@ class HomeContent extends StatelessWidget {
         );
     }
 
+    // For You sits between the trending hero and the Trending rail so the two
+    // don't read as a repeat (when it's empty, Trending follows the hero).
     addRail('For You', state.forYou);
+    // The hero already shows the top titles; the rail picks up after them.
+    addRail(
+      'Trending',
+      state.trending.skip(_heroCount).toList(),
+      onSeeAll: () => unawaited(pushView(context, const TrendingScreen())),
+    );
     addRail(
       'Now Playing',
       state.nowPlaying,
@@ -140,7 +152,7 @@ class HomeContent extends StatelessWidget {
         children: [
           if (hasHero)
             FeaturedCarousel(
-              items: state.trending.take(6).toList(),
+              items: state.trending.take(_heroCount).toList(),
               onTap: (item) => _openFeatured(context, item),
               heroTag: _heroTag,
               topInset: topInset,

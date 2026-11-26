@@ -5,6 +5,7 @@ import 'package:tmdb/core/error/failures.dart';
 import 'package:tmdb/core/logging/app_logger.dart';
 import 'package:tmdb/core/utils/typedef.dart';
 import 'package:tmdb/features/home/data/datasources/trending_remote_data_source.dart';
+import 'package:tmdb/features/home/domain/entities/paginated_trending.dart';
 import 'package:tmdb/features/home/domain/repositories/trending_repository.dart';
 import 'package:tmdb/features/tv/domain/entities/tv_show.dart';
 import 'package:tmdb/shared/domain/media/poster_item.dart';
@@ -19,6 +20,14 @@ class TrendingRepositoryImpl implements TrendingRepository {
   @override
   ResultFuture<List<PosterItem>> getTrending({String window = 'day'}) {
     return _guard(() => _remote.getTrending(window: window));
+  }
+
+  @override
+  ResultFuture<PaginatedTrending> getTrendingPage({
+    int page = 1,
+    String window = 'day',
+  }) {
+    return _guard(() => _remote.getTrendingPage(page: page, window: window));
   }
 
   @override
